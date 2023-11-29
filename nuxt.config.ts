@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     jwt_secret: process.env.JWT_SECRET,
   },
   colorMode: {
-    preference: 'dark'
-  }
+    preference: 'light',
+  },
+  ssr: true,
 })

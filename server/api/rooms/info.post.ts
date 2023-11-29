@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
         setResponseStatus(event,400,"Bad Request")
         return
     }
-    const floor_number = Number.parseInt(body.floor_number) +1
+    const floor_number = Number.parseInt(body.floor_number)
     const floors : Array<any> = await mongoose.connection.db.collection('hotel-floors').find().toArray()
     const floor = floors.find((floor) => floor.floor_number == floor_number)
     if (floor === null) {
@@ -44,7 +44,6 @@ export default defineEventHandler(async (event) => {
         return
     }
     let room_number = Number.parseInt(body.room_number)
-    console.log(body.floor_number)
     let room = floor.rooms.find((room: any) => room.room_number == room_number)
     if (room === undefined) {
         setResponseStatus(event,404,"Not Found")

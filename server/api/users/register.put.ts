@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import Permissions from '~/utilities/permsisions';
 const config = useRuntimeConfig();
 
 const missingDataReturnMessage = {
@@ -21,23 +23,27 @@ export default defineEventHandler(async (event) => {
         },
         config.jwt_secret
     )
-    let user = {
-        'token' : token,
-        'login' : body.login,
-        'password': body.password,
-    }
     if (await mongoose.connection.db.collection('hotel-users').find({login: body.login}).count() > 0) {
         return {
             statusCode: 409,
             body: 'User already exists'
         }
     }
-    mongoose.connection.db.collection('hotel-users').insertOne(user)
-    setCookie(event,'token',token)
-
-    return {
-        statusCode: 201,
-        body: 'User created'
-    }
-
+    const saltRounds = 10 // HIGHER = MORE SECURE BUT SLOWER
+    bcrypt.genSalt(saltRounds,function(err: any,salt: string) {
+        bcrypt.hash(body.password,salt,function(err: any,hash: string) {
+            let user = {
+                'token' : token,
+                'login' : body.login,
+                'password': hash,
+                'permissions' : new Permissions()
+            }
+            mongoose.connection.db.collection('hotel-users').insertOne(user)
+            setCookie(event,'token',token)
+            return {
+                statusCode: 201,
+                body: 'User created'
+            }
+        })
+    })
 })

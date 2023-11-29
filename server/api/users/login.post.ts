@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import Permissions from "~/utilities/permsisions";
 const config = useRuntimeConfig();
 
 const missingDataReturnMessage = {
@@ -12,21 +14,18 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     if (typeof(body.login) === 'undefined') { return missingDataReturnMessage}
     if (typeof(body.password) === 'undefined') {return missingDataReturnMessage}
-    let user = await mongoose.connection.db.collection('hotel-users').findOne({"login" : body.login, "password": body.password})
+    let user = await mongoose.connection.db.collection('hotel-users').findOne({"login" : body.login})
     if (user === null) {
-        return {
-            statusCode: 401,
-            body: "Wrong password or email"
-        }
+        setResponseStatus(event,401,"Wrong password or email")
+        return
     }
-    else {
-        let id = jwt.sign({
-            exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 30),
-            data: body.email
-            },
-            config.jwt_secret
-        )
-        setCookie(event,'token',id)
-        setResponseStatus(event,202,"OK")
+
+    const result: boolean = await bcrypt.compare(body.password,user.password)
+    if (result === false) {
+        setResponseStatus(event,401,"Wrong password or email")
+        return
     }
+    console.log(new Permissions(user.permissions).canRead())
+    setResponseStatus(event,202,"OK")
+    setCookie(event,'token',user.token)
 })

@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
         setResponseStatus(event,400,"Bad Request")
         return
     }
-    const floor_number = Number.parseInt(body.floor_number)+1
+    const floor_number = Number.parseInt(body.floor_number)
     const floor = await mongoose.connection.db.collection('hotel-floors').findOne({floor_number: floor_number})
     if (floor === null) {
         setResponseStatus(event,404,"Not Found")
@@ -53,13 +53,11 @@ export default defineEventHandler(async (event) => {
         "comment" : body.comment,
         "macAddress" : body.macAddress,
     }
+
     // delete old room  
-    rooms = rooms.filter((room:any) => room.room_number != body.room_number)
+    rooms = rooms.filter((room:any) => room.room_number != room_number)
     rooms.push(room)
-    let floor_obj = {
-        "floor_number" : floor_number,
-        "rooms" : rooms,
-    }
+    let floor_obj = Object.assign(floor, {rooms: rooms})
     mongoose.connection.db.collection('hotel-floors').replaceOne({floor_number: floor_number},floor_obj,{upsert: true})
     return {
         statusCode: 200,

@@ -42,8 +42,10 @@ export default defineEventHandler(async (event) => {
         room_number = Number.parseInt(`${floor_number}001`)
     }
     else {
-        room_number = Number.parseInt(rooms[rooms.length - 1].room_number) + 1
-
+        let biggest_room_number = rooms.reduce((prev:any, current:any) => (prev.room_number > current.room_number) ? prev : current)
+        room_number = biggest_room_number.room_number + 1
+        console.log(room_number)
+        console.log(biggest_room_number)
     }
     let room = {
         'room_number' : room_number,
@@ -59,4 +61,7 @@ export default defineEventHandler(async (event) => {
     }
 
     mongoose.connection.db.collection('hotel-floors').replaceOne({floor_number: floor_number},floor_obj,{upsert: true})
+    return {
+        body: room
+    }
 })

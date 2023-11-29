@@ -1,16 +1,10 @@
 <template>
-    <div class="flex m-8 flex-col">
+    <div class="flex m-2 flex-col font-gost">
     <div class="flex flex-col">
-        <UModal v-model="isOpen" class="w-60" :ui="{ container: 'items-start' }">
-            <div class="p-8 flex flex-col">
-                <UInput color="white" variant="outline" placeholder="Login" v-model="login" class="pt-4"></UInput>
-                <UInput color="white" variant="outline" placeholder="Password" v-model="password" class="pt-4"></UInput>
-                <UButton block label="Login" @click="onLoginFormSubmit" class="mt-4 align-middle self-center"></UButton>
-            </div>
-        </UModal>
         <UModal v-model="isOpenRoomModal" class="w-60" :ui="{ container: 'items-start' }">
-            <div class="p-6 flex justify-center flex-col items-center">
-                <UInput v-model="openedRoomNumber" class="text-xl w-24" placeholder="Room number"/>
+            <div class="flex justify-center flex-col items-center p-6">
+                <UInput v-model="openedRoomNumber" v-maska data-maska="#####" class="text-xl w-24 mb-2" placeholder="Room number"/>
+                <UInput v-model="openedRoomAcessPointMAC" v-maska data-maska="**:**:**:**:**:**" placeholder="MAC:Address"/>
                 <div class="m-2 flex flex-col">
                     <div class="flex flex-row">
                         <div class="pr-2">
@@ -19,7 +13,6 @@
                             <img v-if="isAcessPointRed()" src="~/assets/pngs/wifi-red.png" @click="AcessPointstate" class="cursor-pointer"/>
                         </div>
                         <div class="pr-2">
-                            
                             <img v-if="isTvGreen()" src="~/assets/pngs/tv-green.png" @click="TVstate" class="cursor-pointer"/>
                             <img v-if="isTvGray()" src="~/assets/pngs/tv-gray.png" @click="TVstate" class="cursor-pointer"/>
                             <img v-if="isTvRed()" src="~/assets/pngs/tv-red.png" @click="TVstate" class="cursor-pointer"/>
@@ -42,44 +35,61 @@
                     <UButton label="Submit" @click="submitEdit"></UButton>
                     <div class="flex flex-col mx-4 2xl:mx-0">
                         <UInput v-model="openedRoomComment" placeholder="Comment" class="pb-2"/>
-                        <UInput v-model="openedRoomAcessPointMAC" v-maska data-maska="**:**:**:**:**:**" placeholder="MAC:Address"/>
                     </div>
+                    
                     <UButton label="Cancel" color="red" @click="isOpenRoomModal = false"></UButton>
                 </div>
             </div>
         </UModal>
-        <div class="flex items-end justify-end" v-if="!islogged">
-            <UButton label="Login" @click="isOpen = true" class="self-end items-end justify-end"></UButton>
-        </div>
+        <!-- Outdated login
+            <div class="flex items-end justify-end" v-if="!islogged">
+                <UButton label="Login" @click="isOpen = true" class="self-end items-end justify-end"></UButton>
+            </div>
+        -->
+        <!--
         <div class="flex items-end justify-end" v-if="islogged">
+            <ClientOnly>
+                <UButton
+                :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
+                color="gray"
+                variant="ghost"
+                aria-label="Theme"
+                @click="isDark = !isDark"
+                class="mr-2"
+                />
+
+                <template #fallback>
+                <div class="w-8 h-8" />
+                </template>
+            </ClientOnly>
             <UButton label="Log out" @click="deleteCookie" class="self-end items-end justify-end"></UButton>
         </div>
+        -->
     </div>
     <div class="flex flex-col items-center">
-        <span class="text-4xl justify-center prevent_select">Piętra</span>
-        <div v-if="pending">Loading...</div>
-        <div v-else class="w-full flex flex-col-reverse">
-            <div class="text-2xl bg-black rounded-3xl flex text-center justify-center h-16 items-center cursor-pointer" @click="addFloor">
+        <div v-if="pending && islogged">Loading...</div>
+        <div v-else class="w-full flex flex-col-reverse justify-center">
+            <div v-if="islogged" class="text-2xl rounded-3xl flex text-center justify-center h-16 items-center cursor-pointer" @click="addFloor">
                 <span class="self-center text-5xl font-black">+</span>
             </div>
             <div v-for="(floor,floor_index) in floors" :key="floor_index">
-                <div class="text-2xl bg-black rounded-3xl flex justify-center items-center cursor-pointer flex-col px-6 my-4 w-full">
-                    <span class="self-center my-4 prevent_select" @click="toggleFloorMenu(floor_index)">Piętro #{{ floor.floor_number }}</span>
+                <div class="text-2xl outline-2 rounded-3xl flex justify-center items-center cursor-pointer flex-col dark:bg-gray-800 w-60 mb-4">
+                    <span class="self-center my-4 prevent_select" @click="toggleFloorMenu(floor_index)">Piętro {{ floor.floor_number }}</span>
                     <div
                         v-if="openFloorIndex === floor_index"
-                        class="grid 2xl:grid-cols-5 grid-cols-3 w-full place-items-center justify-center"
+                        class="grid 2xl:grid-cols-12 xl:grid-cols-10 grid-cols-6 w-full place-items-center justify-center"
                     >
                     <div
                         v-for="(room, roomIndex) in floor.rooms"
                         :key="roomIndex"
-                        class="mb-6 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-20 h-20  xl:w-24 xl:h-24 text-l xl:text-sm 2xl:text-2xl flex-grow bg-gray-800"
+                        class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
                         :class="setRoomColor(roomIndex)"
                         @click="openRoomModal(floor_index,roomIndex)"
                     >
-                        # {{ room.room_number }}
+                        {{ room.room_number }}
                     </div>
                     <div
-                        class="xl:w-24 xl:h-24 w-20 h-20  mb-6 room-card bg-gray-800 text-white flex items-center justify-center rounded-lg cursor-pointer"
+                        class="xl:w-24 xl:h-24 w-12 h-12  mb-6 room-card bg-gray-500 text-white flex items-center justify-center rounded-lg cursor-pointer"
                         @click="createNew(floor_index)"
                     >
                         <span class="text-center text-6xl">+</span>
@@ -102,9 +112,17 @@ import axios from 'axios';
 const islogged = ref(false)
 const isOpen = ref(false)
 const isOpenRoomModal = ref(false)
+const colorMode = useColorMode()
 
-const login = ref('')
-const password = ref('')
+const isDark = computed({
+  get () {
+    return colorMode.value === 'dark'
+  },
+  set () {
+    colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+  }
+})
+
 
 const floors = ref([])
 const pending = ref(true)
@@ -118,8 +136,6 @@ const openedRoomHasBathPhone = ref('NoData')
 const openedRoomHasAcessPoint= ref('NoData')
 const openedRoomComment = ref('NoData')
 const openedRoomAcessPointMAC = ref('NoData')
-
-const toast = useToast()
 
 const TVstate = () => {
     if (openedRoomHasTV.value === 'unknown') {
@@ -170,54 +186,26 @@ onMounted(async () => {
     const tokenCookie = useCookie('token')
     if (typeof(tokenCookie.value) === 'string') {
         islogged.value = true
+        loadFloors()
+    }
+    else {
+        navigateTo('/login')
     }
     // load floors from api
-    loadFloors()
 })
 
 const loadFloors = () => {
     axios.get('/api/floors').then((response) => {
         const new_floors = response.data.body.sort((a,b) => a.floor_number - b.floor_number)
-        new_floors.forEach(floor => {
-            floor.rooms.sort((a,b) => a.room_number - b.room_number)
-        });
         floors.value = new_floors
         pending.value = false
-    })
-}
-const onLoginFormSubmit = () => {
-    axios.post('/api/users/login', {
-        login: login.value,
-        password: password.value
-    }).then((response) => {
-        if (response.status === 202) {
-            useCookie('token', response.data.token)
-            islogged.value = true
-            toast.add({
-                icon: "i-heroicons-check-circle",
-                description: "Sucessfully logged in.",
-                id: "onLoginFormSubmit",
-                timeout: 6000,
-                title: "Login",
-            })
-            isOpen.value = false
-        }
-        else {
-            toast.add({
-                icon: "i-heroicons-exclamation",
-                color: "red",
-                description: "Wrong login or password.",
-                id: "onLoginFormSubmit",
-                timeout: 6000,
-                title: "Login",
-            })
-        }
     })
 }
 const deleteCookie = () => {
     let cookie = useCookie('token')
     cookie.value = null
     islogged.value = false
+    navigateTo('/login')
 }
 const addFloor = () => {
     axios.post('/api/floors').then((response) => {
@@ -225,6 +213,12 @@ const addFloor = () => {
     })
 }
 const toggleFloorMenu = (index) => {
+    navigateTo(`/floor?floor_number=${index+1}`)
+    reloadNuxtApp({
+        path: `/floor?floor_number=${index+1}`,
+        ttl: 1000, // default 10000
+    });
+    return
     openFloorIndex.value = openFloorIndex.value === index ? null : index
 }
 const createNew = (index) => {
@@ -242,7 +236,6 @@ const openRoomModal = (floor_number,room_number) => {
         openedRoomHasTV.value = response.data.hasTV
         openedRoomComment.value = response.data.comment
         openedRoomAcessPointMAC.value = response.data.macAddress
-        console.log(response.data)
     })
     openedRoomNumber.value = room_number
     isOpenRoomModal.value = true
@@ -257,7 +250,7 @@ const submitEdit = () => {
 const setRoomColor = (roomIndex) => {
     let room = floors.value[openFloorIndex.value].rooms[roomIndex]
     if (room.hasTV === 'unknown' && room.hasPhone === 'unknown' && room.hasBathPhone === 'unknown' && room.hasAccessPoint === 'unknown') {
-        return 'bg-gray-800'
+        return 'bg-gray-500'
     }
     else if (room.hasTV === 'Yes' && room.hasPhone === 'Yes' && room.hasBathPhone === 'Yes' && room.hasAccessPoint === 'Yes') {
         return 'bg-green-500'

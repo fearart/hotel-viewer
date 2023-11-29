@@ -18,7 +18,10 @@
     "vue-router": "^4.2.5"
   },
   "dependencies": {
+    "@types/bcrypt": "^5.0.2",
     "axios": "^1.6.2",
+    "bcrypt": "^5.1.1",
+    "exceljs": "^4.4.0",
     "jsonwebtoken": "^9.0.2",
     "maska": "^2.1.10",
     "mongoose": "^8.0.1"
