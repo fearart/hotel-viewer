@@ -7,6 +7,7 @@
     "dev": "nuxt dev --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "deploy": "gh-pages --dotfiles -d .output/public",
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
@@ -22,6 +23,7 @@
     "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
     "exceljs": "^4.4.0",
+    "gh-pages": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "maska": "^2.1.10",
     "mongoose": "^8.0.1"

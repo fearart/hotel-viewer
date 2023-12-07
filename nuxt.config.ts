@@ -9,5 +9,8 @@ export default defineNuxtConfig({
   colorMode: {
     preference: 'light',
   },
-  ssr: true,
+  ssr: false,
+  app: {
+    baseURL: ''
+  }
 })
