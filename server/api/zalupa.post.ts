@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 export default defineEventHandler(async (event) => {
+    return
     const backup = await mongoose.connection.db.collection('hotel-floors').find().toArray()
     for (let i = 0; i < backup.length; i++) {
         const result = []

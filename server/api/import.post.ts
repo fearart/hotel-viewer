@@ -9,6 +9,7 @@ const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
 export default defineEventHandler(async (event) => {
+    return
     let token = getCookie(event,'token')
     if (!token) {
         unauthorizedReturn(event)
