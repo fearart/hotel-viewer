@@ -1,0 +1,1 @@
+import{ab as a,L as i,ac as r,M as s}from"./entry.f456d439.js";import{m as l}from"./browser.umd.3719f3a5.js";const m=a(async()=>{let e,o;const t=i("token").value,n=([e,o]=r(()=>l.connection.db.collection("hotel-users").findOne({token:t})),e=await e,o(),e);if(n===null)return s("/login");if(n.permissions.root===!1)return s("/");console.log("admin passed")});export{m as default};
