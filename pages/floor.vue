@@ -12,11 +12,6 @@
                 <div id="gray-filter" class="w-4 h-4 bg-gray-500 rounded-sm cursor-pointer" @click="applyGrey">
                     
                 </div>
-                <!--
-                <div class="w-4 h-4 bg-white rounded-sm cursor-pointer outline dark:outline-none outline-gray-500" @click="resetFilters">
-                    
-                </div>
-                -->
             </div>
         </div>
         <UDivider v-if="!hide_naxuy_rooms" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENrooms">Pokoje [{{ rooms.length }}]</UDivider>
@@ -25,7 +20,7 @@
             >
             <div v-if="displayRooms && !hide_naxuy_rooms" v-for="(room, roomIndex) in rooms" :key="roomIndex"
                 class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
-                :class="setRoomColor(roomIndex)" @click="openRoomModal(roomIndex)">
+                :class="[setRoomColor(roomIndex), room.alarm ? 'alarm' : '']" @click="openRoomModal(roomIndex)">
                 {{ room.room_number }}
             </div>
             <div class="xl:w-24 xl:h-24 w-12 h-12  mb-3 room-card bg-gray-500 text-white flex items-center justify-center rounded-lg cursor-pointer"
@@ -75,8 +70,12 @@
     <UModal v-model="isOpenRoomModal" class="w-60" :ui="{ container: 'items-start' }">
         <button></button>
         <div class="flex justify-center flex-col items-center p-6">
-            <UInput v-model="openedRoomNumber" v-maska data-maska="#####" class="text-xl w-24 mb-2"
-                placeholder="Room number" />
+            <div class="flex flex-row h-8 mb-2">
+                <UInput v-model="openedRoomNumber" v-maska data-maska="#####" class="text-xl w-24 mb-2"
+                    placeholder="Room number" />
+                <UButton v-if="openedRoomAlarm" icon="i-heroicons-bell" color="red" @click="toggleAlarm" class="ml-4"/>
+                <UButton v-else icon="i-heroicons-bell" color="gray" @click="toggleAlarm" class="ml-4"/>
+            </div>
             <UInput v-model="openedRoomAcessPointMAC" v-maska data-maska="**:**:**:**:**:**" placeholder="MAC:Address" />
             <div class="m-2 flex flex-col">
                 <div class="flex flex-row">
@@ -185,6 +184,7 @@ const openedRoomHasBathPhone = ref('NoData')
 const openedRoomHasAcessPoint = ref('NoData')
 const openedRoomComment = ref('NoData')
 const openedRoomAcessPointMAC = ref('NoData')
+const openedRoomAlarm = ref(false)
 
 const openedCorrdior = ref({})
 
@@ -281,6 +281,7 @@ const openRoomModal = (room_number) => {
         openedRoomHasTV.value = response.data.hasTV
         openedRoomComment.value = response.data.comment
         openedRoomAcessPointMAC.value = response.data.macAddress
+        openedRoomAlarm.value = response.data.alarm
     })
     openedRoomNumber.value = room_number
     isOpenRoomModal.value = true
@@ -432,13 +433,13 @@ const isAcessPointRed = () => {
 
 
 const submitEdit = () => {
-    axios.post('/api/rooms/modify', { "floor_number": floor_number.value, "room_number": openedRoomNumber.value, "hasAccessPoint": openedRoomHasAcessPoint.value, "hasBathPhone": openedRoomHasBathPhone.value, "hasPhone": openedRoomHasPhone.value, "hasTV": openedRoomHasTV.value, "comment": openedRoomComment.value, "macAddress": openedRoomAcessPointMAC.value }).then((response) => {
+    axios.post('/api/rooms/modify', { "floor_number": floor_number.value, "room_number": openedRoomNumber.value, "hasAccessPoint": openedRoomHasAcessPoint.value, "hasBathPhone": openedRoomHasBathPhone.value, "hasPhone": openedRoomHasPhone.value, "hasTV": openedRoomHasTV.value, "comment": openedRoomComment.value, "macAddress": openedRoomAcessPointMAC.value, "alarm" : openedRoomAlarm.value }).then((response) => {
         getFloorInfo()
         isOpenRoomModal.value = false
     })
 }
 const submitCorridorEdit = () => {
-    axios.post('/api/corridors/modify',{ "floor_number": floor_number.value, "accessPointNumber": openedCorrdior.value.AccessPointNumber, "macAddress": openedCorrdior.value.macAddress, "comment": openedCorrdior.value.comment }).then((response) => {
+    axios.post('/api/corridors/modify',{ "floor_number": floor_number.value, "accessPointNumber": openedCorrdior.value.accessPointNumber, "macAddress": openedCorrdior.value.macAddress, "comment": openedCorrdior.value.comment }).then((response) => {
         getFloorInfo()
         isOpenCorridorModal.value = false
     })
@@ -681,6 +682,9 @@ const setFilterOutline = () => {
         document.getElementById('gray-filter').classList.remove('outline-sky-500')
     }
 }
+const toggleAlarm = () => {
+    openedRoomAlarm.value = !openedRoomAlarm.value
+}
 </script>
 <style scoped>
 .prevent-select {
@@ -696,5 +700,20 @@ const setFilterOutline = () => {
     /* Internet Explorer/Edge */
     user-select: none;
     /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+@keyframes alarm {
+    0% {
+        color:rgb(239 68 68); /* bg-red-500 */
+    }
+    50% {
+        color: #fff; /* bg-gray-500 */
+    }
+    100% {
+        color: rgb(239 68 68); /* bg-red-500 */
+    }
+}
+.alarm {
+    animation: alarm 1s infinite;
+    font-weight: 1000;
 }
 </style>

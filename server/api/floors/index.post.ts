@@ -19,6 +19,8 @@ export default defineEventHandler(async (event) => {
         unauthorizedReturn(event)
         return
     }
+    const config = useRuntimeConfig();
+    await mongoose.connect(config.mongodb_uri);
     let floor_number = await mongoose.connection.db.collection('hotel-floors').countDocuments() + 1
     let floor = {
         "floor_number" : floor_number,

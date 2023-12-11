@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
-const config = useRuntimeConfig();
 
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
 
 export default defineEventHandler(async (event) => {
+    const config = useRuntimeConfig();
+    await mongoose.connect(config.mongodb_uri);
     let token = getCookie(event,'token')
     if (!token) {
         unauthorizedReturn(event)
@@ -20,7 +21,7 @@ export default defineEventHandler(async (event) => {
         return
     }
     const body = await readBody(event)
-    if (body.floor_number === undefined || body.room_number === undefined || body.hasPhone === undefined || body.hasTV === undefined || body.hasAccessPoint === undefined || body.hasBathPhone === undefined || body.comment === undefined,body.macAddress === undefined) {
+    if (body.floor_number === undefined || body.room_number === undefined || body.hasPhone === undefined || body.hasTV === undefined || body.hasAccessPoint === undefined || body.hasBathPhone === undefined || body.comment === undefined,body.macAddress === undefined,body.alarm === undefined) {
         setResponseStatus(event,400,"Bad Request")
         return
     }
@@ -52,6 +53,7 @@ export default defineEventHandler(async (event) => {
         'hasBathPhone' : body.hasBathPhone,
         "comment" : body.comment,
         "macAddress" : body.macAddress,
+        "alarm" : body.alarm
     }
 
     // delete old room  

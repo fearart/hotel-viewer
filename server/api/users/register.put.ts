@@ -10,6 +10,8 @@ const missingDataReturnMessage = {
 }
 
 export default defineEventHandler(async (event) => {
+    const config = useRuntimeConfig();
+    await mongoose.connect(config.mongodb_uri);
     const body = await readBody(event)
     if (typeof(body.login) === 'undefined') {
         return missingDataReturnMessage;

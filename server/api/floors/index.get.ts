@@ -7,6 +7,8 @@ const unauthorizedReturn = (event: any) => {
 
 
 export default defineEventHandler(async (event) => {
+    const config = useRuntimeConfig();
+    await mongoose.connect(config.mongodb_uri);
     let floors = await mongoose.connection.db.collection('hotel-floors').find().toArray()
     return {
         statusCode: 200,

@@ -6,7 +6,6 @@ export default async (_nitroApp: Nitro) => {
 
   try {
     await mongoose.connect(config.mongodb_uri);
-    console.log("Database Pugin loaded");
   } catch (e) {
     console.error(e);
   }

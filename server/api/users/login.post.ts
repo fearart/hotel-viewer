@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     if (typeof(body.login) === 'undefined') { return missingDataReturnMessage}
     if (typeof(body.password) === 'undefined') {return missingDataReturnMessage}
-    let user = await mongoose.connection.db.collection('hotel-users').findOne({"login" : body.login})
+    const user = await mongoose.connection.db.collection('hotel-users').findOne({"login" : body.login})
     if (user === null) {
         setResponseStatus(event,401,"Wrong password or email")
         return

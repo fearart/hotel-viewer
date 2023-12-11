@@ -7,6 +7,8 @@ const unauthorizedReturn = (event: any) => {
 }
 
 export default defineEventHandler(async (event) => {
+    const config = useRuntimeConfig();
+    await mongoose.connect(config.mongodb_uri);
     try {
     let token = getCookie(event,'token')
     if (!token) {
@@ -59,6 +61,7 @@ export default defineEventHandler(async (event) => {
             hasBathPhone: room.hasBathPhone,
             comment: roomComment,
             macAddress: roomMac,
+            alarm: room.alarm,
         }
     }
 }

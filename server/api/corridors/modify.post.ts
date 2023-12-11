@@ -42,15 +42,14 @@ export default defineEventHandler(async (event) => {
         corridor_number = Number.parseInt(`${floor_number}001`)
     }
     else {
-        corridor_number = Number.parseInt(body.corridor_number)
+        corridor_number = Number.parseInt(body.accessPointNumber)
     }
     let corridor_record = {
-        'accessPointNumber' : body.accessPointNumber,
+        'accessPointNumber' : corridor_number,
         "macAddress" : body.macAddress,
         "comment" : body.comment,
     }
-
-    // delete old room  
+    console.log(corridor_record)
     corridor = corridor.filter((record:any) => record.accessPointNumber != body.accessPointNumber)
     corridor.push(corridor_record)
     corridor.sort((a:any,b:any) => a.accessPointNumber - b.accessPointNumber)

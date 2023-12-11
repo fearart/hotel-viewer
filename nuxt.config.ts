@@ -5,12 +5,13 @@ export default defineNuxtConfig({
   runtimeConfig: {
     mongodb_uri: process.env.MONGODB_URI,
     jwt_secret: process.env.JWT_SECRET,
+    port: 3030,
   },
   colorMode: {
     preference: 'light',
   },
   ssr: false,
   app: {
-    baseURL: ''
-  }
+    baseURL: '',
+  },
 })
