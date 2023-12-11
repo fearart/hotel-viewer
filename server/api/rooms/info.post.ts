@@ -62,6 +62,7 @@ export default defineEventHandler(async (event) => {
             comment: roomComment,
             macAddress: roomMac,
             alarm: room.alarm,
+            hasLock: room.hasLock
         }
     }
 }

@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
         return
     }
     const body = await readBody(event)
-    if (body.floor_number === undefined || body.room_number === undefined || body.hasPhone === undefined || body.hasTV === undefined || body.hasAccessPoint === undefined || body.hasBathPhone === undefined || body.comment === undefined,body.macAddress === undefined,body.alarm === undefined) {
+    if (body.floor_number === undefined || body.room_number === undefined || body.hasPhone === undefined || body.hasTV === undefined || body.hasAccessPoint === undefined || body.hasBathPhone === undefined || body.comment === undefined,body.macAddress === undefined,body.alarm === undefined,body.hasLock === undefined) {
         setResponseStatus(event,400,"Bad Request")
         return
     }
@@ -53,7 +53,8 @@ export default defineEventHandler(async (event) => {
         'hasBathPhone' : body.hasBathPhone,
         "comment" : body.comment,
         "macAddress" : body.macAddress,
-        "alarm" : body.alarm
+        "alarm" : body.alarm,
+        'hasLock' : body.hasLock
     }
 
     // delete old room  

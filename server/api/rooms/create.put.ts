@@ -57,12 +57,8 @@ export default defineEventHandler(async (event) => {
         'hasBathPhone' : "unknown"
     }
     rooms.push(room)
-    let floor_obj = {
-        "floor_number" : floor_number,
-        "rooms" : rooms,
-    }
-
-    mongoose.connection.db.collection('hotel-floors').replaceOne({floor_number: floor_number},floor_obj,{upsert: true})
+    Object.assign(floor, {rooms: rooms})
+    await mongoose.connection.db.collection('hotel-floors').updateOne({floor_number: floor_number},{$set: floor})
     return {
         body: room
     }

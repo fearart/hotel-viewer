@@ -32,9 +32,7 @@ export default defineEventHandler(async (event) => {
     }
     const floor_number = body.floor_number
     const rooms = body.rooms
-    let floor = {
-        "floor_number" : floor_number,
-        "rooms" : rooms,
-    }
-    mongoose.connection.db.collection('hotel-floors').replaceOne({floor_number: floor_number},floor,{upsert: true})
+    let floor = mongoose.connection.db.collection('hotel-floors').findOne({floor_number: floor_number})
+    Object.assign(floor,{rooms: rooms})
+    await mongoose.connection.db.collection('hotel-floors').replaceOne({floor_number: floor_number},floor,{upsert: true})
 })

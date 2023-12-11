@@ -26,6 +26,7 @@
     "gh-pages": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "maska": "^2.1.10",
-    "mongoose": "^8.0.1"
+    "mongoose": "^8.0.1",
+    "telegraf": "^4.15.3"
   }
 }

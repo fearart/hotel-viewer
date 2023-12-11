@@ -77,7 +77,7 @@
                 <UButton v-else icon="i-heroicons-bell" color="gray" @click="toggleAlarm" class="ml-4"/>
             </div>
             <UInput v-model="openedRoomAcessPointMAC" v-maska data-maska="**:**:**:**:**:**" placeholder="MAC:Address" />
-            <div class="m-2 flex flex-col">
+            <div class="m-2 flex flex-col items-center">
                 <div class="flex flex-row">
                     <div class="pr-2">
                         <img v-if="isAcessPointGreen()" src="~/assets/pngs/wifi-green.png" @click="AcessPointstate"
@@ -110,10 +110,20 @@
                         <img v-if="isPhoneRed()" src="~/assets/pngs/phone-red.png" @click="Phonestate"
                             class="cursor-pointer" />
                     </div>
+                    <div>
+                        <img v-if="isLockGreen()" src="~/assets/pngs/lock-green.png" @click="Lockstate"
+                            class="cursor-pointer" />
+                        <img v-if="isLockGray()" src="~/assets/pngs/lock-gray.png" @click="Lockstate"
+                            class="cursor-pointer" />
+                        <img v-if="isLockRed()" src="~/assets/pngs/lock-red.png" @click="Lockstate"
+                            class="cursor-pointer" />
+                    </div>
                 </div>
             </div>
             <div class="w-full justify-between flex mt-4">
-                <UButton label="Submit" @click="submitEdit"></UButton>
+                <UButton v-if="isAdmin" label="Submit" @click="submitEdit"></UButton>
+                <UButton v-else label="Submit" @click="requestEdit" icon="i-heroicons-arrow-right-circle"></UButton>
+                <UButton v-if="isRoot" label="" @click="requestEdit" icon="i-heroicons-arrow-right-circle"></UButton>
                 <div class="flex flex-col mx-4 2xl:mx-0">
                     <UTextarea v-model="openedRoomComment" placeholder="Comment" class="pb-2" size="xs"/>
                 </div>
@@ -152,6 +162,7 @@ const savedCorridors = ref([])
 const cinemas = ref([])
 const userPermissions = ref({})
 const isAdmin = ref(false)
+const isRoot = ref(false)
 
 // Floor part
 const displayRooms = ref(false)
@@ -185,7 +196,7 @@ const openedRoomHasAcessPoint = ref('NoData')
 const openedRoomComment = ref('NoData')
 const openedRoomAcessPointMAC = ref('NoData')
 const openedRoomAlarm = ref(false)
-
+const openedRoomHasLock = ref('NoData')
 const openedCorrdior = ref({})
 
 // Modals vars
@@ -193,7 +204,6 @@ const isOpenRoomModal = ref(false)
 const isOpenCorridorModal = ref(false)
 
 // FIlters
-const filterApplied = ref(false)
 const greenFilter = ref(false)
 const redFilter = ref(false)
 const grayFilter = ref(false)
@@ -214,6 +224,7 @@ onMounted(() => {
             else {
                 userPermissions.value = response.data
                 isAdmin.value = userPermissions.value.admin
+                isRoot.value = userPermissions.value.root
             }
         })
     }
@@ -282,6 +293,7 @@ const openRoomModal = (room_number) => {
         openedRoomComment.value = response.data.comment
         openedRoomAcessPointMAC.value = response.data.macAddress
         openedRoomAlarm.value = response.data.alarm
+        openedRoomHasLock.value = response.data.hasLock
     })
     openedRoomNumber.value = room_number
     isOpenRoomModal.value = true
@@ -358,6 +370,18 @@ const BathPhonestate = () => {
         openedRoomHasBathPhone.value = 'unknown'
     }
 }
+const Lockstate = () => {
+    if (openedRoomHasLock.value === 'unknown') {
+        openedRoomHasLock.value = 'Yes'
+    }
+    else if (openedRoomHasLock.value === 'Yes') {
+        openedRoomHasLock.value = 'No'
+    }
+    else {
+        openedRoomHasLock.value = 'unknown'
+    }
+
+}
 const isTvGreen = () => {
     if (openedRoomHasTV.value === 'Yes') {
         return true
@@ -430,10 +454,33 @@ const isAcessPointRed = () => {
     }
     return false
 }
+const isLockGreen = () => {
+    if (openedRoomHasLock.value === 'Yes') {
+        return true
+    }
+    return false
+}
+const isLockGray = () => {
+    if (openedRoomHasLock.value === 'unknown') {
+        return true
+    }
+    return false
+}
+const isLockRed = () => {
+    if (openedRoomHasLock.value === 'No') {
+        return true
+    }
+    return false
+}
 
 
 const submitEdit = () => {
-    axios.post('/api/rooms/modify', { "floor_number": floor_number.value, "room_number": openedRoomNumber.value, "hasAccessPoint": openedRoomHasAcessPoint.value, "hasBathPhone": openedRoomHasBathPhone.value, "hasPhone": openedRoomHasPhone.value, "hasTV": openedRoomHasTV.value, "comment": openedRoomComment.value, "macAddress": openedRoomAcessPointMAC.value, "alarm" : openedRoomAlarm.value }).then((response) => {
+    axios.post('/api/rooms/modify', { "floor_number": floor_number.value, "room_number": openedRoomNumber.value, 
+                                        "hasAccessPoint": openedRoomHasAcessPoint.value, "hasBathPhone": openedRoomHasBathPhone.value, 
+                                        "hasPhone": openedRoomHasPhone.value, "hasTV": openedRoomHasTV.value, 
+                                        "comment": openedRoomComment.value, "macAddress": openedRoomAcessPointMAC.value, 
+                                        "alarm" : openedRoomAlarm.value, "hasLock" : openedRoomHasLock.value})
+    .then((response) => {
         getFloorInfo()
         isOpenRoomModal.value = false
     })
@@ -684,6 +731,18 @@ const setFilterOutline = () => {
 }
 const toggleAlarm = () => {
     openedRoomAlarm.value = !openedRoomAlarm.value
+}
+const requestEdit = () => {
+    axios.post('/api/telegram/notify', { "floor_number": floor_number.value, "room_number": openedRoomNumber.value, 
+                                        "hasAccessPoint": openedRoomHasAcessPoint.value, "hasBathPhone": openedRoomHasBathPhone.value, 
+                                        "hasPhone": openedRoomHasPhone.value, "hasTV": openedRoomHasTV.value, 
+                                        "comment": openedRoomComment.value, "macAddress": openedRoomAcessPointMAC.value, 
+                                        "alarm" : openedRoomAlarm.value, "hasLock" : openedRoomHasLock.value})
+    .then((response) => {
+        getFloorInfo()
+        isOpenRoomModal.value = false
+    })
+
 }
 </script>
 <style scoped>
