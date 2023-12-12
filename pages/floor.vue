@@ -275,7 +275,7 @@ const setRoomColor = (roomIndex) => {
     if (room.hasTV === 'Yes' && room.hasPhone === 'Yes' && room.hasBathPhone === 'Yes' && room.hasAccessPoint === 'Yes' && room.hasLock) {
         return 'bg-green-500'
     }
-    else if (room.hasTV === 'No' || room.hasPhone === 'No' || room.hasBathPhone === 'No' || room.hasAccessPoint === 'No' && room.hasLock === 'No') {
+    else if (room.hasTV === 'No' || room.hasPhone === 'No' || room.hasBathPhone === 'No' || room.hasAccessPoint === 'No' || room.hasLock === 'No') {
         return 'bg-red-500'
     }
     else {
