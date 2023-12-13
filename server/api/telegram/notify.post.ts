@@ -5,7 +5,6 @@ const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
 const pushChanges = async (body: any) => {
-    console.log(body)
     body.floor_number = Number.parseInt(body.floor_number)
     const floors = await mongoose.connection.db.collection('hotel-floors').find({}).toArray()
     const floor = floors.find((element: any) => element.floor_number == body.floor_number)
@@ -41,7 +40,6 @@ const pushChanges = async (body: any) => {
     // delete old room  
     rooms = rooms.filter((room:any) => room.room_number != room_number)
     rooms.push(room)
-    console.log(rooms)
     await mongoose.connection.db.collection('hotel-floors').updateOne({floor_number: body.floor_number},{$set: {rooms: rooms}})
 }
 

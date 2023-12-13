@@ -308,9 +308,7 @@ const setCorridorAPColor = (corridorIndex) => {
     }
 }
 const OpenCorridorModal = (corridor_number) => {
-    console.log(corridor_number)
     corridor_number = corridors.value[corridor_number].accessPointNumber
-    console.log(corridor_number)
     axios.post('/api/corridors/info', { "floor_number": floor_number.value, "corridor_number": corridor_number }).then((response) => {
         openedCorrdior.value.accessPointNumber = corridor_number
         openedCorrdior.value.macAddress = response.data.macAddress

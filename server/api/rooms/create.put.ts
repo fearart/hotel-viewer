@@ -46,8 +46,6 @@ export default defineEventHandler(async (event) => {
     else {
         let biggest_room_number = rooms.reduce((prev:any, current:any) => (prev.room_number > current.room_number) ? prev : current)
         room_number = biggest_room_number.room_number + 1
-        console.log(room_number)
-        console.log(biggest_room_number)
     }
     let room = {
         'room_number' : room_number,

@@ -10,7 +10,5 @@ export default defineNuxtRouteMiddleware(async ()=> {
         return navigateTo("/")
     }
     else {
-        console.log('admin passed')
-
     }
 })

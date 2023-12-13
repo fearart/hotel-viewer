@@ -49,7 +49,6 @@ export default defineEventHandler(async (event) => {
         "macAddress" : body.macAddress,
         "comment" : body.comment,
     }
-    console.log(corridor_record)
     corridor = corridor.filter((record:any) => record.accessPointNumber != body.accessPointNumber)
     corridor.push(corridor_record)
     corridor.sort((a:any,b:any) => a.accessPointNumber - b.accessPointNumber)

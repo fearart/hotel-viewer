@@ -48,9 +48,7 @@ export default defineEventHandler(async (event) => {
         "macAddress" : "",
         "comment" : "",
     }
-    console.log(AcessPointRecord)
     cinemas.push(AcessPointRecord)
-    console.log(cinemas)
     Object.assign(floor, {cinema: cinemas})
     mongoose.connection.db.collection('hotel-floors').replaceOne({floor_number: floor_number},floor,{upsert: true})
 })

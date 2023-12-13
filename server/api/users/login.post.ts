@@ -25,7 +25,6 @@ export default defineEventHandler(async (event) => {
         setResponseStatus(event,401,"Wrong password or email")
         return
     }
-    console.log(new Permissions(user.permissions).canRead())
     setResponseStatus(event,202,"OK")
     setCookie(event,'token',user.token)
 })

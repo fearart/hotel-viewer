@@ -26,7 +26,6 @@ export default defineEventHandler(async (event) => {
         return
     }
     const floor_number = Number.parseInt(body.floor_number)
-    console.log(floor_number)
     const floors : Array<any> = await mongoose.connection.db.collection('hotel-floors').find().toArray()
     const floor = floors.find((floor) => floor.floor_number == floor_number)
     if (floor === null) {

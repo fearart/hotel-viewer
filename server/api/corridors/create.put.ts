@@ -42,16 +42,13 @@ export default defineEventHandler(async (event) => {
     else {
         let biggest_AccessPointNumber = AcessPoints.reduce((prev:any, current:any) => (prev.AccessPointNumber > current.AccessPointNumber) ? prev : current)
         AccessPointNumber = biggest_AccessPointNumber.accessPointNumber + 1
-        console.log(biggest_AccessPointNumber)
     }
     let AcessPointRecord = {
         "accessPointNumber" : AccessPointNumber,
         "macAddress" : "",
         "comment" : "",
     }
-    console.log(AcessPointRecord)
     AcessPoints.push(AcessPointRecord)
-    console.log(AcessPoints)
     Object.assign(floor, {corridor: AcessPoints})
     mongoose.connection.db.collection('hotel-floors').replaceOne({floor_number: floor_number},floor,{upsert: true})
 })
