@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 import bot from "~/utilities/bot";
-import axios from "axios";
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
@@ -66,20 +65,20 @@ export default defineEventHandler(async (event) => {
         setResponseStatus(event,400,"Bad Request")
         return
     }
-    bot.telegram.sendMessage(config.telegram_chat_id,
-`           №${body.room_number} | ${Date().toString().slice(0,24)}
+    bot.telegram.sendMessage(config.telegram_chat_id_dev,
+`\\-\\-\\-\\-\\-\\-\\-**№${body.room_number}**\\-\\-\\-\\-\\-\\-\\-
+${Date().toString().slice(0,24)}
 
-    AP: ${body.hasAccessPoint}
-    TV: ${body.hasTV}
-    Telefon: ${body.hasPhone}
-    Telefon w lazience: ${body.hasBathPhone}
-    Komentarz: ${body.comment}
-    MAC: ${body.macAddress}
-    Alarm: ${body.alarm}
-    Lock: ${body.hasLock}
-    `,
+Komentarz: ${body.comment}
+AP: ${body.hasAccessPoint}
+MAC: ${body.macAddress}
+TV: ${body.hasTV}
+Telefon: ${body.hasPhone}
+Telefon w lazience: ${body.hasBathPhone}
+Lock: ${body.hasLock}
+`,
     {
-        parse_mode: 'Markdown',
+        parse_mode: 'MarkdownV2',
         reply_markup: {
           inline_keyboard: [
             [

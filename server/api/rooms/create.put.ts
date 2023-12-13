@@ -54,7 +54,11 @@ export default defineEventHandler(async (event) => {
         'hasAccessPoint' : "unknown",
         'hasTV' : "unknown",
         "hasPhone" : "unknown",
-        'hasBathPhone' : "unknown"
+        'hasBathPhone' : "unknown",
+        "comment" : "",
+        "macAddress" : "",
+        "alarm" : false,
+        'hasLock' : 'unknown'
     }
     rooms.push(room)
     Object.assign(floor, {rooms: rooms})
