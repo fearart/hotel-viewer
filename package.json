@@ -19,6 +19,7 @@
     "vue-router": "^4.2.5"
   },
   "dependencies": {
+    "@pinia/nuxt": "^0.5.1",
     "@types/bcrypt": "^5.0.2",
     "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
@@ -27,6 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "maska": "^2.1.10",
     "mongoose": "^8.0.1",
+    "pinia": "^2.1.7",
     "telegraf": "^4.15.3"
   }
 }

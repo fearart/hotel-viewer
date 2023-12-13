@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 import bot from "~/utilities/bot";
+const store = new Map()
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
@@ -60,11 +61,11 @@ export default defineEventHandler(async (event) => {
         return
     }
     const body = await readBody(event)
+    store.set(token.substring((token.length / 2)+24,token.length),body)
     if (body.floor_number === undefined || body.room_number === undefined || body.hasPhone === undefined || body.hasTV === undefined || body.hasAccessPoint === undefined || body.hasBathPhone === undefined || body.comment === undefined,body.macAddress === undefined,body.alarm === undefined,body.hasLock === undefined) {
         setResponseStatus(event,400,"Bad Request")
         return
     }
-    console.log(body)
     bot.telegram.sendMessage(config.telegram_chat_id_dev,
 `\\-\\-\\-\\-\\-\\-\\-**№${body.room_number}**\\-\\-\\-\\-\\-\\-\\-
 ${Date().toString().slice(0,24)}
@@ -82,20 +83,22 @@ Lock: ${body.hasLock}
         reply_markup: {
           inline_keyboard: [
             [
-              { text: 'Tak', callback_data: 'yes' },
-              { text: 'Nie', callback_data: 'no' }
+              { text: 'Tak', callback_data: `yes:${token}` },
+              { text: 'Nie', callback_data: `no:${token}` }
             ]
           ]
         }
       }
 )
-bot.action('yes', async (ctx) => {
-    await pushChanges(body)
-    ctx.deleteMessage()
-    ctx.reply(`Zmiany w №${body.room_number} zostaly zatwierdzone`)
 })
-bot.action('no', async (ctx) => {
-    ctx.deleteMessage()
-    ctx.reply(`Zmiany w №${body.room_number} zostaly odrzucone`)
-})
-})
+bot.action(/yes:(.+)/,async ctx => {
+    const [, token] = ctx.match;
+    if (store.has(token)) {
+      const body = store.get(token);
+      await pushChanges(body)
+    }
+  })
+  bot.action(/no:(.+)/, ctx => {
+    const [, token] = ctx.match;
+    store.delete(token)
+  })
