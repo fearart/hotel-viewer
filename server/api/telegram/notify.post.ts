@@ -66,27 +66,9 @@ export default defineEventHandler(async (event) => {
         setResponseStatus(event,400,"Bad Request")
         return
     }
-    const floors = await mongoose.connection.db.collection('hotel-floors').find().toArray()
-    const floor = floors.find((element: any) => element.floor_number == body.floor_number)
-    if (floor === null || floor === undefined) {
-        setResponseStatus(event,404,"Not Found")
-        return
-    }
-    const rooms = floor.rooms
     bot.telegram.sendMessage(config.telegram_chat_id,
-`Zatwierdzenie zmian w №${body.room_number} | ${Date().toString().slice(0,24)}
-  Bylo:
-    AP: ${rooms.find((element: any) => element.room_number == body.room_number).hasAccessPoint}
-    TV: ${rooms.find((element: any) => element.room_number == body.room_number).hasTV}
-    Telefon: ${rooms.find((element: any) => element.room_number == body.room_number).hasPhone}
-    Telefon w lazience: ${rooms.find((element: any) => element.room_number == body.room_number).hasBathPhone}
-    Komentarz: ${rooms.find((element: any) => element.room_number == body.room_number).comment}
-    MAC: ${rooms.find((element: any) => element.room_number == body.room_number).macAddress}
-    Alarm: ${rooms.find((element: any) => element.room_number == body.room_number).alarm}
-    Lock: ${rooms.find((element: any) => element.room_number == body.room_number).hasLock}
+`           №${body.room_number} | ${Date().toString().slice(0,24)}
 
-
-  Jest:
     AP: ${body.hasAccessPoint}
     TV: ${body.hasTV}
     Telefon: ${body.hasPhone}

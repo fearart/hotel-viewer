@@ -22,8 +22,4 @@ export default defineEventHandler(async (event) => {
         return
     }
     const floors = await mongoose.connection.db.collection('hotel-floors').find().toArray()
-    floors[1].rooms.forEach(element => {
-        element.hasLock = "Yes"
-    });
-    await mongoose.connection.db.collection('hotel-floors').updateOne({floor_number: 2},{$set: {rooms: floors[1].rooms}})
 })
