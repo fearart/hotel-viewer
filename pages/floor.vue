@@ -124,8 +124,7 @@
                 <UButton v-if="isAdmin" label="Submit" @click="submitEdit"></UButton>
                 <UButton v-else label="Submit" @click="requestEdit" icon="i-heroicons-arrow-right-circle"></UButton>
                 <UButton v-if="isRoot" label="" @click="requestEdit" class="ml-2">
-                    <img v-if="useColorMode.value === 'dark'" src="~/assets/svg/telegram.svg" class=""/>
-                    <img v-else src="~/assets/svg/tg-white.png" class="w-12 h-12">
+                    <img src="~/assets/svg/tg-white.png" class="w-12 h-12">
                 </UButton>
                 <div class="flex flex-col mx-4 2xl:mx-0">
                     <UTextarea v-model="openedRoomComment" placeholder="Comment" class="pb-2" size="xs"/>
