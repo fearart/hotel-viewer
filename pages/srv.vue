@@ -14,7 +14,7 @@
                         <UIcon v-if="user.permissions.admin && user.permissions.root" name="i-heroicons-star-20-solid" class="text-sky-500 2xl:mr-2" />
                         <UIcon v-else v-if="user.permissions.admin && !user.permissions.root" name="i-heroicons-star" class="text-sky-500 2xl:mr-2" />
                         <div class="flex 2xl:flex-row flex-col">
-                            <p>Login:{{ user.login }} | </p>
+                            <p>Login:{{ user.login }} &emsp;</p>
                              {{ user.name }} {{ user.surname }} 
                             <div class="2xl:ml-2 2xl:flex 2xl:flex-row">
                                 <div>
@@ -28,7 +28,13 @@
                         </div>
                     </div>
                 </div>
-
+                <div class="dark:bg-gray-700 rounded-lg 2xl:px-4 px-2 py-2 my-2 2xl:h-14">
+                    <div class="flex flex-row 2xl:h-8 cursor-pointer">
+                        <div class="flex items-center justify-center align-middle w-full h-full" @click="isRegisterOpen = true"> 
+                            <p class="text-2xl">+</p>
+                        </div>
+                    </div>
+                </div>
                 <template #footer>
                 </template>
             </UCard>
@@ -80,8 +86,55 @@
                 <div class="flex items-end">
                     <UButton color="sky" class="mt-4" @click="submitUserModal">Zapisz</UButton>
                 </div>
+                <div class="flex flex-row">
+                    <div class="flex items-end">
+                        <UButton color="red" class="mt-4" @click="resetPassword">Zresetować haslo</UButton>
+                    </div>
+                    <div class="flex items-end ml-2">
+                        <UButton color="red" class="mt-4" @click="deleteUser">Usunąć</UButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </UModal>
+    <UModal v-model="isRegisterOpen" class="w-60" :ui="{ container: 'items-start' }">
+        <button></button>
+        <div class="flex flex-col p-6 h-96 items-center justify-center">
+            <div>
+                <div class="flex flex-row items-center">
+                    <div class="flex flex-col items-center">
+                        <label class="text-gray-700 dark:text-gray-200 text-l">Imię</label>
+                        <UInput v-model="createUser.name"/>
+                    </div>
+                    <div class="flex flex-col ml-4 items-center">
+                        <label class="text-gray-700 dark:text-gray-200 text-l">Nazwisko</label>
+                        <UInput v-model="createUser.surname"/>
+                    </div>
+                </div>
+                <div class="flex flex-row items-center">
+                    <div class="flex flex-col items-center">
+                        <label class="text-gray-700 dark:text-gray-200 text-l">Login</label>
+                        <UInput v-model="createUser.login"/>
+                    </div>
+                    <div class="flex flex-col ml-4 items-center">
+                        <label class="text-gray-700 dark:text-gray-200 text-l">Haslo</label>
+                        <UInput v-model="createUser.password"/>
+                    </div>
+                </div>
+                <div class="flex flex-row items-center justify-around align-middle 2xl:h-16">
+                    <div class="flex flex-col ml-4 items-center">
+                        <label class="text-gray-700 dark:text-gray-200 text-l">Grupy</label>
+                        <USelectMenu v-model="selectedGroups" :options="options" placeholder="Select Groups" multiple/>
+                    </div>
+                    <div class="flex flex-col 2xl:h-16 justify-center">
+                        <UCheckbox v-model="createUser.permissions.admin" name="admin" label="Admin"></UCheckbox>
+                        <UCheckbox v-model="createUser.permissions.root" name="admin" label="Root"></UCheckbox>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-row justify-around w-full">
                 <div class="flex items-end">
-                    <UButton color="sky" class="mt-4" @click="resetPassword">Zresetować haslo</UButton>
+                    <UButton color="sky" class="mt-4" @click="createNewUser">Zapisz</UButton>
                 </div>
             </div>
         </div>
@@ -95,6 +148,14 @@ const cookie = useCookie('token')
 
 const users = ref([])
 const openedUser = ref({})
+const createUser = ref({
+    login: "",
+    password: "",
+    permissions: {
+        root: false,
+        admin: false
+    }
+})
 const items = [{
   slot: 'users',
   label: 'Users'
@@ -103,6 +164,7 @@ const items = [{
   label: 'Logs'
 }]
 const isOpen = ref(false)
+const isRegisterOpen = ref(false)
 const selectedGroups = ref([])
 const logs = ref([])
 const accountForm = reactive({ name: 'Benjamin', username: 'benjamincanac' })
@@ -187,6 +249,21 @@ const submitUserModal = (index) => {
         getUsers()
         console.log(res)
     })
+}
+const createNewUser = () => {
+    const user = createUser.value
+    axios.put('/api/users/register',{"login" : user.login,"password": user.password,
+    "name" : user.name, "surname" : user.surname,
+    "permissions": user.permissions, "group": user.group}).then((res) => {
+        isRegisterOpen.value = false
+    })
+    getUsers()
+}
+const deleteUser = () => {
+    axios.post('/api/users/delete',{"login" : openedUser.value.login, "auth" : cookie.value}).then((res) => {
+        isOpen.value = false
+    })
+    getUsers()
 }
 const resetPassword = () => {
     if (!isRoot) return

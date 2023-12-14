@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import Permissions from '~/utilities/permsisions';
+import Logger from "~/utilities/logger";
 const config = useRuntimeConfig();
 
 const missingDataReturnMessage = {
@@ -13,11 +14,22 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
     await mongoose.connect(config.mongodb_uri);
     const body = await readBody(event)
-    if (typeof(body.login) === 'undefined') {
+    if (body.password === undefined || body.login === undefined || body.name === undefined || body.surname === undefined) {
         return missingDataReturnMessage;
     }
-    if (typeof(body.password) === 'undefined') {
-        return missingDataReturnMessage;
+    if (body.permissions === undefined) {
+        body.permissions = {
+            root: false,
+            admin: false
+        }
+    }
+    if (body.group === undefined) {
+        body.group = {
+            it: false,
+            cleaning: false,
+            hydro: false,
+            elec: false
+        }
     }
     let token = jwt.sign({
         exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 30),
@@ -25,7 +37,7 @@ export default defineEventHandler(async (event) => {
         },
         config.jwt_secret
     )
-    if (await mongoose.connection.db.collection('hotel-users').find({login: body.login}).count() > 0) {
+    if (await mongoose.connection.db.collection('hotel-users').countDocuments({login: body.login}) > 0) {
         return {
             statusCode: 409,
             body: 'User already exists'
@@ -38,9 +50,12 @@ export default defineEventHandler(async (event) => {
                 'token' : token,
                 'login' : body.login,
                 'password': hash,
-                'permissions' : new Permissions(),
-                'group' : 'user'
+                'permissions' : body.permissions,
+                'group' : body.group,
+                'name' : body.name,
+                'surname' : body.surname
             }
+            console.log(user)
             mongoose.connection.db.collection('hotel-users').insertOne(user)
             setCookie(event,'token',token)
             return {
