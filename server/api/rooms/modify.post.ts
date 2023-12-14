@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
-
+import Logger from "~/utilities/logger";
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
@@ -62,6 +62,15 @@ export default defineEventHandler(async (event) => {
     rooms.push(room)
     let floor_obj = Object.assign(floor, {rooms: rooms})
     mongoose.connection.db.collection('hotel-floors').replaceOne({floor_number: floor_number},floor_obj,{upsert: true})
+    mongoose.connection.db.collection('hotel-logs').insertOne({
+        "event" : `Room #${room_number} modified.`,
+        "type" : "modify",
+        "timestamp" : Date.now(),
+        "user" : await new Logger(token).search(),
+        "details" : `${JSON.stringify(room)}`,
+        'ID' : await Logger.getID()
+        
+    })
     return {
         statusCode: 200,
         body: "OK"

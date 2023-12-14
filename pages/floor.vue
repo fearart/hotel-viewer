@@ -123,7 +123,10 @@
             <div class="w-full justify-between flex mt-4">
                 <UButton v-if="isAdmin" label="Submit" @click="submitEdit"></UButton>
                 <UButton v-else label="Submit" @click="requestEdit" icon="i-heroicons-arrow-right-circle"></UButton>
-                <UButton v-if="isRoot" label="" @click="requestEdit" icon="i-heroicons-arrow-right-circle"></UButton>
+                <UButton v-if="isRoot" label="" @click="requestEdit" class="ml-2">
+                    <img v-if="useColorMode.value === 'dark'" src="~/assets/svg/telegram.svg" class=""/>
+                    <img v-else src="~/assets/svg/tg-white.png" class="w-12 h-12">
+                </UButton>
                 <div class="flex flex-col mx-4 2xl:mx-0">
                     <UTextarea v-model="openedRoomComment" placeholder="Comment" class="pb-2" size="xs"/>
                 </div>
@@ -153,6 +156,7 @@
 import axios from 'axios';
 
 // Base data
+const colorScheme = useColorMode()
 const floor_number = ref(0)
 const floor = ref(null)
 const rooms = ref([])
@@ -272,7 +276,7 @@ const getFloorInfo = () => {
 }
 const setRoomColor = (roomIndex) => {
     let room = rooms.value[roomIndex]
-    if (room.hasTV === 'Yes' && room.hasPhone === 'Yes' && room.hasBathPhone === 'Yes' && room.hasAccessPoint === 'Yes' && room.hasLock) {
+    if (room.hasTV === 'Yes' && room.hasPhone === 'Yes' && room.hasBathPhone === 'Yes' && room.hasAccessPoint === 'Yes' && room.hasLock === "Yes") {
         return 'bg-green-500'
     }
     else if (room.hasTV === 'No' || room.hasPhone === 'No' || room.hasBathPhone === 'No' || room.hasAccessPoint === 'No' || room.hasLock === 'No') {

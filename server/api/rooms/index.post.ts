@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
+import Logger from "~/utilities/logger";
 const config = useRuntimeConfig();
 
 const unauthorizedReturn = (event: any) => {
@@ -35,4 +36,12 @@ export default defineEventHandler(async (event) => {
     let floor = mongoose.connection.db.collection('hotel-floors').findOne({floor_number: floor_number})
     Object.assign(floor,{rooms: rooms})
     await mongoose.connection.db.collection('hotel-floors').replaceOne({floor_number: floor_number},floor,{upsert: true})
+    await mongoose.connection.db.collection('hotel-logs').insertOne({
+        "ID" : await Logger.getID(),
+        "type" : "modify",
+        "event" : "Rooms Modified",
+        "user" : await new Logger(token).search(),
+        "timestamp" : new Date().getTime(),
+        "details" : rooms
+    })
 })

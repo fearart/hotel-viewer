@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 const config = useRuntimeConfig();
-
+import Logger from "~/utilities/logger";
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
@@ -61,6 +61,17 @@ export default defineEventHandler(async (event) => {
     rooms.push(room)
     Object.assign(floor, {rooms: rooms})
     await mongoose.connection.db.collection('hotel-floors').updateOne({floor_number: floor_number},{$set: floor})
+    await mongoose.connection.db.collection('hotel-logs').insertOne({
+        "event" : `Room added`,
+        "type" : "info",
+        "timestamp" : Date.now(),
+        "user" : await new Logger(token).search(),
+        "details" : {
+            "floor_number" : floor_number,
+            "room_number" : room_number,
+        },
+        'ID' : await Logger.getID()
+    })
     return {
         body: room
     }
