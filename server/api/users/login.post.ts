@@ -16,13 +16,13 @@ export default defineEventHandler(async (event) => {
     if (typeof(body.password) === 'undefined') {return missingDataReturnMessage}
     const user = await mongoose.connection.db.collection('hotel-users').findOne({"login" : body.login})
     if (user === null) {
-        setResponseStatus(event,401,"Wrong password or email")
+        setResponseStatus(event,203,"Wrong password or email")
         return
     }
 
     const result: boolean = await bcrypt.compare(body.password,user.password)
     if (result === false) {
-        setResponseStatus(event,401,"Wrong password or email")
+        setResponseStatus(event,203,"Wrong password or email")
         return
     }
     setResponseStatus(event,202,"OK")
