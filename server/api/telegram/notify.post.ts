@@ -5,45 +5,6 @@ const store = new Map()
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
-const pushChanges = async (body:any) => {
-    console.log('------------')
-    console.log(body)
-    body.floor_number = Number.parseInt(body.floor_number)
-    const floors = await mongoose.connection.db.collection('hotel-floors').find({}).toArray()
-    const floor = floors.find((element: any) => element.floor_number == body.floor_number)
-    if (floor === null || floor === undefined) {
-        return
-    }
-    let rooms = []
-    try {
-        rooms = floor.rooms
-    }
-    catch {
-        rooms = []
-    }
-    let room_number = 1
-    if (rooms.length == 0) {
-        room_number = Number.parseInt(`${body.floor_number}001`)
-    }
-    else {
-        room_number = Number.parseInt(body.room_number)
-    }
-    let room = {
-        'room_number' : room_number,
-        'hasAccessPoint' : body.hasAccessPoint,
-        'hasTV' : body.hasTV,
-        "hasPhone" : body.hasPhone,
-        'hasBathPhone' : body.hasBathPhone,
-        "comment" : body.comment,
-        "macAddress" : body.macAddress,
-        "alarm" : body.alarm,
-        'hasLock' : body.hasLock
-    }
-    // delete old room 
-    rooms = rooms.filter((room:any) => room.room_number != room_number)
-    rooms.push(room)
-    await mongoose.connection.db.collection('hotel-floors').updateOne({floor_number: body.floor_number},{$set: {rooms: rooms}})
-}
 
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
@@ -69,36 +30,10 @@ export default defineEventHandler(async (event) => {
     bot.telegram.sendMessage(config.telegram_chat_id_dev,
 `\\-\\-\\-\\-\\-\\-\\-**№${body.room_number}**\\-\\-\\-\\-\\-\\-\\-
 ${Date().toString().slice(0,24)}
-
 Komentarz: ${body.comment}
-AP: ${body.hasAccessPoint}
-MAC: ${body.macAddress}
-TV: ${body.hasTV}
-Telefon: ${body.hasPhone}
-Telefon w lazience: ${body.hasBathPhone}
-Lock: ${body.hasLock}
 `,
     {
         parse_mode: 'MarkdownV2',
-        reply_markup: {
-          inline_keyboard: [
-            [
-              { text: 'Tak', callback_data: `yes:${token}` },
-              { text: 'Nie', callback_data: `no:${token}` }
-            ]
-          ]
-        }
       }
 )
 })
-bot.action(/yes:(.+)/,async ctx => {
-    const [, token] = ctx.match;
-    if (store.has(token)) {
-      const body = store.get(token);
-      await pushChanges(body)
-    }
-  })
-  bot.action(/no:(.+)/, ctx => {
-    const [, token] = ctx.match;
-    store.delete(token)
-  })

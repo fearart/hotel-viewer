@@ -54,14 +54,6 @@ export default defineEventHandler(async (event) => {
     else {
         let roomComment = room.comment || "";
         let roomMac = room.macAddress || "";
-        await mongoose.connection.db.collection('hotel-logs').insertOne({
-            "id" : Logger.getID(),
-            "event" : "Get room status",
-            "type" : "info",
-            "details" : `Room ${room_number} status was requested`,
-            "timestamp" : Date.now(),
-            "user" : await new Logger(token).search()
-        })
         return {
             hasPhone: room.hasPhone,
             hasTV: room.hasTV,

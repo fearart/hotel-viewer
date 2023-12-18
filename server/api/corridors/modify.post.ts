@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
+import Logger from "~/utilities/logger";
 const config = useRuntimeConfig();
 
 const unauthorizedReturn = (event: any) => {
@@ -56,6 +57,14 @@ export default defineEventHandler(async (event) => {
     corridor.sort((a:any,b:any) => a.accessPointNumber - b.accessPointNumber)
     let floor_obj = Object.assign(floor, {corridor: corridor})
     mongoose.connection.db.collection('hotel-floors').replaceOne({floor_number: floor_number},floor_obj,{upsert: true})
+    mongoose.connection.db.collection('hotel-logs').insertOne({
+        "ID" : Logger.getID(),
+        "type" : "modify",
+        "event" : `Corridor AP #${corridor_number} was modified`,
+        "user" : new Logger(token).search(),
+        "timestamp" : Date.now(),
+        "details" : body
+    })
     return {
         statusCode: 200,
         body: "OK"
