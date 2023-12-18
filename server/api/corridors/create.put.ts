@@ -47,6 +47,7 @@ export default defineEventHandler(async (event) => {
         "accessPointNumber" : AccessPointNumber,
         "macAddress" : "",
         "comment" : "",
+        'APStatus' : "unknown",
     }
     AcessPoints.push(AcessPointRecord)
     Object.assign(floor, {corridor: AcessPoints})

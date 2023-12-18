@@ -21,4 +21,6 @@ export default defineEventHandler(async (event) => {
         unauthorizedReturn(event)
         return
     }
+    const body = await readBody(event)
+    
 })

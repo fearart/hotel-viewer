@@ -55,6 +55,7 @@ export default defineEventHandler(async (event) => {
         return {
             comment: roomComment,
             macAddress: roomMac,
+            APStatus: corridor.APStatus
         }
     }
 }

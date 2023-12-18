@@ -20,7 +20,8 @@ export default defineEventHandler(async (event) => {
         return
     }
     const body = await readBody(event)
-    if (body.floor_number === undefined || body.accessPointNumber === undefined || body.macAddress === undefined || body.comment === undefined) {
+    if (body.floor_number === undefined || body.accessPointNumber === undefined || body.macAddress === undefined || 
+        body.comment === undefined || body.APStatus === undefined) {
         setResponseStatus(event,400,"Bad Request")
         return
     }
@@ -48,6 +49,7 @@ export default defineEventHandler(async (event) => {
         'accessPointNumber' : corridor_number,
         "macAddress" : body.macAddress,
         "comment" : body.comment,
+        "APStatus" : body.APStatus
     }
     corridor = corridor.filter((record:any) => record.accessPointNumber != body.accessPointNumber)
     corridor.push(corridor_record)

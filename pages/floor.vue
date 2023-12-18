@@ -138,14 +138,17 @@
     <UModal v-model="isOpenCorridorModal" class="w-60" :ui="{ container: 'items-start' }">
         <button></button>
         <div class="flex justify-center flex-col items-center p-6">
-            <UInput v-model="openedCorrdior.accessPointNumber" v-maska data-maska="#####" class="text-xl w-24 mb-2"
+            <UInput v-model="openedCorridor.accessPointNumber" v-maska data-maska="#####" class="text-xl w-24 mb-2"
                 placeholder="Room number" />
-            <UInput v-model="openedCorrdior.macAddress" v-maska data-maska="**:**:**:**:**:**" placeholder="MAC:Address" class="pb-2"/>
-            <UInput v-model="openedCorrdior.comment" placeholder="Comment"  />
+            <div>
+                <img v-if="isCorrdiorAPGreen()" src="~/assets/pngs/wifi-green.png" @click="CorridorAPState" class="cursor-pointer"/>
+                <img v-if="isCorrdiorAPGray()" src="~/assets/pngs/wifi-gray.png" @click="CorridorAPState" class="cursor-pointer"/>
+                <img v-if="isCorrdiorAPRed()" src="~/assets/pngs/wifi-red.png" @click="CorridorAPState" class="cursor-pointer"/>
+            </div>
+            <UInput v-model="openedCorridor.macAddress" v-maska data-maska="**:**:**:**:**:**" placeholder="MAC:Address" class="pb-2"/>
+            <UInput v-model="openedCorridor.comment" placeholder="Comment"  />
             <div class="w-full justify-between flex mt-4">
                 <UButton label="Submit" @click="submitCorridorEdit"></UButton>
-                <div class="flex flex-col mx-4 2xl:mx-0">
-                </div>
                 <UButton label="Cancel" color="red" @click="isOpenCorridorModal = false"></UButton>
             </div>
         </div>
@@ -200,7 +203,7 @@ const openedRoomComment = ref('NoData')
 const openedRoomAcessPointMAC = ref('NoData')
 const openedRoomAlarm = ref(false)
 const openedRoomHasLock = ref('NoData')
-const openedCorrdior = ref({})
+const openedCorridor = ref({})
 
 // Modals vars
 const isOpenRoomModal = ref(false)
@@ -313,11 +316,12 @@ const setCorridorAPColor = (corridorIndex) => {
 const OpenCorridorModal = (corridor_number) => {
     corridor_number = corridors.value[corridor_number].accessPointNumber
     axios.post('/api/corridors/info', { "floor_number": floor_number.value, "corridor_number": corridor_number }).then((response) => {
-        openedCorrdior.value.accessPointNumber = corridor_number
-        openedCorrdior.value.macAddress = response.data.macAddress
-        openedCorrdior.value.comment = response.data.comment
+        openedCorridor.value.accessPointNumber = corridor_number
+        openedCorridor.value.macAddress = response.data.macAddress
+        openedCorridor.value.comment = response.data.comment
+        openedCorridor.value.APStatus = response.data.APStatus
     })
-    openedCorrdior.value.AccessPointNumber = corridor_number
+    openedCorridor.value.AccessPointNumber = corridor_number
     isOpenCorridorModal.value = true
 }
 const setCinemaColor = () => {
@@ -382,6 +386,17 @@ const Lockstate = () => {
         openedRoomHasLock.value = 'unknown'
     }
 
+}
+const CorridorAPState = () => {
+    if (openedCorridor.value.APStatus === 'unknown') {
+        openedCorridor.value.APStatus = 'Yes'
+    }
+    else if (openedCorridor.value.APStatus === 'Yes') {
+        openedCorridor.value.APStatus = 'No'
+    }
+    else {
+        openedCorridor.value.APStatus = 'unknown'
+    }
 }
 const isTvGreen = () => {
     if (openedRoomHasTV.value === 'Yes') {
@@ -473,6 +488,25 @@ const isLockRed = () => {
     }
     return false
 }
+const isCorrdiorAPGreen = () => {
+    console.log(openedCorridor.value.APStatus)
+    if (openedCorridor.value.APStatus === 'Yes') {
+        return true
+    }
+    return false
+}
+const isCorrdiorAPGray = () => {
+    if (openedCorridor.value.APStatus === 'unknown') {
+        return true
+    }
+    return false
+}
+const isCorrdiorAPRed = () => {
+    if (openedCorridor.value.APStatus === 'No') {
+        return true
+    }
+    return false
+}
 
 
 const submitEdit = () => {
@@ -487,7 +521,7 @@ const submitEdit = () => {
     })
 }
 const submitCorridorEdit = () => {
-    axios.post('/api/corridors/modify',{ "floor_number": floor_number.value, "accessPointNumber": openedCorrdior.value.accessPointNumber, "macAddress": openedCorrdior.value.macAddress, "comment": openedCorrdior.value.comment }).then((response) => {
+    axios.post('/api/corridors/modify',{ "floor_number": floor_number.value, "accessPointNumber": openedCorridor.value.accessPointNumber, "macAddress": openedCorridor.value.macAddress, "comment": openedCorridor.value.comment, "APStatus" : openedCorridor.value.APStatus }).then((response) => {
         getFloorInfo()
         isOpenCorridorModal.value = false
     })
