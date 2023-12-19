@@ -21,7 +21,11 @@ export default defineEventHandler(async (event) => {
         return
     }
     const body = await readBody(event)
-    if (body.floor_number === undefined || body.room_number === undefined || body.hasPhone === undefined || body.hasTV === undefined || body.hasAccessPoint === undefined || body.hasBathPhone === undefined || body.comment === undefined,body.macAddress === undefined,body.alarm === undefined,body.hasLock === undefined) {
+    if (body.floor_number === undefined || body.room_number === undefined || body.hasPhone === undefined || body.hasTV === undefined || 
+        body.hasAccessPoint === undefined || body.hasBathPhone === undefined || body.comment === undefined || body.macAddress === undefined || 
+        body.alarm === undefined || body.hasLock === undefined || body.hasBroom === undefined || body.hasSink === undefined || body.hasToilet === undefined ||
+        body.hasRadiator === undefined || body.hasShower === undefined || body.hasBidet === undefined || body.hasSocket === undefined || 
+        body.hasBulb === undefined) {
         setResponseStatus(event,400,"Bad Request")
         return
     }
@@ -54,7 +58,15 @@ export default defineEventHandler(async (event) => {
         "comment" : body.comment,
         "macAddress" : body.macAddress,
         "alarm" : body.alarm,
-        'hasLock' : body.hasLock
+        'hasLock' : body.hasLock,
+        'hasBroom' : body.hasBroom,
+        'hasSink' : body.hasSink,
+        'hasToilet' : body.hasToilet,
+        'hasRadiator' : body.hasRadiator,
+        'hasShower' : body.hasShower,
+        'hasBidet' : body.hasBidet,
+        'hasSocket' : body.hasSocket,
+        'hasBulb' : body.hasBulb
     }
 
     // delete old room  

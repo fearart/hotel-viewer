@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ['@nuxt/ui','@pinia/nuxt'],
+  modules: ['@nuxt/ui','@pinia/nuxt','@nuxtjs/google-fonts'],
   runtimeConfig: {
     mongodb_uri: process.env.MONGODB_URI,
     jwt_secret: process.env.JWT_SECRET,
@@ -17,4 +17,10 @@ export default defineNuxtConfig({
   app: {
     baseURL: '',
   },
+  googleFonts: {
+    download: true,
+    families: {
+      'Montserrat': true,
+    }
+  }
 })

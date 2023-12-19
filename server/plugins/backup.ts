@@ -9,11 +9,6 @@ export default async (_nitroApp: Nitro) => {
   } catch (e) {
     console.error(e);
   }
-
-  const floors = await mongoose.connection.db.collection('hotel-floors').find().toArray();
-  await mongoose.connection.db.collection('hotel-floors-backup').deleteMany({});
-  await mongoose.connection.db.collection('hotel-floors-backup').insertMany(floors);
-  console.log("Backup done at " + Date().toString().slice(0,24) + "");
   // Backup every hour
   setInterval(async () => {
     const floors = await mongoose.connection.db.collection('hotel-floors').find().toArray();

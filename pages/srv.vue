@@ -241,6 +241,11 @@ const submitUserModal = (index) => {
                 break;
         }
     });
+    if (openedUser.value.group.it === undefined) openedUser.value.group.it = false;
+    if (openedUser.value.group.pokojowki === undefined) openedUser.value.group.pokojowki = false;
+    if (openedUser.value.group.elektrycy === undefined) openedUser.value.group.elektrycy = false;
+    if (openedUser.value.group.hydraulicy === undefined) openedUser.value.group.hydraulicy = false;
+    if (openedUser.value.group.konserwatorzy === undefined) openedUser.value.group.konserwatorzy = false;
     isOpen.value = false
     selectedGroups.value = []
     console.log(openedUser.value)
@@ -267,7 +272,8 @@ const deleteUser = () => {
 }
 const resetPassword = () => {
     if (!isRoot) return
-    const password = prompt("Podaj nowe hasło")
+    let password = prompt("Podaj nowe hasło")
+    password = password.trim().replaceAll(" ","")
     if (password === null || password === "") {
         return
     }

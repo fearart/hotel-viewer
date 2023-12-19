@@ -14,7 +14,6 @@ class Logger {
         }
         return user.login;
     }
-    
     public static async getID() {
         return await mongoose.connection.db.collection('hotel-logs').countDocuments() + 1
     }

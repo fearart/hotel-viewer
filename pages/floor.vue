@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col p-4 items-center w-full">
+    <div class="flex flex-col p-4 items-center w-full montserrat">
         <div class="flex flex-col">
             <h1 class="text-3xl justify-center w-full">Piętro {{ floor_number }}</h1>
             <div class="flex flex-row justify-between">
@@ -19,9 +19,16 @@
             class="grid 2xl:grid-cols-12 xl:grid-cols-10 grid-cols-6 w-full place-items-center justify-center h-full"
             >
             <div v-if="displayRooms && !hide_naxuy_rooms" v-for="(room, roomIndex) in rooms" :key="roomIndex"
-                class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
+                class="mb-3 room-card text-white flex-col flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
                 :class="[setRoomColor(roomIndex), room.alarm ? 'alarm' : '']" @click="openRoomModal(roomIndex)">
                 {{ room.room_number }}
+                <div class="flex flex-row 2xl:w-2/3 w-5/6 justify-center text-center text-sm 2xl:pt-4">
+                    <p class="w-1/5" v-if="eShouldDisplay(roomIndex)">E</p>
+                    <p class="w-1/5" v-if="kShouldDisplay(roomIndex)">K</p>
+                    <p class="w-1/5" v-if="iShouldDisplay(roomIndex)">I</p>
+                    <p class="w-1/5" v-if="pShouldDisplay(roomIndex)">P</p>
+                    <p class="w-1/5" v-if="aShouldDisplay(roomIndex)">A</p>
+                </div>
             </div>
             <div class="xl:w-24 xl:h-24 w-12 h-12  mb-3 room-card bg-gray-500 text-white flex items-center justify-center rounded-lg cursor-pointer"
                 @click="createNewRoom()" v-if="isAdmin">
@@ -69,70 +76,108 @@
     <!-- rooms modal-->
     <UModal v-model="isOpenRoomModal" class="w-60" :ui="{ container: 'items-start' }">
         <button></button>
-        <div class="flex justify-center flex-col items-center p-6">
-            <div class="flex flex-row h-8 mb-2">
-                <UInput v-model="openedRoomNumber" v-maska data-maska="#####" class="text-xl w-24 mb-2"
-                    placeholder="Room number" />
-                <UButton v-if="openedRoomAlarm" icon="i-heroicons-bell" color="red" @click="toggleAlarm" class="ml-4"/>
-                <UButton v-else icon="i-heroicons-bell" color="gray" @click="toggleAlarm" class="ml-4"/>
-            </div>
-            <UInput v-model="openedRoomAcessPointMAC" v-maska data-maska="**:**:**:**:**:**" placeholder="MAC:Address" />
-            <div class="m-2 flex flex-col items-center">
-                <div class="flex flex-row">
-                    <div class="pr-2">
-                        <img v-if="isAcessPointGreen()" src="~/assets/pngs/wifi-green.png" @click="AcessPointstate"
-                            class="cursor-pointer" />
-                        <img v-if="isAcessPointGray()" src="~/assets/pngs/wifi-gray.png" @click="AcessPointstate"
-                            class="cursor-pointer" />
-                        <img v-if="isAcessPointRed()" src="~/assets/pngs/wifi-red.png" @click="AcessPointstate"
-                            class="cursor-pointer" />
+        <UTabs :items="roomModalItems" class="px-2 mt-2">
+            <template #item="{ item }">
+                <UCard @submit.prevent="() => onSubmit(item.key === 'account' ? accountForm : passwordForm)" class="mb-2">
+                    <template #header>
+                        <div class="flex flex-row h-10 w-full justify-center">
+                            <UButton v-if="isAdmin" label="Submit" @click="submitEdit"></UButton>
+                            <UButton label="Cancel" color="red" class="ml-2" @click="isOpenRoomModal = false"></UButton>
+                            <UInput v-model="openedRoom.room_number" v-maska data-maska="#####" class="text-xl w-24 mb-2 mx-2"
+                            placeholder="Room number" size="l"/>
+                            <UButton v-if="openedRoom.alarm" icon="i-heroicons-bell" color="red" @click="toggleAlarm" class="mr-2"/>
+                            <UButton v-else icon="i-heroicons-bell" color="gray" @click="toggleAlarm" class="mr-2"/>
+                            <UButton v-if="isAdmin" label="" @click="requestEdit">
+                                <img src="~/assets/svg/tg-white.png" class="w-6 h-6">
+                            </UButton>
+                        </div>
+                    </template>
+                    <div v-if="item.key === 'I'" class="flex justify-center flex-col items-center p-6">
+                        <UInput v-model="openedRoom.macAddress" v-maska data-maska="**:**:**:**:**:**" placeholder="MAC:Address" />
+                        <div class="m-2 flex flex-col items-center">
+                            <div class="flex flex-row">
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.AccessPointImage" @click="AcessPointstate" class="cursor-pointer"/>
+                                </div>
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.TVImage" @click="TVstate" class="cursor-pointer">
+                                </div>
+                            </div>
+                            <div class="flex flex-row">
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.BathPhoneImage" @click="BathPhonestate" class="cursor-pointer">
+                                </div>
+                                <div class="h-20 w-20">
+                                    <img :src="imageLibrary.PhoneImage" @click="Phonestate" class="cursor-pointer"/>
+                                </div>
+                                <div class="h-20 w-20">
+                                    <img :src="imageLibrary.LockImage" @click="Lockstate" class="cursor-pointer"/>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="pr-2">
-                        <img v-if="isTvGreen()" src="~/assets/pngs/tv-green.png" @click="TVstate" class="cursor-pointer" />
-                        <img v-if="isTvGray()" src="~/assets/pngs/tv-gray.png" @click="TVstate" class="cursor-pointer" />
-                        <img v-if="isTvRed()" src="~/assets/pngs/tv-red.png" @click="TVstate" class="cursor-pointer" />
+                    <div v-if="item.key === 'P'">
+                        <div class="m-2 flex flex-col items-center">
+                            <div class="flex flex-row">
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.BroomImage" @click="Broomstate" class="cursor-pointer"/>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="flex flex-row">
-                    <div class="pr-2">
-                        <img v-if="isBathPhoneGreen()" src="~/assets/pngs/bath-green.png" @click="BathPhonestate"
-                            class="cursor-pointer" />
-                        <img v-if="isBathPhoneGray()" src="~/assets/pngs/bath-gray.png" @click="BathPhonestate"
-                            class="cursor-pointer" />
-                        <img v-if="isBathPhoneRed()" src="~/assets/pngs/bath-red.png" @click="BathPhonestate"
-                            class="cursor-pointer" />
+                    <div v-if="item.key === 'K'">
+                        <div class="m-2 flex flex-col items-center">
+                            <div class="flex flex-row">
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.SinkImage" @click="Sinkstate" class="cursor-pointer"/>
+                                </div>
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.ToiletImage" @click="Toiletstate" class="cursor-pointer"/>
+                                </div>
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.RadiatorImage" @click="Radiatorstate" class="cursor-pointer"/>
+                                </div>
+                            </div>
+                            <div class="flex flex-row">
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.BidetImage" @click="Bidetstate" class="cursor-pointer"/>
+                                </div>
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.ShowerImage" @click="Showerstate" class="cursor-pointer"/>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <img v-if="isPhoneGreen()" src="~/assets/pngs/phone-green.png" @click="Phonestate"
-                            class="cursor-pointer" />
-                        <img v-if="isPhoneGray()" src="~/assets/pngs/phone-gray.png" @click="Phonestate"
-                            class="cursor-pointer" />
-                        <img v-if="isPhoneRed()" src="~/assets/pngs/phone-red.png" @click="Phonestate"
-                            class="cursor-pointer" />
+                    <div v-if="item.key === 'E'">
+                        <div class="m-2 flex flex-col items-center">
+                            <div class="flex flex-row">
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.SocketImage" @click="Socketstate" class="cursor-pointer"/>
+                                </div>
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.BulbImage" @click="Bulbstate" class="cursor-pointer"/>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <img v-if="isLockGreen()" src="~/assets/pngs/lock-green.png" @click="Lockstate"
-                            class="cursor-pointer" />
-                        <img v-if="isLockGray()" src="~/assets/pngs/lock-gray.png" @click="Lockstate"
-                            class="cursor-pointer" />
-                        <img v-if="isLockRed()" src="~/assets/pngs/lock-red.png" @click="Lockstate"
-                            class="cursor-pointer" />
-                    </div>
-                </div>
-            </div>
-            <div class="w-full justify-between flex mt-4">
-                <UButton v-if="isAdmin" label="Submit" @click="submitEdit"></UButton>
-                <UButton v-else label="Submit" @click="requestEdit" icon="i-heroicons-arrow-right-circle"></UButton>
-                <UButton v-if="isRoot" label="" @click="requestEdit" class="ml-2">
-                    <img src="~/assets/svg/tg-white.png" class="w-12 h-12">
-                </UButton>
-                <div class="flex flex-col mx-4 2xl:mx-0">
-                    <UTextarea v-model="openedRoomComment" placeholder="Comment" class="pb-2" size="xs"/>
-                </div>
+                    <template #footer>
+                        <div id="roomModalFooter" class="w-full flex items-center justify-center">
+                            <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
+                                <UTextarea v-model="openedRoom.comment" placeholder="Comment" class="pb-2" size="xs"/>
+                            </div>
+                        </div>
+                    </template>
+                </UCard>
+            </template>
+            <template #default="{item,index,selected}">
+                <div class="flex items-center gap-2 relative truncate">
+                    <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
+                    <span class="truncate">{{ item.key }}</span>
 
-                <UButton label="Cancel" color="red" @click="isOpenRoomModal = false"></UButton>
-            </div>
-        </div>
+                    <span v-if="selected" class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
+                </div>
+            </template>
+        </UTabs>
     </UModal>
     <!-- corridors modal -->
     <UModal v-model="isOpenCorridorModal" class="w-60" :ui="{ container: 'items-start' }">
@@ -158,18 +203,24 @@
 import axios from 'axios';
 
 // Base data
-const colorScheme = useColorMode()
 const floor_number = ref(0)
 const floor = ref(null)
 const rooms = ref([])
 const savedRooms = ref([])
 const corridors = ref([])
 const savedCorridors = ref([])
-const cinemas = ref([])
 const userPermissions = ref({})
+const user = ref({})
 const isAdmin = ref(false)
 const isRoot = ref(false)
-
+const modalType = ref('it')
+/*
+    it - informatycy
+    cl - pokojówki
+    hy - hydraulicy
+    el - elektrycy
+    ks - konserwatorzy
+*/ 
 // Floor part
 const displayRooms = ref(false)
 
@@ -192,19 +243,10 @@ const hide_naxuy_corridor = ref(false)
 const hide_naxuy_rooms = ref(false)
 const hide_naxuy_conference_rooms = ref(false)
 const hide_naxuy_restaurants = ref(false)
-// Rooms part
-const openedRoomNumber = ref(0)
-const openedRoomFloorNumber = ref(0)
-const openedRoomHasTV = ref('NoData')
-const openedRoomHasPhone = ref('NoData')
-const openedRoomHasBathPhone = ref('NoData')
-const openedRoomHasAcessPoint = ref('NoData')
-const openedRoomComment = ref('NoData')
-const openedRoomAcessPointMAC = ref('NoData')
-const openedRoomAlarm = ref(false)
-const openedRoomHasLock = ref('NoData')
+// Objects
+const openedRoom = ref({})
 const openedCorridor = ref({})
-
+const imageLibrary = ref({})
 // Modals vars
 const isOpenRoomModal = ref(false)
 const isOpenCorridorModal = ref(false)
@@ -236,6 +278,7 @@ onMounted(() => {
     }
     const querry = useRoute().query
     floor_number.value = querry.floor_number
+    getUser()
     getFloorInfo()
 })
 const getFloorInfo = () => {
@@ -278,30 +321,221 @@ const getFloorInfo = () => {
 }
 const setRoomColor = (roomIndex) => {
     let room = rooms.value[roomIndex]
-    if (room.hasTV === 'Yes' && room.hasPhone === 'Yes' && room.hasBathPhone === 'Yes' && room.hasAccessPoint === 'Yes' && room.hasLock === "Yes") {
-        return 'bg-green-500'
+    let userGroup = user.value.group
+    if (userGroup.it) {
+        if (room.hasAccessPoint === "Yes" && room.hasBathPhone === "Yes" && room.hasBathPhone === "Yes" && room.hasTV === "Yes" && room.hasLock === "Yes") {
+            return 'bg-green-500'
+        }
+        else if (room.hasAccessPoint === "No" || room.hasBathPhone === "No" || room.hasBathPhone === "No" || room.hasTV === "No" || room.hasLock === "No") {
+            return 'bg-red-500'
+        }
+        else {
+            return 'bg-gray-500'
+        }
     }
-    else if (room.hasTV === 'No' || room.hasPhone === 'No' || room.hasBathPhone === 'No' || room.hasAccessPoint === 'No' || room.hasLock === 'No') {
-        return 'bg-red-500'
+    if (userGroup.pokojowki) {
+        if (room.hasBroom === "Yes") {
+            return 'bg-green-500'
+        }
+        else if (room.hasBroom === "No") {
+            return 'bg-red-500'
+        }
+        else {
+            return 'bg-gray-500'
+        }
     }
-    else {
-        return 'bg-gray-500'
+    if (userGroup.hydraulicy) {
+        if (room.hasSink === "Yes" && room.hasToilet === "Yes" && room.hasRadiator === "Yes" && room.hasBidet === "Yes" && room.hasShower === "Yes") {
+            return 'bg-green-500'
+        }
+        else if (room.hasSink === "No" || room.hasToilet === "No" || room.hasRadiator === "No" || room.hasBidet === "No" || room.hasShower === "No") {
+            return 'bg-red-500'
+        }
+        else {
+            return 'bg-gray-500'
+        }
+    }
+    if (userGroup.elektrycy) {
+        if (room.hasSocket === "Yes" && room.hasBulb === "Yes") {
+            return 'bg-green-500'
+        }
+        else if (room.hasSocket === "No" || room.hasBulb === "No") {
+            return 'bg-red-500'
+        }
+        else {
+            return 'bg-gray-500'
+        }
     }
 }
 const openRoomModal = (room_number) => {
-    openedRoomFloorNumber.value = floor_number
     room_number = rooms.value[room_number].room_number
     axios.post('/api/rooms/info', { "floor_number": floor_number.value, "room_number": room_number }).then((response) => {
-        openedRoomHasAcessPoint.value = response.data.hasAccessPoint
-        openedRoomHasBathPhone.value = response.data.hasBathPhone
-        openedRoomHasPhone.value = response.data.hasPhone
-        openedRoomHasTV.value = response.data.hasTV
-        openedRoomComment.value = response.data.comment
-        openedRoomAcessPointMAC.value = response.data.macAddress
-        openedRoomAlarm.value = response.data.alarm
-        openedRoomHasLock.value = response.data.hasLock
+        openedRoom.value.alarm = response.data.alarm
+        openedRoom.value.hasLock = response.data.hasLock
+        openedRoom.value = {
+            "floor_number": floor_number.value,
+            "room_number": room_number,
+            "hasAccessPoint": response.data.hasAccessPoint,
+            "hasBathPhone": response.data.hasBathPhone,
+            "hasPhone": response.data.hasPhone,
+            "hasTV": response.data.hasTV,
+            "comment": response.data.comment,
+            "macAddress": response.data.macAddress,
+            "alarm": response.data.alarm,
+            "hasLock": response.data.hasLock,
+            "hasBroom": response.data.hasBroom,
+            "hasSink": response.data.hasSink,
+            "hasToilet": response.data.hasToilet,
+            "hasRadiator": response.data.hasRadiator,
+            "hasBidet": response.data.hasBidet,
+            "hasShower": response.data.hasShower,
+            "hasSocket": response.data.hasSocket,
+            "hasBulb": response.data.hasBulb,
+        }
+        switch(openedRoom.value.hasAccessPoint) {
+            case "Yes":
+                imageLibrary.value.AccessPointImage = '/img/pngs/wifi-green.png'
+                break;
+            case "No":
+                imageLibrary.value.AccessPointImage = '/img/pngs/wifi-red.png'
+                break;
+            default:
+                imageLibrary.value.AccessPointImage = '/img/pngs/wifi-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasBathPhone) {
+            case "Yes":
+                imageLibrary.value.BathPhoneImage = '/img/pngs/bath-green.png'
+                break;
+            case "No":
+                imageLibrary.value.BathPhoneImage = '/img/pngs/bath-red.png'
+                break;
+            default:
+                imageLibrary.value.BathPhoneImage = '/img/pngs/bath-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasPhone) {
+            case "Yes":
+                imageLibrary.value.PhoneImage = '/img/pngs/phone-green.png'
+                break;
+            case "No":
+                imageLibrary.value.PhoneImage = '/img/pngs/phone-red.png'
+                break;
+            default:
+                imageLibrary.value.PhoneImage = '/img/pngs/phone-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasTV) {
+            case "Yes":
+                imageLibrary.value.TVImage = '/img/pngs/tv-green.png'
+                break;
+            case "No":
+                imageLibrary.value.TVImage = '/img/pngs/tv-red.png'
+                break;
+            default:
+                imageLibrary.value.TVImage = '/img/pngs/tv-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasLock) {
+            case "Yes":
+                imageLibrary.value.LockImage = '/img/pngs/lock-green.png'
+                break;
+            case "No":
+                imageLibrary.value.LockImage = '/img/pngs/lock-red.png'
+                break;
+            default:
+                imageLibrary.value.LockImage = '/img/pngs/lock-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasBroom) {
+            case "Yes":
+                imageLibrary.value.BroomImage = '/img/pngs/broom-green.png'
+                break;
+            case "No":
+                imageLibrary.value.BroomImage = '/img/pngs/broom-red.png'
+                break;
+            default:
+                imageLibrary.value.BroomImage = '/img/pngs/broom-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasSink) {
+            case "Yes":
+                imageLibrary.value.SinkImage = '/img/pngs/sink-green.png'
+                break;
+            case "No":
+                imageLibrary.value.SinkImage = '/img/pngs/sink-red.png'
+                break;
+            default:
+                imageLibrary.value.SinkImage = '/img/pngs/sink-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasToilet) {
+            case "Yes":
+                imageLibrary.value.ToiletImage = '/img/pngs/toilet-green.png'
+                break;
+            case "No":
+                imageLibrary.value.ToiletImage = '/img/pngs/toilet-red.png'
+                break;
+            default:
+                imageLibrary.value.ToiletImage = '/img/pngs/toilet-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasRadiator) {
+            case "Yes":
+                imageLibrary.value.RadiatorImage = '/img/pngs/radiator-green.png'
+                break;
+            case "No":
+                imageLibrary.value.RadiatorImage = '/img/pngs/radiator-red.png'
+                break;
+            default:
+                imageLibrary.value.RadiatorImage = '/img/pngs/radiator-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasBidet) {
+            case "Yes":
+                imageLibrary.value.BidetImage = '/img/pngs/bidet-green.png'
+                break;
+            case "No":
+                imageLibrary.value.BidetImage = '/img/pngs/bidet-red.png'
+                break;
+            default:
+                imageLibrary.value.BidetImage = '/img/pngs/bidet-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasShower) {
+            case "Yes":
+                imageLibrary.value.ShowerImage = '/img/pngs/shower-green.png'
+                break;
+            case "No":
+                imageLibrary.value.ShowerImage = '/img/pngs/shower-red.png'
+                break;
+            default:
+                imageLibrary.value.ShowerImage = '/img/pngs/shower-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasSocket) {
+            case "Yes":
+                imageLibrary.value.SocketImage = '/img/pngs/socket-green.png'
+                break;
+            case "No":
+                imageLibrary.value.SocketImage = '/img/pngs/socket-red.png'
+                break;
+            default:
+                imageLibrary.value.SocketImage = '/img/pngs/socket-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasBulb) {
+            case "Yes":
+                imageLibrary.value.BulbImage = '/img/pngs/bulb-green.png'
+                break;
+            case "No":
+                imageLibrary.value.BulbImage = '/img/pngs/bulb-red.png'
+                break;
+            default:
+                imageLibrary.value.BulbImage = '/img/pngs/bulb-gray.png'
+                break;
+        }
     })
-    openedRoomNumber.value = room_number
     isOpenRoomModal.value = true
 }
 const setCorridorAPColor = (corridorIndex) => {
@@ -331,61 +565,188 @@ const setCinemaColor = () => {
 const openCinemaModal = () => {
     // TODO: implement
 }
+// #region States
 const TVstate = () => {
-    if (openedRoomHasTV.value === 'unknown') {
-        openedRoomHasTV.value = 'Yes'
+    if (openedRoom.value.hasTV === 'unknown') {
+        openedRoom.value.hasTV = 'Yes'
+        imageLibrary.value.TVImage = 'img/pngs/tv-green.png'
     }
-    else if (openedRoomHasTV.value === 'Yes') {
-        openedRoomHasTV.value = 'No'
+    else if (openedRoom.value.hasTV === 'Yes') {
+        openedRoom.value.hasTV = 'No'
+        imageLibrary.value.TVImage = 'img/pngs/tv-red.png'
     }
     else {
-        openedRoomHasTV.value = 'unknown'
+        openedRoom.value.hasTV = 'unknown'
+        imageLibrary.value.TVImage = 'img/pngs/tv-gray.png'
     }
 }
 const AcessPointstate = () => {
-    if (openedRoomHasAcessPoint.value === 'unknown') {
-        openedRoomHasAcessPoint.value = 'Yes'
+    if (openedRoom.value.hasAccessPoint === 'unknown') {
+        openedRoom.value.hasAccessPoint = 'Yes'
+        imageLibrary.value.AccessPointImage = 'img/pngs/wifi-green.png'
     }
-    else if (openedRoomHasAcessPoint.value === 'Yes') {
-        openedRoomHasAcessPoint.value = 'No'
+    else if (openedRoom.value.hasAccessPoint === 'Yes') {
+        openedRoom.value.hasAccessPoint = 'No'
+        imageLibrary.value.AccessPointImage = 'img/pngs/wifi-red.png'
     }
     else {
-        openedRoomHasAcessPoint.value = 'unknown'
+        openedRoom.value.hasAccessPoint = 'unknown'
+        imageLibrary.value.AccessPointImage = 'img/pngs/wifi-gray.png'
     }
 }
 const Phonestate = () => {
-    if (openedRoomHasPhone.value === 'unknown') {
-        openedRoomHasPhone.value = 'Yes'
+    if (openedRoom.value.hasPhone === 'unknown') {
+        openedRoom.value.hasPhone = 'Yes'
+        imageLibrary.value.PhoneImage = 'img/pngs/phone-green.png'
     }
-    else if (openedRoomHasPhone.value === 'Yes') {
-        openedRoomHasPhone.value = 'No'
+    else if (openedRoom.value.hasPhone === 'Yes') {
+        openedRoom.value.hasPhone = 'No'
+        imageLibrary.value.PhoneImage = 'img/pngs/phone-red.png'
     }
     else {
-        openedRoomHasPhone.value = 'unknown'
+        openedRoom.value.hasPhone = 'unknown'
+        imageLibrary.value.PhoneImage = 'img/pngs/phone-gray.png'
     }
 }
 const BathPhonestate = () => {
-    if (openedRoomHasBathPhone.value === 'unknown') {
-        openedRoomHasBathPhone.value = 'Yes'
+    if (openedRoom.value.hasBathPhone === 'unknown') {
+        openedRoom.value.hasBathPhone = 'Yes'
+        imageLibrary.value.BathPhoneImage = 'img/pngs/bath-green.png'
     }
-    else if (openedRoomHasBathPhone.value === 'Yes') {
-        openedRoomHasBathPhone.value = 'No'
+    else if (openedRoom.value.hasBathPhone === 'Yes') {
+        openedRoom.value.hasBathPhone = 'No'
+        imageLibrary.value.BathPhoneImage = 'img/pngs/bath-red.png'
     }
     else {
-        openedRoomHasBathPhone.value = 'unknown'
+        openedRoom.value.hasBathPhone = 'unknown'
+        imageLibrary.value.BathPhoneImage = 'img/pngs/bath-gray.png'
     }
 }
 const Lockstate = () => {
-    if (openedRoomHasLock.value === 'unknown') {
-        openedRoomHasLock.value = 'Yes'
+    if (openedRoom.value.hasLock === 'unknown') {
+        openedRoom.value.hasLock = 'Yes'
+        imageLibrary.value.LockImage = 'img/pngs/lock-green.png'
     }
-    else if (openedRoomHasLock.value === 'Yes') {
-        openedRoomHasLock.value = 'No'
+    else if (openedRoom.value.hasLock === 'Yes') {
+        openedRoom.value.hasLock = 'No'
+        imageLibrary.value.LockImage = 'img/pngs/lock-red.png'
     }
     else {
-        openedRoomHasLock.value = 'unknown'
+        openedRoom.value.hasLock = 'unknown'
+        imageLibrary.value.LockImage = 'img/pngs/lock-gray.png'
     }
-
+}
+const Broomstate = () => {
+    if (openedRoom.value.hasBroom === 'unknown') {
+        openedRoom.value.hasBroom = 'Yes'
+        imageLibrary.value.BroomImage = 'img/pngs/broom-green.png'
+    }
+    else if (openedRoom.value.hasBroom === 'Yes') {
+        openedRoom.value.hasBroom = 'No'
+        imageLibrary.value.BroomImage = 'img/pngs/broom-red.png'
+    }
+    else {
+        openedRoom.value.hasBroom = 'unknown'
+        imageLibrary.value.BroomImage = 'img/pngs/broom-gray.png'
+    }
+}
+const Sinkstate = () => {
+    if (openedRoom.value.hasSink === 'unknown') {
+        openedRoom.value.hasSink = 'Yes'
+        imageLibrary.value.SinkImage = 'img/pngs/sink-green.png'
+    }
+    else if (openedRoom.value.hasSink === 'Yes') {
+        openedRoom.value.hasSink = 'No'
+        imageLibrary.value.SinkImage = 'img/pngs/sink-red.png'
+    }
+    else {
+        openedRoom.value.hasSink = 'unknown'
+        imageLibrary.value.SinkImage = 'img/pngs/sink-gray.png'
+    }
+}
+const Toiletstate = () => {
+    if (openedRoom.value.hasToilet === 'unknown') {
+        openedRoom.value.hasToilet = 'Yes'
+        imageLibrary.value.ToiletImage = 'img/pngs/toilet-green.png'
+    }
+    else if (openedRoom.value.hasToilet === 'Yes') {
+        openedRoom.value.hasToilet = 'No'
+        imageLibrary.value.ToiletImage = 'img/pngs/toilet-red.png'
+    }
+    else {
+        openedRoom.value.hasToilet = 'unknown'
+        imageLibrary.value.ToiletImage = 'img/pngs/toilet-gray.png'
+    }
+}
+const Radiatorstate = () => {
+    if (openedRoom.value.hasRadiator === 'unknown') {
+        openedRoom.value.hasRadiator = 'Yes'
+        imageLibrary.value.RadiatorImage = 'img/pngs/radiator-green.png'
+    }
+    else if (openedRoom.value.hasRadiator === 'Yes') {
+        openedRoom.value.hasRadiator = 'No'
+        imageLibrary.value.RadiatorImage = 'img/pngs/radiator-red.png'
+    }
+    else {
+        openedRoom.value.hasRadiator = 'unknown'
+        imageLibrary.value.RadiatorImage = 'img/pngs/radiator-gray.png'
+    }
+}
+const Bidetstate = () => {
+    if (openedRoom.value.hasBidet === 'unknown') {
+        openedRoom.value.hasBidet = 'Yes'
+        imageLibrary.value.BidetImage = 'img/pngs/bidet-green.png'
+    }
+    else if (openedRoom.value.hasBidet === 'Yes') {
+        openedRoom.value.hasBidet = 'No'
+        imageLibrary.value.BidetImage = 'img/pngs/bidet-red.png'
+    }
+    else {
+        openedRoom.value.hasBidet = 'unknown'
+        imageLibrary.value.BidetImage = 'img/pngs/bidet-gray.png'
+    }
+}
+const Showerstate = () => {
+    if (openedRoom.value.hasShower === 'unknown') {
+        openedRoom.value.hasShower = 'Yes'
+        imageLibrary.value.ShowerImage = 'img/pngs/shower-green.png'
+    }
+    else if (openedRoom.value.hasShower === 'Yes') {
+        openedRoom.value.hasShower = 'No'
+        imageLibrary.value.ShowerImage = 'img/pngs/shower-red.png'
+    }
+    else {
+        openedRoom.value.hasShower = 'unknown'
+        imageLibrary.value.ShowerImage = 'img/pngs/shower-gray.png'
+    }
+}
+const Socketstate = () => {
+    if (openedRoom.value.hasSocket === 'unknown') {
+        openedRoom.value.hasSocket = 'Yes'
+        imageLibrary.value.SocketImage = 'img/pngs/socket-green.png'
+    }
+    else if (openedRoom.value.hasSocket === 'Yes') {
+        openedRoom.value.hasSocket = 'No'
+        imageLibrary.value.SocketImage = 'img/pngs/socket-red.png'
+    }
+    else {
+        openedRoom.value.hasSocket = 'unknown'
+        imageLibrary.value.SocketImage = 'img/pngs/socket-gray.png'
+    }
+}
+const Bulbstate = () => {
+    if (openedRoom.value.hasBulb === 'unknown') {
+        openedRoom.value.hasBulb = 'Yes'
+        imageLibrary.value.BulbImage = 'img/pngs/bulb-green.png'
+    }
+    else if (openedRoom.value.hasBulb === 'Yes') {
+        openedRoom.value.hasBulb = 'No'
+        imageLibrary.value.BulbImage = 'img/pngs/bulb-red.png'
+    }
+    else {
+        openedRoom.value.hasBulb = 'unknown'
+        imageLibrary.value.BulbImage = 'img/pngs/bulb-gray.png'
+    }
 }
 const CorridorAPState = () => {
     if (openedCorridor.value.APStatus === 'unknown') {
@@ -398,123 +759,19 @@ const CorridorAPState = () => {
         openedCorridor.value.APStatus = 'unknown'
     }
 }
-const isTvGreen = () => {
-    if (openedRoomHasTV.value === 'Yes') {
-        return true
-    }
-    return false
-}
-const isTvGray = () => {
-    if (openedRoomHasTV.value === 'unknown') {
-        return true
-    }
-    return false
-}
-const isTvRed = () => {
-    if (openedRoomHasTV.value === 'No') {
-        return true
-    }
-    return false
-}
-const isPhoneGreen = () => {
-    if (openedRoomHasPhone.value === 'Yes') {
-        return true
-    }
-    return false
-}
-const isPhoneGray = () => {
-    if (openedRoomHasPhone.value === 'unknown') {
-        return true
-    }
-    return false
-}
-const isPhoneRed = () => {
-    if (openedRoomHasPhone.value === 'No') {
-        return true
-    }
-    return false
-}
-const isBathPhoneGreen = () => {
-    if (openedRoomHasBathPhone.value === 'Yes') {
-        return true
-    }
-    return false
-}
-const isBathPhoneGray = () => {
-    if (openedRoomHasBathPhone.value === 'unknown') {
-        return true
-    }
-    return false
-}
-const isBathPhoneRed = () => {
-    if (openedRoomHasBathPhone.value === 'No') {
-        return true
-    }
-    return false
-}
-const isAcessPointGreen = () => {
-    if (openedRoomHasAcessPoint.value === 'Yes') {
-        return true
-    }
-    return false
-}
-const isAcessPointGray = () => {
-    if (openedRoomHasAcessPoint.value === 'unknown') {
-        return true
-    }
-    return false
-}
-const isAcessPointRed = () => {
-    if (openedRoomHasAcessPoint.value === 'No') {
-        return true
-    }
-    return false
-}
-const isLockGreen = () => {
-    if (openedRoomHasLock.value === 'Yes') {
-        return true
-    }
-    return false
-}
-const isLockGray = () => {
-    if (openedRoomHasLock.value === 'unknown') {
-        return true
-    }
-    return false
-}
-const isLockRed = () => {
-    if (openedRoomHasLock.value === 'No') {
-        return true
-    }
-    return false
-}
-const isCorrdiorAPGreen = () => {
-    console.log(openedCorridor.value.APStatus)
-    if (openedCorridor.value.APStatus === 'Yes') {
-        return true
-    }
-    return false
-}
-const isCorrdiorAPGray = () => {
-    if (openedCorridor.value.APStatus === 'unknown') {
-        return true
-    }
-    return false
-}
-const isCorrdiorAPRed = () => {
-    if (openedCorridor.value.APStatus === 'No') {
-        return true
-    }
-    return false
-}
-
+// #endregion
 
 const submitEdit = () => {
-    axios.post('/api/rooms/modify', { "floor_number": floor_number.value, "room_number": openedRoomNumber.value, 
-                                        "hasAccessPoint": openedRoomHasAcessPoint.value, "hasBathPhone": openedRoomHasBathPhone.value, 
-                                        "hasPhone": openedRoomHasPhone.value, "hasTV": openedRoomHasTV.value, 
-                                        "comment": openedRoomComment.value, "macAddress": openedRoomAcessPointMAC.value, 
-                                        "alarm" : openedRoomAlarm.value, "hasLock" : openedRoomHasLock.value})
+    axios.post('/api/rooms/modify', { "floor_number": floor_number.value, "room_number": openedRoom.value.room_number, 
+                                        "hasAccessPoint": openedRoom.value.hasAccessPoint, "hasBathPhone": openedRoom.value.hasBathPhone, 
+                                        "hasPhone": openedRoom.value.hasPhone, "hasTV": openedRoom.value.hasTV, 
+                                        "comment": openedRoom.value.comment, "macAddress": openedRoom.value.macAddress, 
+                                        "alarm" : openedRoom.value.alarm, "hasLock" : openedRoom.value.hasLock,
+                                        "hasBroom" : openedRoom.value.hasBroom, "hasSink" : openedRoom.value.hasSink,
+                                        "hasToilet" : openedRoom.value.hasToilet, "hasRadiator" : openedRoom.value.hasRadiator,
+                                        "hasBidet" : openedRoom.value.hasBidet, "hasShower" : openedRoom.value.hasShower,
+                                        "hasSocket" : openedRoom.value.hasSocket, "hasBulb" : openedRoom.value.hasBulb
+                                    })
     .then((response) => {
         getFloorInfo()
         isOpenRoomModal.value = false
@@ -625,103 +882,35 @@ const MEGAOPENrestaurants = () => {
 const applyGreen = () => {
     greenFilter.value = !greenFilter.value
     refreshFilter()
-    /*
-    if (!filterApplied.value) {
-        savedRooms.value = rooms.value
-        savedCorridors.value = corridors.value
-        // remove from rooms all rooms that don't have all fields as "Yes"
-        rooms.value = rooms.value.filter((room) => {
-            return room.hasTV === "Yes" && room.hasAccessPoint === "Yes" && room.hasPhone === "Yes" && room.hasBathPhone === "Yes";
-        })
-        console.log(corridors.value[0])
-        corridors.value = corridors.value.filter((value) => {
-            return value.macAddress.length === 17
-        })
-        filterApplied.value = true
-    }
-    else {
-        rooms.value = savedRooms.value
-        corridors.value = savedCorridors.value
-        filterApplied.value = false
-    }*/
 }
 const applyRed = () => {
     redFilter.value = !redFilter.value
     refreshFilter()
-    /*
-    if (!filterApplied.value) {
-        savedRooms.value = rooms.value
-        savedCorridors.value = corridors.value
-        rooms.value = rooms.value.filter((room) => {
-            return room.hasTV === "No" && room.hasAccessPoint === "No" && room.hasPhone === "No" && room.hasBathPhone === "No";
-        })
-        corridors.value.filter((corridor) => {
-            corridor.macAddress.length === 17
-        })
-        filterApplied.value = true
-    }
-    else {
-        rooms.value = savedRooms.value
-        corridors.value = savedCorridors.value
-        filterApplied.value = false
-    }*/
 }
 const applyGrey = () => {
     grayFilter.value = !grayFilter.value
     refreshFilter()
-    /*
-    if (!filterApplied.value) {
-        savedRooms.value = rooms.value
-        savedCorridors.value = corridors.value
-        rooms.value = rooms.value.filter((room) => {
-            return room.hasTV === "unknown" && room.hasAccessPoint === "unknown" && room.hasPhone === "unknown" && room.hasBathPhone === "unknown";
-        })
-        corridors.value = corridors.value.filter((corridor) => {
-            console.log(corridor.macAddress.length)
-            corridor.macAddress.length === 17
-        })
-        filterApplied.value = true
-    }
-    else {
-        rooms.value = savedRooms.value
-        corridors.value = savedCorridors.value
-        filterApplied.value = false
-    }*/
-}
-const resetFilters = () => {/*
-    rooms.value = savedRooms.value
-    corridors.value = savedCorridors.value
-    filterApplied.value = false
-    redFilter.value = false
-    grayFilter.value = false
-    greenFilter.value = false
-    document.getElementById('green-filter').classList.remove('outline')
-    document.getElementById('green-filter').classList.remove('outline-sky-500')
-    document.getElementById('red-filter').classList.remove('outline')
-    document.getElementById('red-filter').classList.remove('outline-sky-500')
-    document.getElementById('gray-filter').classList.remove('outline')
-    document.getElementById('gray-filter').classList.remove('outline-sky-500')*/
 }
 const refreshFilter = () => {
     rooms.value = []
     corridors.value = []
     if (greenFilter.value) {
         savedRooms.value.forEach((value) => {
-            if (value.hasAccessPoint === "Yes", value.hasBathPhone === "Yes", value.hasPhone === "Yes",value.hasTV === "Yes") {
+            if (value.hasAccessPoint === "Yes" && value.hasBathPhone === "Yes" && value.hasPhone === "Yes" && value.hasTV === "Yes" && value.hasLock === "Yes") {
                 rooms.value.push(value)
             }
         })
     }
     if (redFilter.value) {
         savedRooms.value.forEach((value) => {
-            if (value.hasAccessPoint === "No", value.hasBathPhone === "No", value.hasPhone === "No",value.hasTV === "No") {
+            if (value.hasAccessPoint === "No" || value.hasBathPhone === "No" || value.hasPhone === "No" || value.hasTV === "No" || value.hasLock === "No") {
                 rooms.value.push(value)
             }
         })
     }
     if (grayFilter.value) {
         savedRooms.value.forEach((value) => {
-            if (value.hasAccessPoint === "unknown", value.hasBathPhone === "unknown", value.hasPhone === "unknown",value.hasTV === "unknown") {
+            if (value.hasAccessPoint === "unknown" && value.hasBathPhone === "unknown" && value.hasPhone === "unknown" && value.hasTV === "unknown" && value.hasLock === "unknown") {
                 rooms.value.push(value)
             }
         })
@@ -765,19 +954,108 @@ const setFilterOutline = () => {
     }
 }
 const toggleAlarm = () => {
-    openedRoomAlarm.value = !openedRoomAlarm.value
+    openedRoom.value.alarm = !openedRoom.value.alarm
 }
 const requestEdit = () => {
-    axios.post('/api/telegram/notify', { "floor_number": floor_number.value, "room_number": openedRoomNumber.value, 
-                                        "hasAccessPoint": openedRoomHasAcessPoint.value, "hasBathPhone": openedRoomHasBathPhone.value, 
-                                        "hasPhone": openedRoomHasPhone.value, "hasTV": openedRoomHasTV.value, 
-                                        "comment": openedRoomComment.value, "macAddress": openedRoomAcessPointMAC.value, 
-                                        "alarm" : openedRoomAlarm.value, "hasLock" : openedRoomHasLock.value})
+    axios.post('/api/telegram/notify', { "floor_number": floor_number.value, "room_number": openedRoom.value.room_number, 
+                                        "hasAccessPoint": openedRoom.value.hasAccessPoint, "hasBathPhone": openedRoom.value.hasBathPhone, 
+                                        "hasPhone": openedRoom.value.hasPhone, "hasTV": openedRoom.value.hasTV, 
+                                        "comment": openedRoom.value.comment, "macAddress": openedRoom.value.macAddress, 
+                                        "alarm" : openedRoom.value.alarm, "hasLock" : openedRoom.value.hasLock,
+                                        "hasBroom" : openedRoom.value.hasBroom, "hasSink" : openedRoom.value.hasSink,
+                                        "hasToilet" : openedRoom.value.hasToilet, "hasRadiator" : openedRoom.value.hasRadiator,
+                                        "hasBidet" : openedRoom.value.hasBidet, "hasShower" : openedRoom.value.hasShower,
+                                        "hasSocket" : openedRoom.value.hasSocket, "hasBulb" : openedRoom.value.hasBulb})
     .then((response) => {
         getFloorInfo()
         isOpenRoomModal.value = false
     })
 
+}
+const roomModalItems = [
+    {
+        label: "Elektrycy",
+        icon: "i-heroicons-bolt-20-solid",
+        key: 'E'
+    },
+    {
+        label: "Hydraulicy",
+        icon: 'i-heroicons-wrench-screwdriver-20-solid',
+        key: 'K'
+    },
+    {
+        label: 'Informatycy',
+        icon: 'i-heroicons-wifi-20-solid',
+        key: 'I'
+    },
+    {
+        label: "Pokojówki",
+        icon: 'i-heroicons-user',
+        key: 'P'
+    },
+    {
+        label: "Administacja",
+        icon: 'i-heroicons-cpu-chip-20-solid',
+        key: 'A'
+    },/*
+    {
+        label: "Konserwatorzy",
+        icon: 'i-heroicons-wrench-screwdriver-20-solid',
+        key: 'ks'
+    },*/
+]
+const getUser = () => {
+    const token = useCookie('token').value
+    axios.get('/api/users/').then((response) => {
+        let users = response.data
+        user.value = users.find(user => user.token == token)
+        console.log(user.value)
+    })
+}
+const eShouldDisplay = (index) => {
+    let room = rooms.value[index]
+    if (room.hasSocket === "No" || room.hasBulb === "No") {
+        return true
+    }
+    else {
+        return false
+    }
+}
+const kShouldDisplay = (index) => {
+    let room = rooms.value[index]
+    if (room.hasSink === "No" || room.hasToilet === "No" || room.hasRadiator === "No" || room.hasBidet === "No" || room.hasShower === "No") {
+        return true
+    }
+    else {
+        return false
+    }
+}
+const iShouldDisplay = (index) => {
+    let room = rooms.value[index]
+    if (room.hasAccessPoint === "No" || room.hasBathPhone === "No" || room.hasPhone === "No" || room.hasTV === "No" || room.hasLock === "No") {
+        return true
+    }
+    else {
+        return false
+    }
+}
+const pShouldDisplay = (index) => {
+    let room = rooms.value[index]
+    if (room.hasBroom === "No") {
+        return true
+    }
+    else {
+        return false
+    }
+}
+const aShouldDisplay = (index) => {
+    let room = rooms.value[index]
+    if (room.alarm === true) {
+        return true
+    }
+    else {
+        return false
+    }
 }
 </script>
 <style scoped>
@@ -808,6 +1086,5 @@ const requestEdit = () => {
 }
 .alarm {
     animation: alarm 1s infinite;
-    font-weight: 1000;
 }
 </style>
