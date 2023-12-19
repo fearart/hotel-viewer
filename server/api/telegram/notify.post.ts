@@ -7,6 +7,7 @@ const unauthorizedReturn = (event: any) => {
 }
 
 export default defineEventHandler(async (event) => {
+    return
     const config = useRuntimeConfig();
     await mongoose.connect(config.mongodb_uri);
     let token = getCookie(event,'token')

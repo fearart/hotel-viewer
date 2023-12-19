@@ -87,9 +87,10 @@
                             placeholder="Room number" size="l"/>
                             <UButton v-if="openedRoom.alarm" icon="i-heroicons-bell" color="red" @click="toggleAlarm" class="mr-2"/>
                             <UButton v-else icon="i-heroicons-bell" color="gray" @click="toggleAlarm" class="mr-2"/>
-                            <UButton v-if="isAdmin" label="" @click="requestEdit">
+                            <!-- <UButton v-if="isAdmin" label="" @click="requestEdit">
                                 <img src="~/assets/svg/tg-white.png" class="w-6 h-6">
                             </UButton>
+                            -->
                         </div>
                     </template>
                     <div v-if="item.key === 'I'" class="flex justify-center flex-col items-center p-6">
