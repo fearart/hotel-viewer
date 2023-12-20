@@ -55,7 +55,6 @@ export default defineEventHandler(async (event) => {
                 'name' : body.name,
                 'surname' : body.surname
             }
-            console.log(user)
             mongoose.connection.db.collection('hotel-users').insertOne(user)
             setCookie(event,'token',token)
             return {

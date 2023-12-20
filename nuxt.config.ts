@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     telegram_token: process.env.TELEGRAM_TOKEN,
     version: "0.3",
     telegram_chat_id: -4021165189,
-    telegram_chat_id_dev: -4085678486
+    telegram_chat_id_test: -1002137267212/3
   },
   colorMode: {
     preference: 'light',

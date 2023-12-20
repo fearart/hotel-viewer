@@ -87,10 +87,9 @@
                             placeholder="Room number" size="l"/>
                             <UButton v-if="openedRoom.alarm" icon="i-heroicons-bell" color="red" @click="toggleAlarm" class="mr-2"/>
                             <UButton v-else icon="i-heroicons-bell" color="gray" @click="toggleAlarm" class="mr-2"/>
-                            <!-- <UButton v-if="isAdmin" label="" @click="requestEdit">
+                            <UButton label="" @click="requestEdit">
                                 <img src="~/assets/svg/tg-white.png" class="w-6 h-6">
                             </UButton>
-                            -->
                         </div>
                     </template>
                     <div v-if="item.key === 'I'" class="flex justify-center flex-col items-center p-6">
@@ -108,11 +107,11 @@
                                 </div>
                             </div>
                             <div class="flex flex-row">
-                                <div class="pr-2 h-20 w-20">
-                                    <img :src="imageLibrary.BathPhoneImage" @click="BathPhonestate" class="cursor-pointer">
-                                </div>
                                 <div class="h-20 w-20">
                                     <img :src="imageLibrary.PhoneImage" @click="Phonestate" class="cursor-pointer"/>
+                                </div>
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.BathPhoneImage" @click="BathPhonestate" class="cursor-pointer">
                                 </div>
                             </div>
                         </div>
@@ -931,24 +930,76 @@ const applyGrey = () => {
 const refreshFilter = () => {
     rooms.value = []
     corridors.value = []
+    console.log(user.value.group)
     if (greenFilter.value) {
         savedRooms.value.forEach((value) => {
-            if (value.hasAccessPoint === "Yes" && value.hasBathPhone === "Yes" && value.hasPhone === "Yes" && value.hasTV === "Yes" && value.hasLock === "Yes") {
-                rooms.value.push(value)
+            if (user.value.group.it) {
+                if (value.hasAccessPoint === "Yes" && value.hasBathPhone === "Yes" && value.hasPhone === "Yes" && value.hasTV === "Yes" && value.hasLock === "Yes") {
+                    rooms.value.push(value)
+                }
+            }
+            if (user.value.group.pokojowki) {
+                if (value.hasBroom === "Yes" && value.hasBed === "Yes") {
+                    rooms.value.push(value)
+                }
+            }
+            if (user.value.group.hydraulicy) {
+                if (value.hasSink === "Yes" && value.hasToilet === "Yes" && value.hasRadiator === "Yes" && value.hasBidet === "Yes" && value.hasShower === "Yes") {
+                    rooms.value.push(value)
+                }
+            }
+            if (user.value.group.elektrycy) {
+                if (value.hasSocket === "Yes" && value.hasBulb === "Yes") {
+                    rooms.value.push(value)
+                }
             }
         })
     }
     if (redFilter.value) {
         savedRooms.value.forEach((value) => {
-            if (value.hasAccessPoint === "No" || value.hasBathPhone === "No" || value.hasPhone === "No" || value.hasTV === "No" || value.hasLock === "No") {
-                rooms.value.push(value)
+            if (user.value.group.it) {
+                if (value.hasAccessPoint === "No" || value.hasBathPhone === "No" || value.hasPhone === "No" || value.hasTV === "No" || value.hasLock === "No") {
+                    rooms.value.push(value)
+                }
+            }
+            if (user.value.group.pokojowki) {
+                if (value.hasBroom === "No" || value.hasBed === "No") {
+                    rooms.value.push(value)
+                }
+            }
+            if (user.value.group.hydraulicy) {
+                if (value.hasSink === "No" || value.hasToilet === "No" || value.hasRadiator === "No" || value.hasBidet === "No" || value.hasShower === "No") {
+                    rooms.value.push(value)
+                }
+            }
+            if (user.value.group.elektrycy) {
+                if (value.hasSocket === "No" || value.hasBulb === "No") {
+                    rooms.value.push(value)
+                }
             }
         })
     }
     if (grayFilter.value) {
         savedRooms.value.forEach((value) => {
-            if (value.hasAccessPoint === "unknown" && value.hasBathPhone === "unknown" && value.hasPhone === "unknown" && value.hasTV === "unknown" && value.hasLock === "unknown") {
-                rooms.value.push(value)
+            if (user.value.group.it) {
+                if (value.hasAccessPoint === "unknown" || value.hasBathPhone === "unknown" || value.hasPhone === "unknown" || value.hasTV === "unknown" || value.hasLock === "unknown") {
+                    rooms.value.push(value)
+                }
+            }
+            if (user.value.group.pokojowki) {
+                if (value.hasBroom === "unknown" || value.hasBed === "unknown") {
+                    rooms.value.push(value)
+                }
+            }
+            if (user.value.group.hydraulicy) {
+                if (value.hasSink === "unknown" || value.hasToilet === "unknown" || value.hasRadiator === "unknown" || value.hasBidet === "unknown" || value.hasShower === "unknown") {
+                    rooms.value.push(value)
+                }
+            }
+            if (user.value.group.elektrycy) {
+                if (value.hasSocket === "unknown" || value.hasBulb === "unknown") {
+                    rooms.value.push(value)
+                }
             }
         })
     }
@@ -996,8 +1047,8 @@ const toggleAlarm = () => {
 const requestEdit = () => {
     axios.post('/api/telegram/notify', { "floor_number": floor_number.value, "room_number": openedRoom.value.room_number, 
                                         "hasAccessPoint": openedRoom.value.hasAccessPoint, "hasBathPhone": openedRoom.value.hasBathPhone, 
-                                        "hasPhone": openedRoom.value.hasPhone, "hasTV": openedRoom.value.hasTV, 
-                                        "comment": openedRoom.value.comment, "macAddress": openedRoom.value.macAddress, 
+                                        "hasPhone": openedRoom.value.hasPhone, "hasTV": openedRoom.value.hasTV,
+                                        "macAddress": openedRoom.value.macAddress, 
                                         "alarm" : openedRoom.value.alarm, "hasLock" : openedRoom.value.hasLock,
                                         "hasBroom" : openedRoom.value.hasBroom, "hasSink" : openedRoom.value.hasSink,
                                         "hasToilet" : openedRoom.value.hasToilet, "hasRadiator" : openedRoom.value.hasRadiator,
@@ -1049,7 +1100,6 @@ const getUser = () => {
     axios.get('/api/users/').then((response) => {
         let users = response.data
         user.value = users.find(user => user.token == token)
-        console.log(user.value)
     })
 }
 const eShouldDisplay = (index) => {
