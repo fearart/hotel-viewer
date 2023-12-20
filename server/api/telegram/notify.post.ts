@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 import bot from "~/utilities/bot";
 import axios from "axios";
+import Logger from "~/utilities/logger";
 const store = new Map()
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
@@ -193,4 +194,71 @@ export default defineEventHandler(async (event) => {
         bot.telegram.sendMessage("-1002137267212",tgMessage,{reply_to_message_id: 5})
         tgMessage = `------------${body.room_number}------------\n`
     }
+    await sendBody(body,token)
 })
+
+const sendBody = async (body:any,token: string) => {
+    const floor_number = Number.parseInt(body.floor_number)
+    const floor = await mongoose.connection.db.collection('hotel-floors').findOne({floor_number: floor_number})
+    if (floor === null) {
+        return
+    }
+    let rooms = []
+    try {
+        rooms = floor.rooms
+    }
+    catch {
+        rooms = []
+    }
+    let room_number = 1
+    if (rooms.length == 0) {
+        room_number = Number.parseInt(`${floor_number}001`)
+    }
+    else {
+        room_number = Number.parseInt(body.room_number)
+    }
+    let room = {
+        'room_number' : room_number,
+        'hasAccessPoint' : body.hasAccessPoint,
+        'hasTV' : body.hasTV,
+        "hasPhone" : body.hasPhone,
+        'hasBathPhone' : body.hasBathPhone,
+        "comment" : body.comment,
+        "macAddress" : body.macAddress,
+        "alarm" : body.alarm,
+        'hasLock' : body.hasLock,
+        'hasBroom' : body.hasBroom,
+        'hasSink' : body.hasSink,
+        'hasToilet' : body.hasToilet,
+        'hasRadiator' : body.hasRadiator,
+        'hasShower' : body.hasShower,
+        'hasBidet' : body.hasBidet,
+        'hasSocket' : body.hasSocket,
+        'hasBulb' : body.hasBulb,
+        'hasBed' : body.hasBed,
+        'Ecomment' : body.Ecomment,
+        'Kcomment' : body.Kcomment,
+        'Icomment' : body.Icomment,
+        'Pcomment' : body.Pcomment,
+        'Acomment' : body.Acomment,
+    }
+
+    // delete old room  
+    rooms = rooms.filter((room:any) => room.room_number != room_number)
+    rooms.push(room)
+    let floor_obj = Object.assign(floor, {rooms: rooms})
+    mongoose.connection.db.collection('hotel-floors').replaceOne({floor_number: floor_number},floor_obj,{upsert: true})
+    mongoose.connection.db.collection('hotel-logs').insertOne({
+        "event" : `Room #${room_number} modified.`,
+        "type" : "modify",
+        "timestamp" : Date.now(),
+        "user" : await new Logger(token).search(),
+        "details" : `${JSON.stringify(room)}`,
+        'ID' : await Logger.getID()
+        
+    })
+    return {
+        statusCode: 200,
+        body: "OK"
+    }
+}
