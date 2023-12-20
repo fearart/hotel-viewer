@@ -409,10 +409,38 @@
   resolved "https://registry.npmjs.org/@headlessui/vue/-/vue-1.7.16.tgz"
   integrity sha512-nKT+nf/q6x198SsyK54mSszaQl/z+QxtASmgMEJtpxSX2Q0OPJX0upS/9daDyiECpeAsvjkoOrm2O/6PyBQ+Qg==
 
+"@iconify-json/guidance@^1.1.6":
+  version "1.1.6"
+  resolved "https://registry.npmjs.org/@iconify-json/guidance/-/guidance-1.1.6.tgz"
+  integrity sha512-jUezEDR58yT6clQigHxeUv6LkQsBPFAbQWwRY82MR6MZ9MhDu4ffNt3PxhXnIWJLRv++3zJ61vN4b0WUjwJDXg==
+  dependencies:
+    "@iconify/types" "*"
+
 "@iconify-json/heroicons@^1.1.13":
   version "1.1.13"
   resolved "https://registry.npmjs.org/@iconify-json/heroicons/-/heroicons-1.1.13.tgz"
   integrity sha512-WsRTTc0qGDreszIgL9uVpPSnRlM2bXaKmK3E0zpQZloUZQX3FokDqGFgc0UbJ+8np/ta571Ty+8n78mlMhEU8w==
+  dependencies:
+    "@iconify/types" "*"
+
+"@iconify-json/ion@^1.1.15":
+  version "1.1.15"
+  resolved "https://registry.npmjs.org/@iconify-json/ion/-/ion-1.1.15.tgz"
+  integrity sha512-ouEW3wypJCwv9pB6b5k7f2cRMXKSCuxn23S1e9TjJLXXWCF45Juyjls5olrnSRNqYdZise7ZLSojgM8/2kaDtA==
+  dependencies:
+    "@iconify/types" "*"
+
+"@iconify-json/material-symbols@^1.1.68":
+  version "1.1.68"
+  resolved "https://registry.npmjs.org/@iconify-json/material-symbols/-/material-symbols-1.1.68.tgz"
+  integrity sha512-fFMMbdr3DJiQRvi6fKefJMLkrvKnW4x6a0lJwDKeRqgyVpxr1NGP3DCz4q7wWBXTpSTcBSPg4Mbfrdyg8J6R0Q==
+  dependencies:
+    "@iconify/types" "*"
+
+"@iconify-json/mingcute@^1.1.14":
+  version "1.1.14"
+  resolved "https://registry.npmjs.org/@iconify-json/mingcute/-/mingcute-1.1.14.tgz"
+  integrity sha512-oWeGJzNBHPLFLdjqYFg80GL12F7vp+qCpSqt34G9CzP/20eduYLZyB1gB8GW2beTl335lssJo28QT/ObyJ3YpQ==
   dependencies:
     "@iconify/types" "*"
 

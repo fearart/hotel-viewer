@@ -22,5 +22,9 @@ export default defineNuxtConfig({
     families: {
       'Montserrat': true,
     }
+  },
+  ui : {
+    global : true,
+    icons : ['heroicons','mingcute','guidance','ion','material-symbols']
   }
 })

@@ -103,6 +103,9 @@
                                 <div class="pr-2 h-20 w-20">
                                     <img :src="imageLibrary.TVImage" @click="TVstate" class="cursor-pointer">
                                 </div>
+                                <div class="h-20 w-20">
+                                    <img :src="imageLibrary.LockImage" @click="Lockstate" class="cursor-pointer"/>
+                                </div>
                             </div>
                             <div class="flex flex-row">
                                 <div class="pr-2 h-20 w-20">
@@ -111,10 +114,10 @@
                                 <div class="h-20 w-20">
                                     <img :src="imageLibrary.PhoneImage" @click="Phonestate" class="cursor-pointer"/>
                                 </div>
-                                <div class="h-20 w-20">
-                                    <img :src="imageLibrary.LockImage" @click="Lockstate" class="cursor-pointer"/>
-                                </div>
                             </div>
+                        </div>
+                        <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
+                                <UTextarea v-model="openedRoom.Icomment" placeholder="Comment" class="pb-2" size="xs"/>
                         </div>
                     </div>
                     <div v-if="item.key === 'P'">
@@ -123,30 +126,39 @@
                                 <div class="pr-2 h-20 w-20">
                                     <img :src="imageLibrary.BroomImage" @click="Broomstate" class="cursor-pointer"/>
                                 </div>
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.BedImage" @click="Bedstate" class="cursor-pointer"/>
+                                </div>
                             </div>
+                        </div>
+                        <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
+                                <UTextarea v-model="openedRoom.Pcomment" placeholder="Comment" class="pb-2" size="xs"/>
                         </div>
                     </div>
                     <div v-if="item.key === 'K'">
                         <div class="m-2 flex flex-col items-center">
                             <div class="flex flex-row">
                                 <div class="pr-2 h-20 w-20">
-                                    <img :src="imageLibrary.SinkImage" @click="Sinkstate" class="cursor-pointer"/>
+                                    <img :src="imageLibrary.ShowerImage" @click="Showerstate" class="cursor-pointer"/>
+                                </div>
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.BidetImage" @click="Bidetstate" class="cursor-pointer"/>
                                 </div>
                                 <div class="pr-2 h-20 w-20">
                                     <img :src="imageLibrary.ToiletImage" @click="Toiletstate" class="cursor-pointer"/>
+                                </div>
+                            </div>
+                            <div class="flex flex-row">
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.SinkImage" @click="Sinkstate" class="cursor-pointer"/>
                                 </div>
                                 <div class="pr-2 h-20 w-20">
                                     <img :src="imageLibrary.RadiatorImage" @click="Radiatorstate" class="cursor-pointer"/>
                                 </div>
                             </div>
-                            <div class="flex flex-row">
-                                <div class="pr-2 h-20 w-20">
-                                    <img :src="imageLibrary.BidetImage" @click="Bidetstate" class="cursor-pointer"/>
-                                </div>
-                                <div class="pr-2 h-20 w-20">
-                                    <img :src="imageLibrary.ShowerImage" @click="Showerstate" class="cursor-pointer"/>
-                                </div>
-                            </div>
+                        </div>
+                        <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
+                                <UTextarea v-model="openedRoom.Kcomment" placeholder="Comment" class="pb-2" size="xs"/>
                         </div>
                     </div>
                     <div v-if="item.key === 'E'">
@@ -160,14 +172,10 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <template #footer>
-                        <div id="roomModalFooter" class="w-full flex items-center justify-center">
-                            <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
-                                <UTextarea v-model="openedRoom.comment" placeholder="Comment" class="pb-2" size="xs"/>
-                            </div>
+                        <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
+                                <UTextarea v-model="openedRoom.Ecomment" placeholder="Comment" class="pb-2" size="xs"/>
                         </div>
-                    </template>
+                    </div>
                 </UCard>
             </template>
             <template #default="{item,index,selected}">
@@ -214,14 +222,6 @@ const userPermissions = ref({})
 const user = ref({})
 const isAdmin = ref(false)
 const isRoot = ref(false)
-const modalType = ref('it')
-/*
-    it - informatycy
-    cl - pokojówki
-    hy - hydraulicy
-    el - elektrycy
-    ks - konserwatorzy
-*/ 
 // Floor part
 const displayRooms = ref(false)
 
@@ -392,7 +392,14 @@ const openRoomModal = (room_number) => {
             "hasShower": response.data.hasShower,
             "hasSocket": response.data.hasSocket,
             "hasBulb": response.data.hasBulb,
+            "hasBed": response.data.hasBed,
+            'Ecomment' : response.data.Ecomment,
+            'Kcomment' : response.data.Kcomment,
+            'Icomment' : response.data.Icomment,
+            'Pcomment' : response.data.Pcomment,
+            'Acomment' : response.data.Acomment,
         }
+        // DEBUG
         switch(openedRoom.value.hasAccessPoint) {
             case "Yes":
                 imageLibrary.value.AccessPointImage = '/img/pngs/wifi-green.png'
@@ -536,6 +543,17 @@ const openRoomModal = (room_number) => {
                 imageLibrary.value.BulbImage = '/img/pngs/bulb-gray.png'
                 break;
         }
+        switch(openedRoom.value.hasBed) {
+            case "Yes":
+                imageLibrary.value.BedImage = '/img/pngs/bed-green.png'
+                break;
+            case "No":
+                imageLibrary.value.BedImage = '/img/pngs/bed-red.png'
+                break;
+            default:
+                imageLibrary.value.BedImage = '/img/pngs/bed-gray.png'
+                break;
+        }
     })
     isOpenRoomModal.value = true
 }
@@ -649,6 +667,21 @@ const Broomstate = () => {
     else {
         openedRoom.value.hasBroom = 'unknown'
         imageLibrary.value.BroomImage = 'img/pngs/broom-gray.png'
+    }
+}
+const Bedstate = () => {
+    if (openedRoom.value.hasBed === 'unknown') {
+        openedRoom.value.hasBed = 'Yes'
+        imageLibrary.value.BedImage = 'img/pngs/bed-green.png'
+    }
+    else if (openedRoom.value.hasBed === 'Yes') {
+        openedRoom.value.hasBed = 'No'
+        imageLibrary.value.BedImage = 'img/pngs/bed-red.png'
+    }
+    else {
+        openedRoom.value.hasBed = 'unknown'
+        imageLibrary.value.BedImage = 'img/pngs/bed-gray.png'
+    
     }
 }
 const Sinkstate = () => {
@@ -771,7 +804,10 @@ const submitEdit = () => {
                                         "hasBroom" : openedRoom.value.hasBroom, "hasSink" : openedRoom.value.hasSink,
                                         "hasToilet" : openedRoom.value.hasToilet, "hasRadiator" : openedRoom.value.hasRadiator,
                                         "hasBidet" : openedRoom.value.hasBidet, "hasShower" : openedRoom.value.hasShower,
-                                        "hasSocket" : openedRoom.value.hasSocket, "hasBulb" : openedRoom.value.hasBulb
+                                        "hasSocket" : openedRoom.value.hasSocket, "hasBulb" : openedRoom.value.hasBulb,
+                                        'hasBed' : openedRoom.value.hasBed, 'Ecomment' : openedRoom.value.Ecomment,
+                                        'Kcomment' : openedRoom.value.Kcomment, 'Icomment' : openedRoom.value.Icomment,
+                                        'Pcomment' : openedRoom.value.Pcomment, 'Acomment' : openedRoom.value.Acomment
                                     })
     .then((response) => {
         getFloorInfo()
@@ -966,7 +1002,10 @@ const requestEdit = () => {
                                         "hasBroom" : openedRoom.value.hasBroom, "hasSink" : openedRoom.value.hasSink,
                                         "hasToilet" : openedRoom.value.hasToilet, "hasRadiator" : openedRoom.value.hasRadiator,
                                         "hasBidet" : openedRoom.value.hasBidet, "hasShower" : openedRoom.value.hasShower,
-                                        "hasSocket" : openedRoom.value.hasSocket, "hasBulb" : openedRoom.value.hasBulb})
+                                        "hasSocket" : openedRoom.value.hasSocket, "hasBulb" : openedRoom.value.hasBulb,
+                                        'hasBed' : openedRoom.value.hasBed, 'Ecomment' : openedRoom.value.Ecomment,
+                                        'Kcomment' : openedRoom.value.Kcomment, 'Icomment' : openedRoom.value.Icomment,
+                                        'Pcomment' : openedRoom.value.Pcomment, 'Acomment' : openedRoom.value.Acomment})
     .then((response) => {
         getFloorInfo()
         isOpenRoomModal.value = false
@@ -991,12 +1030,12 @@ const roomModalItems = [
     },
     {
         label: "Pokojówki",
-        icon: 'i-heroicons-user',
+        icon: 'i-ion-bed',
         key: 'P'
     },
     {
         label: "Administacja",
-        icon: 'i-heroicons-cpu-chip-20-solid',
+        icon: 'i-material-symbols-notifications-active',
         key: 'A'
     },/*
     {

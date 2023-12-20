@@ -65,6 +65,12 @@ export default defineEventHandler(async (event) => {
         'hasBidet' : 'unknown',
         'hasSocket' : 'unknown',
         'hasBulb' : 'unknown',
+        'hasBed' : 'unknown',
+        'Ecomment' : "",
+        'Kcomment' : "",
+        'Icomment' : "",
+        'Pcomment' : "",
+        'Acomment' : "",
     }
     rooms.push(room)
     Object.assign(floor, {rooms: rooms})

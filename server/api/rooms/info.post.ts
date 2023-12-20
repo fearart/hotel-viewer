@@ -70,7 +70,13 @@ export default defineEventHandler(async (event) => {
             hasShower: room.hasShower,
             hasBidet: room.hasBidet,
             hasSocket: room.hasSocket,
-            hasBulb: room.hasBulb
+            hasBulb: room.hasBulb,
+            hasBed: room.hasBed,
+            Ecomment: room.Ecomment,
+            Kcomment: room.Kcomment,
+            Icomment: room.Icomment,
+            Pcomment: room.Pcomment,
+            Acomment: room.Acomment,
         }
     }
 }
