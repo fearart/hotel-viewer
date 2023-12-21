@@ -116,7 +116,7 @@
                             </div>
                         </div>
                         <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
-                                <UTextarea v-model="openedRoom.Icomment" placeholder="Comment" class="pb-2" size="xs"/>
+                                <UTextarea v-model="openedRoom.Icomment" placeholder="Comment" class="pb-2" size="xl"/>
                         </div>
                     </div>
                     <div v-if="item.key === 'P'">
@@ -131,7 +131,7 @@
                             </div>
                         </div>
                         <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
-                                <UTextarea v-model="openedRoom.Pcomment" placeholder="Comment" class="pb-2" size="xs"/>
+                                <UTextarea v-model="openedRoom.Pcomment" placeholder="Comment" class="pb-2" size="xl"/>
                         </div>
                     </div>
                     <div v-if="item.key === 'K'">
@@ -154,10 +154,13 @@
                                 <div class="pr-2 h-20 w-20">
                                     <img :src="imageLibrary.RadiatorImage" @click="Radiatorstate" class="cursor-pointer"/>
                                 </div>
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.DoorImage" @click="Doorstate" class="cursor-pointer"/>
+                                </div>
                             </div>
                         </div>
                         <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
-                                <UTextarea v-model="openedRoom.Kcomment" placeholder="Comment" class="pb-2" size="xs"/>
+                                <UTextarea v-model="openedRoom.Kcomment" placeholder="Comment" class="pb-2" size="xl"/>
                         </div>
                     </div>
                     <div v-if="item.key === 'E'">
@@ -172,7 +175,22 @@
                             </div>
                         </div>
                         <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
-                                <UTextarea v-model="openedRoom.Ecomment" placeholder="Comment" class="pb-2" size="xs"/>
+                                <UTextarea v-model="openedRoom.Ecomment" placeholder="Comment" class="pb-2" size="xl"/>
+                        </div>
+                    </div>
+                    <div v-if="item.key === 'A'">
+                        <div class="m-2 flex flex-col items-center">
+                            <div class="flex flex-row">
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.GuardImage" @click="Guardstate" class="cursor-pointer"/>
+                                </div>
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.AdminImage" @click="Adminstate" class="cursor-pointer"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
+                                <UTextarea v-model="openedRoom.Acomment" placeholder="Comment" class="pb-2" size="xl"/>
                         </div>
                     </div>
                 </UCard>
@@ -194,9 +212,7 @@
             <UInput v-model="openedCorridor.accessPointNumber" v-maska data-maska="#####" class="text-xl w-24 mb-2"
                 placeholder="Room number" />
             <div>
-                <img v-if="isCorrdiorAPGreen()" src="~/assets/pngs/wifi-green.png" @click="CorridorAPState" class="cursor-pointer"/>
-                <img v-if="isCorrdiorAPGray()" src="~/assets/pngs/wifi-gray.png" @click="CorridorAPState" class="cursor-pointer"/>
-                <img v-if="isCorrdiorAPRed()" src="~/assets/pngs/wifi-red.png" @click="CorridorAPState" class="cursor-pointer"/>
+                <img :src="imageLibrary.CorridorImage" @click="CorridorAPState" class="cursor-pointer">
             </div>
             <UInput v-model="openedCorridor.macAddress" v-maska data-maska="**:**:**:**:**:**" placeholder="MAC:Address" class="pb-2"/>
             <UInput v-model="openedCorridor.comment" placeholder="Comment"  />
@@ -392,13 +408,16 @@ const openRoomModal = (room_number) => {
             "hasSocket": response.data.hasSocket,
             "hasBulb": response.data.hasBulb,
             "hasBed": response.data.hasBed,
+            'hasGuard' : response.data.hasGuard,
+            'hasAdmin' : response.data.hasAdmin,
+            'hasDoor' : response.data.hasDoor,
             'Ecomment' : response.data.Ecomment,
             'Kcomment' : response.data.Kcomment,
             'Icomment' : response.data.Icomment,
             'Pcomment' : response.data.Pcomment,
             'Acomment' : response.data.Acomment,
         }
-        // DEBUG
+
         switch(openedRoom.value.hasAccessPoint) {
             case "Yes":
                 imageLibrary.value.AccessPointImage = '/img/pngs/wifi-green.png'
@@ -553,16 +572,52 @@ const openRoomModal = (room_number) => {
                 imageLibrary.value.BedImage = '/img/pngs/bed-gray.png'
                 break;
         }
+        switch(openedRoom.value.hasGuard) {
+            case "Yes":
+                imageLibrary.value.GuardImage = '/img/pngs/guard-green.png'
+                break;
+            case "No":
+                imageLibrary.value.GuardImage = '/img/pngs/guard-red.png'
+                break;
+            default:
+                imageLibrary.value.GuardImage = '/img/pngs/guard-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasAdmin) {
+            case "Yes":
+                imageLibrary.value.AdminImage = '/img/pngs/reception-green.png'
+                break;
+            case "No":
+                imageLibrary.value.AdminImage = '/img/pngs/reception-red.png'
+                break;
+            default:
+                imageLibrary.value.AdminImage = '/img/pngs/reception-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasDoor) {
+            case "Yes":
+                imageLibrary.value.DoorImage = '/img/pngs/door-green.png'
+                break;
+            case "No":
+                imageLibrary.value.DoorImage = '/img/pngs/door-red.png'
+                break;
+            default:
+                imageLibrary.value.DoorImage = '/img/pngs/door-gray.png'
+                break;
+        }
     })
     isOpenRoomModal.value = true
 }
 const setCorridorAPColor = (corridorIndex) => {
     let corridorAP = corridors.value[corridorIndex]
-    if (corridorAP.macAddress === '') {
-        return 'bg-gray-500'
+    if (corridorAP.APStatus === 'Yes') {
+        return 'bg-green-500'
+    }
+    else if (corridorAP.APStatus === 'No') {
+        return 'bg-red-500'
     }
     else {
-        return 'bg-green-500'
+        return 'bg-gray-500'
     }
 }
 const OpenCorridorModal = (corridor_number) => {
@@ -572,6 +627,17 @@ const OpenCorridorModal = (corridor_number) => {
         openedCorridor.value.macAddress = response.data.macAddress
         openedCorridor.value.comment = response.data.comment
         openedCorridor.value.APStatus = response.data.APStatus
+        switch(openedCorridor.value.APStatus) {
+            case "Yes":
+                imageLibrary.value.CorridorImage = '/img/pngs/wifi-green.png'
+                break;
+            case "No":
+                imageLibrary.value.CorridorImage = '/img/pngs/wifi-red.png'
+                break;
+            default:
+                imageLibrary.value.CorridorImage = '/img/pngs/wifi-gray.png'
+                break;
+        }
     })
     openedCorridor.value.AccessPointNumber = corridor_number
     isOpenCorridorModal.value = true
@@ -784,12 +850,57 @@ const Bulbstate = () => {
 const CorridorAPState = () => {
     if (openedCorridor.value.APStatus === 'unknown') {
         openedCorridor.value.APStatus = 'Yes'
+        imageLibrary.value.CorridorImage = 'img/pngs/wifi-green.png'
     }
     else if (openedCorridor.value.APStatus === 'Yes') {
         openedCorridor.value.APStatus = 'No'
+        imageLibrary.value.CorridorImage = 'img/pngs/wifi-red.png'
     }
     else {
         openedCorridor.value.APStatus = 'unknown'
+        imageLibrary.value.CorridorImage = 'img/pngs/wifi-gray.png'
+    }
+}
+const Guardstate = () => {
+    if (openedRoom.value.hasGuard === 'unknown') {
+        openedRoom.value.hasGuard = 'Yes'
+        imageLibrary.value.GuardImage = 'img/pngs/guard-green.png'
+    }
+    else if (openedRoom.value.hasGuard === 'Yes') {
+        openedRoom.value.hasGuard = 'No'
+        imageLibrary.value.GuardImage = 'img/pngs/guard-red.png'
+    }
+    else {
+        openedRoom.value.hasGuard = 'unknown'
+        imageLibrary.value.GuardImage = 'img/pngs/guard-gray.png'
+    }
+}
+const Adminstate = () => {
+    if (openedRoom.value.hasAdmin === 'unknown') {
+        openedRoom.value.hasAdmin = 'Yes'
+        imageLibrary.value.AdminImage = 'img/pngs/reception-green.png'
+    }
+    else if (openedRoom.value.hasAdmin === 'Yes') {
+        openedRoom.value.hasAdmin = 'No'
+        imageLibrary.value.AdminImage = 'img/pngs/reception-red.png'
+    }
+    else {
+        openedRoom.value.hasAdmin = 'unknown'
+        imageLibrary.value.AdminImage = 'img/pngs/reception-gray.png'
+    }
+}
+const Doorstate = () => {
+    if (openedRoom.value.hasDoor === 'unknown') {
+        openedRoom.value.hasDoor = 'Yes'
+        imageLibrary.value.DoorImage = 'img/pngs/door-green.png'
+    }
+    else if (openedRoom.value.hasDoor === 'Yes') {
+        openedRoom.value.hasDoor = 'No'
+        imageLibrary.value.DoorImage = 'img/pngs/door-red.png'
+    }
+    else {
+        openedRoom.value.hasDoor = 'unknown'
+        imageLibrary.value.DoorImage = 'img/pngs/door-gray.png'
     }
 }
 // #endregion
@@ -804,9 +915,11 @@ const submitEdit = () => {
                                         "hasToilet" : openedRoom.value.hasToilet, "hasRadiator" : openedRoom.value.hasRadiator,
                                         "hasBidet" : openedRoom.value.hasBidet, "hasShower" : openedRoom.value.hasShower,
                                         "hasSocket" : openedRoom.value.hasSocket, "hasBulb" : openedRoom.value.hasBulb,
-                                        'hasBed' : openedRoom.value.hasBed, 'Ecomment' : openedRoom.value.Ecomment,
-                                        'Kcomment' : openedRoom.value.Kcomment, 'Icomment' : openedRoom.value.Icomment,
-                                        'Pcomment' : openedRoom.value.Pcomment, 'Acomment' : openedRoom.value.Acomment
+                                        'hasBed' : openedRoom.value.hasBed, 'hasGuard' : openedRoom.value.hasGuard,
+                                        'hasAdmin' : openedRoom.value.hasAdmin, 'hasDoor': openedRoom.value.hasDoor,
+                                        'Ecomment' : openedRoom.value.Ecomment, 'Kcomment' : openedRoom.value.Kcomment, 
+                                        'Icomment' : openedRoom.value.Icomment, 'Pcomment' : openedRoom.value.Pcomment, 
+                                        'Acomment' : openedRoom.value.Acomment
                                     })
     .then((response) => {
         getFloorInfo()
@@ -829,6 +942,7 @@ const createNewCorridorAcessPoint = () => {
         getFloorInfo()
     })
 }
+// region Open/Close
 const MEGAOPENrooms = () => {
     if (displayRooms.value === true) {
         displayRooms.value = false
@@ -914,7 +1028,9 @@ const MEGAOPENrestaurants = () => {
         hide_naxuy_corridor.value = true
         displayCinemas.value = false
     }
-}   
+}
+// endregion
+
 const applyGreen = () => {
     greenFilter.value = !greenFilter.value
     refreshFilter()
@@ -944,7 +1060,7 @@ const refreshFilter = () => {
                 }
             }
             if (user.value.group.hydraulicy) {
-                if (value.hasSink === "Yes" && value.hasToilet === "Yes" && value.hasRadiator === "Yes" && value.hasBidet === "Yes" && value.hasShower === "Yes") {
+                if (value.hasSink === "Yes" && value.hasToilet === "Yes" && value.hasRadiator === "Yes" && value.hasBidet === "Yes" && value.hasShower === "Yes" && value.hasDoor === "Yes") {
                     rooms.value.push(value)
                 }
             }
@@ -1054,9 +1170,11 @@ const requestEdit = () => {
                                         "hasToilet" : openedRoom.value.hasToilet, "hasRadiator" : openedRoom.value.hasRadiator,
                                         "hasBidet" : openedRoom.value.hasBidet, "hasShower" : openedRoom.value.hasShower,
                                         "hasSocket" : openedRoom.value.hasSocket, "hasBulb" : openedRoom.value.hasBulb,
-                                        'hasBed' : openedRoom.value.hasBed, 'Ecomment' : openedRoom.value.Ecomment,
+                                        'hasBed' : openedRoom.value.hasBed, 'hasAdmin' : openedRoom.value.hasAdmin,
+                                        'hasGuard' : openedRoom.value.hasGuard, 'Ecomment' : openedRoom.value.Ecomment,
                                         'Kcomment' : openedRoom.value.Kcomment, 'Icomment' : openedRoom.value.Icomment,
-                                        'Pcomment' : openedRoom.value.Pcomment, 'Acomment' : openedRoom.value.Acomment})
+                                        'Pcomment' : openedRoom.value.Pcomment, 'Acomment' : openedRoom.value.Acomment,
+                                        'hasDoor' : openedRoom.value.hasDoor})
     .then((response) => {
         getFloorInfo()
         isOpenRoomModal.value = false
@@ -1140,7 +1258,7 @@ const pShouldDisplay = (index) => {
 }
 const aShouldDisplay = (index) => {
     let room = rooms.value[index]
-    if (room.alarm === true) {
+    if (room.hasAdmin === "No" || room.hasGuard === "No") {
         return true
     }
     else {

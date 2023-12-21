@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
         body.hasAccessPoint === undefined || body.hasBathPhone === undefined || body.comment === undefined || body.macAddress === undefined || 
         body.alarm === undefined || body.hasLock === undefined || body.hasBroom === undefined || body.hasSink === undefined || body.hasToilet === undefined ||
         body.hasRadiator === undefined || body.hasShower === undefined || body.hasBidet === undefined || body.hasSocket === undefined || 
-        body.hasBulb === undefined || body.hasBed === undefined ) {
+        body.hasBulb === undefined || body.hasBed === undefined || body.hasGuard === undefined || body.hasAdmin === undefined || body.hasDoor === undefined) {
         setResponseStatus(event,400,"Bad Request")
         return
     }
@@ -68,6 +68,9 @@ export default defineEventHandler(async (event) => {
         'hasSocket' : body.hasSocket,
         'hasBulb' : body.hasBulb,
         'hasBed' : body.hasBed,
+        'hasGuard' : body.hasGuard,
+        'hasAdmin' : body.hasAdmin,
+        'hasDoor' : body.hasDoor,
         'Ecomment' : body.Ecomment,
         'Kcomment' : body.Kcomment,
         'Icomment' : body.Icomment,

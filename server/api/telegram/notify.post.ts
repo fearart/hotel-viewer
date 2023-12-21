@@ -28,8 +28,8 @@ export default defineEventHandler(async (event) => {
         body.hasPhone === undefined || body.hasBathPhone === undefined || body.macAddress === undefined || body.alarm === undefined ||
         body.hasLock === undefined || body.hasBroom === undefined || body.hasBed === undefined || body.hasSink === undefined || body.hasToilet === undefined ||
         body.hasRadiator === undefined || body.hasShower === undefined || body.hasBidet === undefined || body.hasSocket === undefined ||
-        body.hasBulb === undefined || body.Ecomment === undefined || body.Kcomment === undefined ||
-        body.Icomment === undefined || body.Pcomment === undefined || body.Acomment === undefined) {
+        body.hasBulb === undefined || body.Ecomment === undefined || body.Kcomment === undefined || body.Icomment === undefined || body.Pcomment === undefined 
+        || body.Acomment === undefined || body.hasGuard === undefined || body.hasAdmin === undefined || body.hasDoor === undefined) {
         setResponseStatus(event,400,"Bad Request")
         }
     const user = await mongoose.connection.db.collection('hotel-users').findOne({token: token})
@@ -103,6 +103,9 @@ export default defineEventHandler(async (event) => {
     }
     if (room.hasBidet !== body.hasBidet) {
         tgMessage += `Bidet: ${room.hasBidet} --> ${body.hasBidet}\n`
+    }
+    if (room.hasDoor !== body.hasDoor) {
+        tgMessage += `Drzwi: ${room.hasDoor} --> ${body.hasDoor}\n`
     }
     if (room.Kcomment !== body.Kcomment) {
         tgMessage += `Kommentarz: ${room.Kcomment} --> ${body.Kcomment}\n`
@@ -194,6 +197,38 @@ export default defineEventHandler(async (event) => {
         bot.telegram.sendMessage("-1002137267212",tgMessage,{reply_to_message_id: 5})
         tgMessage = `------------${body.room_number}------------\n`
     }
+    if (room.hasGuard !== body.hasGuard) {
+        tgMessage += `Ochrona: ${room.hasGuard} --> ${body.hasGuard}\n`
+    }
+    if (room.hasAdmin !== body.hasAdmin) {
+        tgMessage += `Recepcja: ${room.hasAdmin} --> ${body.hasAdmin}\n`
+    }
+    if (room.Acomment !== body.Acomment) {
+        tgMessage += `Kommentarz: ${room.Acomment} --> ${body.Acomment}\n`
+    }
+    if (tgMessage !== `------------${body.room_number}------------\n`) {
+        const user = await mongoose.connection.db.collection('hotel-users').findOne({token: token})
+        if (user === null) {
+            setResponseStatus(event,401,"Unauthorized")
+            return
+        }
+        let group = "" 
+        if (user.group.it) {
+            group += "Informatyk "
+        }
+        if (user.group.pokojowki) {
+            group += "Pokojówka "
+        }
+        if (user.group.elektrycy) {
+            group += "Elektryk "
+        }
+        if (user.group.konserwatorzy) {
+            group += "Konserwator "
+        }
+        tgMessage += `${group} (${user.name}\t ${user.surname}) \n`
+        bot.telegram.sendMessage("-1002137267212",tgMessage,{reply_to_message_id: 58})
+        tgMessage = `------------${body.room_number}------------\n`
+    }
     await sendBody(body,token)
 })
 
@@ -236,6 +271,9 @@ const sendBody = async (body:any,token: string) => {
         'hasSocket' : body.hasSocket,
         'hasBulb' : body.hasBulb,
         'hasBed' : body.hasBed,
+        'hasGuard' : body.hasGuard,
+        'hasAdmin' : body.hasAdmin,
+        'hasDoor' : body.hasDoor,
         'Ecomment' : body.Ecomment,
         'Kcomment' : body.Kcomment,
         'Icomment' : body.Icomment,
