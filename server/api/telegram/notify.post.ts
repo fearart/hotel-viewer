@@ -1,9 +1,7 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 import bot from "~/utilities/bot";
-import axios from "axios";
 import Logger from "~/utilities/logger";
-const store = new Map()
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
@@ -293,7 +291,6 @@ const sendBody = async (body:any,token: string) => {
         "user" : await new Logger(token).search(),
         "details" : `${JSON.stringify(room)}`,
         'ID' : await Logger.getID()
-        
     })
     return {
         statusCode: 200,

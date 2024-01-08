@@ -76,7 +76,7 @@
     <!-- rooms modal-->
     <UModal v-model="isOpenRoomModal" class="w-60" :ui="{ container: 'items-start' }">
         <button></button>
-        <UTabs :items="roomModalItems" class="px-2 mt-2">
+        <UTabs :items="roomModalItems" :default-index="openedRoom.defaultIndex" class="px-2 mt-2">
             <template #item="{ item }">
                 <UCard @submit.prevent="() => onSubmit(item.key === 'account' ? accountForm : passwordForm)" class="mb-2">
                     <template #header>
@@ -606,6 +606,19 @@ const openRoomModal = (room_number) => {
                 break;
         }
     })
+    openedRoom.value.defaultIndex = 0
+    if (user.value.group.it) {
+        openedRoom.value.defaultIndex = 2
+    }
+    else if (user.value.group.electrycy) {
+        openedRoom.value.defaultIndex = 0
+    }
+    else if (user.value.group.hydraulicy) {
+        openedRoom.value.defaultIndex = 1
+    }
+    else if (user.value.group.pokojowki) {
+        openedRoom.value.defaultIndex = 3
+    }
     isOpenRoomModal.value = true
 }
 const setCorridorAPColor = (corridorIndex) => {
