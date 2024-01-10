@@ -361,10 +361,10 @@ const setRoomColor = (roomIndex) => {
         }
     }
     if (userGroup.hydraulicy) {
-        if (room.hasSink === "Yes" && room.hasToilet === "Yes" && room.hasRadiator === "Yes" && room.hasBidet === "Yes" && room.hasShower === "Yes" && room.hasDoor) {
+        if (room.hasSink === "Yes" && room.hasToilet === "Yes" && room.hasRadiator === "Yes" && room.hasBidet === "Yes" && room.hasShower === "Yes" && room.hasDoor === "Yes") {
             return 'bg-green-500'
         }
-        else if (room.hasSink === "No" || room.hasToilet === "No" || room.hasRadiator === "No" || room.hasBidet === "No" || room.hasShower === "No" || room.hasDoor) {
+        else if (room.hasSink === "No" || room.hasToilet === "No" || room.hasRadiator === "No" || room.hasBidet === "No" || room.hasShower === "No" || room.hasDoor === "Yes") {
             return 'bg-red-500'
         }
         else {
