@@ -7,14 +7,14 @@ class Logger {
         this._token = token;
     }
 
-    public async search() {
+    public async search() : Promise<Array<Object>> {
         const user = await mongoose.connection.db.collection('hotel-users').findOne({"token" : this._token})
         if (user === null) {
-            return null;
+            return [];
         }
         return user.login;
     }
-    public static async getID() {
+    public static async getID() : Promise<number> {
         return await mongoose.connection.db.collection('hotel-logs').countDocuments() + 1
     }
 }

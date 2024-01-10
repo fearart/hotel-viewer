@@ -142,6 +142,7 @@
 </template>
 <script setup>
 import axios from 'axios';
+import Logger from '~/utilities/logger';
 
 const isRoot = ref(false)
 const cookie = useCookie('token')
@@ -178,7 +179,7 @@ function onSubmitAccount () {
 function onSubmitPassword () {
   console.log('Submitted form:', passwordForm)
 }
-onMounted(() => {
+onMounted(async () => {
     if (cookie.value === null || cookie.value === undefined) {
         navigateTo('/')
     }
@@ -196,25 +197,19 @@ onMounted(() => {
         })
     }
     getUsers()
-    getLogs()
+    await getLogs()
 })
 const getUsers = () => {
     axios.get('/api/users').then((res) => {
         users.value = res.data
     })
 }
-const getLogs = () => {
+const getLogs = async () => {
     tableLoading.value = true
-    axios.get('/api/logs').then((res) => {
+    await axios.get('/api/logs').then((res) => {
         logs.value = res.data
-        logs.value.forEach(log => {
-            delete log._id
-            log.timestamp = convertUnixTime(log.timestamp)
-        });
-        // sort by newest first
-        logs.value.sort((a, b) => (a.timestamp < b.timestamp) ? 1 : -1)
-        tableLoading.value = false
     })
+    tableLoading.value = false
 }
 const openUserModal = (index) => {
     openedUser.value = users.value[index]
