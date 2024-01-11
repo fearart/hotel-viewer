@@ -23,21 +23,18 @@ export default defineEventHandler(async (event) => {
         return
     }
     const body = await readBody(event)
-    if (body.login === undefined || body.password === undefined || body.name === undefined || 
-        body.surname === undefined || body.password === undefined || body.token === undefined ||
-        body.permissions === undefined || body.group === undefined)
+    if (body.login === undefined || body.name === undefined || 
+        body.surname === undefined || body.permissions === undefined || body.group === undefined)
     {
         setResponseStatus(event,400,"Bad Request") 
     }
-
     const users = await mongoose.connection.db.collection('hotel-users').find().toArray()
     const user = users.find((user) => user.login === body.login)
     if (user === undefined) {
         setResponseStatus(event,400,"Bad Request")
         return
     }
-    // replace old user with new one
-    await mongoose.connection.db.collection('hotel-users').replaceOne(user,body)
+    await mongoose.connection.db.collection('hotel-users').updateOne({"login" : body.login},{$set:{"name":body.name,"surname":body.surname,"permissions":body.permissions,"group":body.group}})
     await mongoose.connection.db.collection('hotel-logs').insertOne({
         'ID' : await Logger.getID(),
         'timestamp' : Date.now(),

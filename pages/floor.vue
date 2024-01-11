@@ -72,6 +72,10 @@
         <UDivider v-if="hasConferenceRooms && !hide_naxuy_conference_rooms" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENconference_rooms">Sale konferencyjne</UDivider>
         <UDivider v-if="hasRestaurants && !hide_naxuy_restaurants" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENrestaurants">Restauracje</UDivider>
         <UDivider v-if="hasPlayrooms" class="prevent-select my-4 cursor-pointer">Bawialni</UDivider>
+        <div>
+            <UButton v-if="!enhancedMode && isRoot" @click="enhanceToggle">Enable Enhanced Mode</UButton>
+            <UButton v-if="enhancedMode && isRoot" @click="enhanceToggle" color="red">Disable Enhanced Mode</UButton>
+        </div>
     </div>
     <!-- rooms modal-->
     <UModal v-model="isOpenRoomModal" class="w-60" :ui="{ container: 'items-start' }">
@@ -237,6 +241,8 @@ const userPermissions = ref({})
 const user = ref({})
 const isAdmin = ref(false)
 const isRoot = ref(false)
+const enhancedMode = ref(false)
+const timeout = ref(null)
 // Floor part
 const displayRooms = ref(false)
 
@@ -292,6 +298,7 @@ onMounted(() => {
             }
         })
     }
+    enhancedMode.value = localStorage.getItem('enhancedMode') || false
     const querry = useRoute().query
     floor_number.value = querry.floor_number
     getUser()
@@ -955,7 +962,7 @@ const createNewCorridorAcessPoint = () => {
         getFloorInfo()
     })
 }
-// region Open/Close
+// #region Open/Close
 const MEGAOPENrooms = () => {
     if (displayRooms.value === true) {
         displayRooms.value = false
@@ -1042,7 +1049,7 @@ const MEGAOPENrestaurants = () => {
         displayCinemas.value = false
     }
 }
-// endregion
+// #endregion
 
 const applyGreen = () => {
     greenFilter.value = !greenFilter.value
@@ -1276,6 +1283,18 @@ const aShouldDisplay = (index) => {
     }
     else {
         return false
+    }
+}
+const enhanceToggle = () => {
+    enhancedMode.value = !enhancedMode.value
+    localStorage.setItem('enhancedMode', enhancedMode.value)
+    if (enhancedMode.value) {
+        timeout.value = setTimeout(() => {
+            getFloorInfo()
+        }, 5000);
+    }
+    else {
+        clearTimeout(timeout.value)
     }
 }
 </script>

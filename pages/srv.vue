@@ -77,9 +77,15 @@
                         <UInput v-model="openedUser.surname"/>
                     </div>
                 </div>
-                <div class="flex flex-col ml-4 items-center">
-                    <label class="text-gray-700 dark:text-gray-200 text-l">Grupy</label>
-                    <USelectMenu v-model="selectedGroups" :options="options" placeholder="Select Groups" multiple/>
+                <div class="flex flex-row justify-around ml-4 items-center">
+                    <div class="flex flex-col items-center">
+                        <label class="text-gray-700 dark:text-gray-200 text-l">Grupy</label>
+                        <USelectMenu v-model="selectedGroups" :options="options" placeholder="Select Groups" multiple/>
+                    </div>
+                    <div>
+                    <UCheckbox v-model="openedUser.permissions.root" name="root" label="Root"></UCheckbox>
+                    <UCheckbox v-model="openedUser.permissions.admin" name="admin" label="Admin"></UCheckbox>
+                </div>
                 </div>
             </div>
             <div class="flex flex-row justify-around w-full">
@@ -206,8 +212,8 @@ const getUsers = () => {
 }
 const getLogs = async () => {
     tableLoading.value = true
-    await axios.get('/api/logs').then((res) => {
-        logs.value = res.data
+    axios.post('/api/log',{"auth" : cookie.value}).then((res) => {
+        logs.value = res.data.sort((a,b) => b.timestamp - a.timestamp)
     })
     tableLoading.value = false
 }
@@ -243,11 +249,9 @@ const submitUserModal = (index) => {
     if (openedUser.value.group.konserwatorzy === undefined) openedUser.value.group.konserwatorzy = false;
     isOpen.value = false
     selectedGroups.value = []
-    console.log(openedUser.value)
-    axios.post('/api/users/modify',{"token": openedUser.value.token, "login": openedUser.value.login,"password": openedUser.value.password,
+    axios.post('/api/users/modify',{"login": openedUser.value.login,"password": openedUser.value.password,
             "permissions": openedUser.value.permissions,"name":openedUser.value.name,"surname":openedUser.value.surname,"group":openedUser.value.group}).then((res) => {
         getUsers()
-        console.log(res)
     })
 }
 const createNewUser = () => {
