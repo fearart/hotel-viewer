@@ -37,5 +37,5 @@ export default defineEventHandler(async (event) => {
     }
     
     setResponseStatus(event,202,"OK")
-    setCookie(event,'token',user.token)
+    setCookie(event,'token',user.token, {maxAge: 30* 24 * 60 * 60 * 1000 })
 })

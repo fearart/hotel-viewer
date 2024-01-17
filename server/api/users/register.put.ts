@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
                 'surname' : body.surname
             }
             mongoose.connection.db.collection('hotel-users').insertOne(user)
-            setCookie(event,'token',token)
+            setCookie(event,'token',token,{maxAge: 30* 24 * 60 * 60 * 1000 })
             return {
                 statusCode: 201,
                 body: 'User created'
