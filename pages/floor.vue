@@ -1289,9 +1289,9 @@ const enhanceToggle = () => {
     enhancedMode.value = !enhancedMode.value
     localStorage.setItem('enhancedMode', enhancedMode.value)
     if (enhancedMode.value) {
-        timeout.value = setTimeout(() => {
+        timeout.value = setInterval(() => {
             getFloorInfo()
-        }, 5000);
+        }, 3000);
     }
     else {
         clearTimeout(timeout.value)
