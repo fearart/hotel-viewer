@@ -9,7 +9,7 @@ const unauthorizedReturn = (event: any) => {
 function prettifyText (text: string) : string {
     text = text.replaceAll('Yes','🟩')
     text = text.replaceAll('No','🟥')
-    text = text.replaceAll('unknown','🟫')
+    text = text.replaceAll('unknown','🟨')
     return text
 }
 

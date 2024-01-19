@@ -1224,7 +1224,7 @@ const requestEdit = () => {
                                         'hasGuard' : openedRoom.value.hasGuard, 'Ecomment' : openedRoom.value.Ecomment,
                                         'Kcomment' : openedRoom.value.Kcomment, 'Icomment' : openedRoom.value.Icomment,
                                         'Pcomment' : openedRoom.value.Pcomment, 'Acomment' : openedRoom.value.Acomment,
-                                        'hasDoor' : openedRoom.value.hasDoor})
+                                        'hasDoor' : openedRoom.value.hasDoor, 'hasDoctor' : openedRoom.value.hasDoctor})
     .then((response) => {
         getFloorInfo()
         isOpenRoomModal.value = false
