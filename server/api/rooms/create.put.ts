@@ -69,6 +69,7 @@ export default defineEventHandler(async (event) => {
         'hasGuard' : 'unknown',
         'hasAdmin' : 'unknown',
         'hasDoor' : 'unknown',
+        'hasDoctor' : 'unknown',
         'Ecomment' : "",
         'Kcomment' : "",
         'Icomment' : "",

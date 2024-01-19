@@ -6,6 +6,13 @@ const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
 
+function prettifyText (text: string) : string {
+    text = text.replaceAll('Yes','🟩')
+    text = text.replaceAll('No','🟥')
+    text = text.replaceAll('unknown','🟫')
+    return text
+}
+
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
     await mongoose.connect(config.mongodb_uri);
@@ -27,7 +34,7 @@ export default defineEventHandler(async (event) => {
         body.hasLock === undefined || body.hasBroom === undefined || body.hasBed === undefined || body.hasSink === undefined || body.hasToilet === undefined ||
         body.hasRadiator === undefined || body.hasShower === undefined || body.hasBidet === undefined || body.hasSocket === undefined ||
         body.hasBulb === undefined || body.Ecomment === undefined || body.Kcomment === undefined || body.Icomment === undefined || body.Pcomment === undefined 
-        || body.Acomment === undefined || body.hasGuard === undefined || body.hasAdmin === undefined || body.hasDoor === undefined) {
+        || body.Acomment === undefined || body.hasGuard === undefined || body.hasAdmin === undefined || body.hasDoor === undefined || body.hasDoctor === undefined) {
         setResponseStatus(event,400,"Bad Request")
         }
     const user = await mongoose.connection.db.collection('hotel-users').findOne({token: token})
@@ -84,7 +91,7 @@ export default defineEventHandler(async (event) => {
             group += "Konserwator "
         }
         tgMessage += `${group} (${user.name}\t ${user.surname}) \n`
-        bot.telegram.sendMessage("-1002137267212",tgMessage,{reply_to_message_id: 3})
+        bot.telegram.sendMessage("-1002137267212",prettifyText(tgMessage),{reply_to_message_id: 3})
         tgMessage = `------------${body.room_number}------------\n`
     }
     if (room.hasSink !== body.hasSink) {
@@ -128,7 +135,7 @@ export default defineEventHandler(async (event) => {
             group += "Konserwator "
         }
         tgMessage += `${group} (${user.name}\t ${user.surname}) \n`
-        bot.telegram.sendMessage("-1002137267212",tgMessage,{reply_to_message_id: 7})
+        bot.telegram.sendMessage("-1002137267212",prettifyText(tgMessage),{reply_to_message_id: 7})
         tgMessage = `------------${body.room_number}------------\n`
     }
     if (room.hasSocket !== body.hasSocket) {
@@ -160,7 +167,7 @@ export default defineEventHandler(async (event) => {
             group += "Konserwator "
         }
         tgMessage += `${group} (${user.name}\t ${user.surname}) \n`
-        bot.telegram.sendMessage("-1002137267212",tgMessage,{reply_to_message_id: 9})
+        bot.telegram.sendMessage("-1002137267212",prettifyText(tgMessage),{reply_to_message_id: 9})
         tgMessage = `------------${body.room_number}------------\n`
     }
     if (room.hasBroom !== body.hasBroom) {
@@ -192,7 +199,7 @@ export default defineEventHandler(async (event) => {
             group += "Konserwator "
         }
         tgMessage += `${group} (${user.name}\t ${user.surname}) \n`
-        bot.telegram.sendMessage("-1002137267212",tgMessage,{reply_to_message_id: 5})
+        bot.telegram.sendMessage("-1002137267212",prettifyText(tgMessage),{reply_to_message_id: 5})
         tgMessage = `------------${body.room_number}------------\n`
     }
     if (room.hasGuard !== body.hasGuard) {
@@ -203,6 +210,9 @@ export default defineEventHandler(async (event) => {
     }
     if (room.Acomment !== body.Acomment) {
         tgMessage += `Kommentarz: ${room.Acomment} --> ${body.Acomment}\n`
+    }
+    if (room.hasDoctor !== body.hasDoctor) {
+        tgMessage += `Lekarz: ${room.hasDoctor} --> ${body.hasDoctor}\n`
     }
     if (tgMessage !== `------------${body.room_number}------------\n`) {
         const user = await mongoose.connection.db.collection('hotel-users').findOne({token: token})
@@ -224,7 +234,7 @@ export default defineEventHandler(async (event) => {
             group += "Konserwator "
         }
         tgMessage += `${group} (${user.name}\t ${user.surname}) \n`
-        bot.telegram.sendMessage("-1002137267212",tgMessage,{reply_to_message_id: 58})
+        bot.telegram.sendMessage("-1002137267212",prettifyText(tgMessage),{reply_to_message_id: 58})
         tgMessage = `------------${body.room_number}------------\n`
     }
     await sendBody(body,token)
@@ -272,6 +282,7 @@ const sendBody = async (body:any,token: string) => {
         'hasGuard' : body.hasGuard,
         'hasAdmin' : body.hasAdmin,
         'hasDoor' : body.hasDoor,
+        'hasDoctor' : body.hasDoctor,
         'Ecomment' : body.Ecomment,
         'Kcomment' : body.Kcomment,
         'Icomment' : body.Icomment,

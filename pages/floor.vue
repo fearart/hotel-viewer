@@ -191,6 +191,9 @@
                                 <div class="pr-2 h-20 w-20">
                                     <img :src="imageLibrary.AdminImage" @click="Adminstate" class="cursor-pointer"/>
                                 </div>
+                                <div class="pr-2 h-20 w-20">
+                                    <img :src="imageLibrary.DoctorImage" @click="Doctorstate" class="cursor-pointer"/>
+                                </div>
                             </div>
                         </div>
                         <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
@@ -423,6 +426,7 @@ const openRoomModal = (room_number) => {
             'Icomment' : response.data.Icomment,
             'Pcomment' : response.data.Pcomment,
             'Acomment' : response.data.Acomment,
+            'hasDoctor' : response.data.hasDoctor,
         }
 
         switch(openedRoom.value.hasAccessPoint) {
@@ -610,6 +614,17 @@ const openRoomModal = (room_number) => {
                 break;
             default:
                 imageLibrary.value.DoorImage = '/img/pngs/door-gray.png'
+                break;
+        }
+        switch(openedRoom.value.hasDoctor) {
+            case "Yes":
+                imageLibrary.value.DoctorImage = '/img/pngs/doctor-green.png'
+                break;
+            case "No":
+                imageLibrary.value.DoctorImage = '/img/pngs/doctor-red.png'
+                break;
+            default:
+                imageLibrary.value.DoctorImage = '/img/pngs/doctor-gray.png'
                 break;
         }
     })
@@ -923,6 +938,21 @@ const Doorstate = () => {
         imageLibrary.value.DoorImage = 'img/pngs/door-gray.png'
     }
 }
+const Doctorstate = () => {
+    if (openedRoom.value.hasDoctor === 'unknown') {
+        openedRoom.value.hasDoctor = 'Yes'
+        imageLibrary.value.DoctorImage = 'img/pngs/doctor-green.png'
+    }
+    else if (openedRoom.value.hasDoctor === 'Yes') {
+        openedRoom.value.hasDoctor = 'No'
+        imageLibrary.value.DoctorImage = 'img/pngs/doctor-red.png'
+    }
+    else {
+        openedRoom.value.hasDoctor = 'unknown'
+        imageLibrary.value.DoctorImage = 'img/pngs/doctor-gray.png'
+    }
+
+}
 // #endregion
 
 const submitEdit = () => {
@@ -939,7 +969,7 @@ const submitEdit = () => {
                                         'hasAdmin' : openedRoom.value.hasAdmin, 'hasDoor': openedRoom.value.hasDoor,
                                         'Ecomment' : openedRoom.value.Ecomment, 'Kcomment' : openedRoom.value.Kcomment, 
                                         'Icomment' : openedRoom.value.Icomment, 'Pcomment' : openedRoom.value.Pcomment, 
-                                        'Acomment' : openedRoom.value.Acomment
+                                        'Acomment' : openedRoom.value.Acomment, 'hasDoctor' : openedRoom.value.hasDoctor,
                                     })
     .then((response) => {
         getFloorInfo()
@@ -1291,7 +1321,7 @@ const enhanceToggle = () => {
     if (enhancedMode.value) {
         timeout.value = setInterval(() => {
             getFloorInfo()
-        }, 3000);
+        }, 5000);
     }
     else {
         clearTimeout(timeout.value)

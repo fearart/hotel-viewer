@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
     const floors = await mongoose.connection.db.collection('hotel-floors').find({}).toArray()
     floors.forEach(async (floor) => {
         floor.rooms.forEach((room:any) => {
-            room.Icomment = room.comment
+            room.hasDoctor = 'unknown'
         })
         await mongoose.connection.db.collection('hotel-floors').updateOne({_id: floor._id},{$set: {rooms: floor.rooms}})
     })

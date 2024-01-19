@@ -75,6 +75,7 @@ export default defineEventHandler(async (event) => {
             hasGuard: room.hasGuard,
             hasAdmin: room.hasAdmin,
             hasDoor: room.hasDoor,
+            hasDoctor: room.hasDoctor,
             Ecomment: room.Ecomment,
             Kcomment: room.Kcomment,
             Icomment: room.Icomment,
