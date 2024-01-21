@@ -6,6 +6,7 @@ const unauthorizedReturn = (event: any) => {
 
 export default defineEventHandler(async (event) => {
     const cookie = getCookie(event,'token');
+    const storage = useStorage('images');
     try {
         jwt.verify(cookie || "",useRuntimeConfig().jwt_secret);
     }
@@ -14,8 +15,11 @@ export default defineEventHandler(async (event) => {
         return;
     }
     const body = await readBody(event);
-    if (body.image === undefined) { setResponseStatus(event,400,"Bad Request"); return }
-
-    fs.unlinkSync(process.cwd() + '/public' + body.image);
+    let keys = await storage.getKeys();
+    keys = keys.filter((key) => key.startsWith(body.room_number))
+    console.log();
+    let key = keys[body.imageIndex];
+    storage.removeItem(key);
+    return `deleted ${key}`
     setResponseStatus(event,200,"OK");
 })

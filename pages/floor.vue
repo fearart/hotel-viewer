@@ -265,9 +265,9 @@
     </UModal>
     <!-- photo gallery modal -->
     <UModal v-model="isOpenPhotoGallery" class="w-60" :ui="{ container: 'items-start' }">
-        <div v-for="image in roomImages" class="p-4">
+        <div v-for="(image,imageIndex) in roomImages" class="p-4">
             <div class="border-sky-400 border-y-2 p-4 flex flex-col justify-end">
-                <UButton label="X" color="red" size="xs" variant="ghost" @click="deleteImage(image)" class=""></UButton>
+                <UButton label="X" color="red" variant="ghost" @click="deleteImage(imageIndex)" class=""></UButton>
                 <img :src="image" class="mt-2">
             </div>
         </div>
@@ -1397,13 +1397,15 @@ const handleFileUpload = (event) => {
 const openPhotoGallery = () => {
     roomImages.value = []
     axios.post('/api/image/get', { "room_number": openedRoom.value.room_number }).then((response) => {
-        roomImages.value = response.data
+        response.data.forEach((image) => {
+            roomImages.value.push(`data:image/webp;base64,${image}`)
+        })
     })
     isOpenPhotoGallery.value = true
     isOpenRoomModal.value = false
 }
-const deleteImage = (image) => {
-    axios.post('/api/image/delete', { "image": image }).then((response) => {
+const deleteImage = (imageIndex) => {
+    axios.post('/api/image/delete', { "imageIndex": imageIndex, 'room_number': openedRoom.value.room_number }).then((response) => {
         getFloorInfo()
         isOpenPhotoGallery.value = false
         isOpenRoomModal.value = true

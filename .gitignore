@@ -27,3 +27,4 @@ logs
 .netlify
 public/images/
 nuxt.config.ts
+images/

@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import { useCookie } from "nuxt/app";
 import fs from 'fs';
 import path from 'path';
 const unauthorizedReturn = (event: any) => {
@@ -8,6 +7,7 @@ const unauthorizedReturn = (event: any) => {
 
 export default defineEventHandler(async (event) => {
     const cookie = getCookie(event,'token');
+    const storage = useStorage('images');
     try {
         jwt.verify(cookie || "",useRuntimeConfig().jwt_secret);
     }
@@ -17,13 +17,14 @@ export default defineEventHandler(async (event) => {
     }
     const body = await readBody(event);
     if (body.room_number === undefined) { setResponseStatus(event,400,"Bad Request"); return }
-
-    let files = fs.readdirSync(process.cwd() + '/public/images');
-    let images = files.filter((file) => {
-        return file.startsWith(body.room_number)
-    })
-    for (let i = 0; i < images.length; i++) {
-        images[i] = path.join('/images',images[i]);
+    let keys = await storage.getKeys();
+    keys = keys.filter((key) => key.startsWith(body.room_number))
+    let simages : Array<string> = [];
+    for (let i = 0; i < keys.length; i++) {
+        let buffer: Buffer | null = await storage.getItemRaw(keys[i]);
+        if (buffer) {
+            simages.push(buffer.toString('base64'));
+        }
     }
-    return images;
+    return simages;
 })
