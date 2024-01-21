@@ -20,6 +20,7 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.10.7",
     "nuxt": "^3.8.1",
+    "sass": "^1.70.0",
     "vue": "^3.3.8",
     "vue-router": "^4.2.5"
   },
@@ -36,6 +37,7 @@
     "maska": "^2.1.10",
     "mongoose": "^8.0.1",
     "pinia": "^2.1.7",
+    "sharp": "^0.33.2",
     "sigma": "3.0.0-beta.4",
     "telegraf": "^4.15.3"
   }

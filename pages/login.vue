@@ -21,7 +21,6 @@ const onLoginFormSubmit = () => {
         login: login.value.replaceAll(" ",''),
         password: password.value.replaceAll(" ",'')
     }).then((response) => {
-        console.log(response)
         if (response.status === 202) {
             useCookie('token', response.data.token)
             navigateTo('/')

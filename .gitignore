@@ -8,7 +8,6 @@ dist
 
 # Node dependencies
 node_modules
-nuxt.config.ts
 
 # Logs
 logs
@@ -26,3 +25,5 @@ logs
 
 # Local Netlify folder
 .netlify
+public/images/
+nuxt.config.ts
