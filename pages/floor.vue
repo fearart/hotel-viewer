@@ -265,11 +265,19 @@
     </UModal>
     <!-- photo gallery modal -->
     <UModal v-model="isOpenPhotoGallery" class="w-60" :ui="{ container: 'items-start' }">
-        <div v-for="(image,imageIndex) in roomImages" class="p-4">
-            <div class="border-sky-400 border-y-2 p-4 flex flex-col justify-end">
-                <UButton label="X" color="red" variant="ghost" @click="deleteImage(imageIndex)" class=""></UButton>
-                <img :src="image" class="mt-2">
+        <div class="flex flex-col p-4">
+            <div class="flex justify-end w-full">
+                <UButton label="Zamknij okno" icon="i-heroicons-x-mark" color="red" variant="ghost" @click="isOpenPhotoGallery = false" class="right-0 top-0 m-2"/>
             </div>
+            <div v-for="(image,imageIndex) in roomImages" class="p-4">
+                <div class="border-sky-400 border-y-2 flex flex-col">
+                    <div class="w-full justify-end flex">
+                        <UButton label="Usuń" icon="i-heroicons-x-mark" color="red" variant="ghost" @click="deleteImage(imageIndex)"></UButton>
+                    </div>
+                    <img :src="image" class="mt-2">
+                </div>
+            </div>
+            <p v-if="roomImages.length === 0">Niema Zdjęc</p>
         </div>
     </UModal>
 </template>

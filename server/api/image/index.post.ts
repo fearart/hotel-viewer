@@ -1,5 +1,6 @@
-import process from "process";
 import TokenDecoder from "~/utilities/tokendecoder";
+import Logger from "~/utilities/logger";
+import mongoose from "mongoose";
 import sharp from 'sharp';
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
@@ -23,6 +24,15 @@ export default defineEventHandler(async (event) => {
         return;
     }
     const fileName = `${room_number}_${Date.now()}_${user.login}.${file.type.split('/')[1]}`;
+    mongoose.connection.db.collection('hotel-logs').insertOne({
+        "event" : `Image was added.`,
+        "type" : "image",
+        "timestamp" : Date.now(),
+        "user" : user.login,
+        "details" : `Image was added to room ${room_number}. Image: ${fileName}`,
+        'ID' : await Logger .getID()
+        
+    })
     await sharp(file.data)
         .webp({ quality: 60 })
         .toBuffer().then((data : any) => {
