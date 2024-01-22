@@ -403,10 +403,10 @@ const setRoomColor = (roomIndex) => {
     let room = rooms.value[roomIndex]
     let userGroup = user.value.group
     if (userGroup.it) {
-        if (room.hasAccessPoint === "Yes" && room.hasBathPhone === "Yes" && room.hasBathPhone === "Yes" && room.hasTV === "Yes" && room.hasLock === "Yes") {
+        if (room.hasAccessPoint === "Yes" && room.hasPhone === "Yes" && room.hasBathPhone === "Yes" && room.hasTV === "Yes" && room.hasLock === "Yes") {
             return 'bg-green-500'
         }
-        else if (room.hasAccessPoint === "No" || room.hasBathPhone === "No" || room.hasBathPhone === "No" || room.hasTV === "No" || room.hasLock === "No") {
+        else if (room.hasAccessPoint === "No" || room.hasPhone === "No" || room.hasBathPhone === "No" || room.hasTV === "No" || room.hasLock === "No") {
             return 'bg-red-500'
         }
         else {
