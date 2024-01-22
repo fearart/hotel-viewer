@@ -277,7 +277,12 @@
                     <img :src="image" class="mt-2">
                 </div>
             </div>
-            <p v-if="roomImages.length === 0">Niema Zdjęc</p>
+            <div class="loader" v-if="roomImageLoading">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+            <p v-if="roomImages.length === 0 && !roomImageLoading">Brak zdjęć w bazie</p>
         </div>
     </UModal>
 </template>
@@ -325,6 +330,7 @@ const openedRoom = ref({})
 const openedCorridor = ref({})
 const imageLibrary = ref({})
 const roomImages = ref([])
+const roomImageLoading = ref(false)
 // Modals vars
 const isOpenPhotoGallery = ref(false)
 const isOpenRoomModal = ref(false)
@@ -1404,11 +1410,13 @@ const handleFileUpload = (event) => {
 }
 const openPhotoGallery = () => {
     roomImages.value = []
+    roomImageLoading.value = true
     axios.post('/api/image/get', { "room_number": openedRoom.value.room_number }).then((response) => {
         response.data.forEach((image) => {
             roomImages.value.push(`data:image/webp;base64,${image}`)
         })
     })
+    roomImageLoading.value = false
     isOpenPhotoGallery.value = true
     isOpenRoomModal.value = false
 }
@@ -1482,6 +1490,47 @@ const deleteImage = (imageIndex) => {
 .file-input__label svg {
   height: 16px;
   margin-right: 4px;
+}
+
+</style>
+<style scoped>
+.loader {
+    position: relative;
+    left: 50%;
+}
+
+.dot {
+    position: absolute;
+    height: 1rem;
+    width: 1rem;
+    border-radius: 50%;
+    background-color: #fff;
+    animation: bounce 1.3s linear infinite;
+}
+
+.dot:nth-child(1) {
+    left: -1.5rem;
+}
+
+.dot:nth-child(2) {
+    animation-delay: -1s;
+}
+
+.dot:nth-child(3) {
+    right: -2.5rem;
+    animation-delay: -0.8s;
+}
+
+@keyframes bounce {
+    0%,
+    66%,
+    100% {
+        transform: initial;
+    }
+
+    33% {
+        transform: translatey(-1rem);
+    }
 }
 
 </style>
