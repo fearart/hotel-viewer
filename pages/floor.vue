@@ -302,21 +302,76 @@
     </UModal>
     <!-- kitchen modal -->
     <UModal v-model="isOpenKitchenModal" class="w-60" :ui="{ container: 'items-start'}">
+    <div class="p-4">
         <button></button>
-        <div class="flex justify-center flex-col items-center p-6">
-            <UInput v-model="openedKitchen.name" v-maska data-maska="#####" class="text-xl w-24 mb-2"
+        <div class="flex justify-center flex-col items-center">
+            <div class="w-full justify-around flex mt-4">
+                <UButton label="Submit" @click="submitKitchenEdit"></UButton>
+                <UButton label="Cancel" color="red" @click="isOpenKitchenModal = false"></UButton>
+            </div>
+            <UInput v-model="openedKitchen.name" class="text-xl w-24 mb-2"
                 placeholder="Kitchen name" />
             <div>
                 <!-- params -->
             </div>
             <UInput v-model="openedKitchen.comment" placeholder="Comment"  />
-            <div class="w-full justify-between flex mt-4">
-                <UButton label="Submit" @click="submitCorridorEdit"></UButton>
-                <UButton label="Cancel" color="red" @click="isOpenCorridorModal = false"></UButton>
+        </div>
+        <div class="flex flex-row justify-evenly mt-4">
+            <form>
+                <div class="file-input">
+                    <input
+                        type="file"
+                        name="file-input"
+                        id="file-input"
+                        class="file-input__input"
+                        v-on:change="kitchenFileUpload"
+                    />
+                    <label class="file-input__label" for="file-input">
+                        <svg
+                        aria-hidden="true"
+                        focusable="false"
+                        data-prefix="fas"
+                        data-icon="upload"
+                        class="svg-inline--fa fa-upload fa-w-16"
+                        role="img"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 512 512"
+                        >
+                        <path
+                            fill="currentColor"
+                            d="M296 384h-80c-13.3 0-24-10.7-24-24V192h-87.7c-17.8 0-26.7-21.5-14.1-34.1L242.3 5.7c7.5-7.5 19.8-7.5 27.3 0l152.2 152.2c12.6 12.6 3.7 34.1-14.1 34.1H320v168c0 13.3-10.7 24-24 24zm216-8v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h136v8c0 30.9 25.1 56 56 56h80c30.9 0 56-25.1 56-56v-8h136c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z"
+                        ></path>
+                        </svg>
+                        <span>Dodaj zdjęcie</span>
+                    </label>
+                </div>
+            </form>
+            <UButton label="Zdjęcia" icon="i-heroicons-photo-16-solid" @click="openKitchenGallery"/>
+        </div>
+    </div>
+    </UModal>
+    <!-- kitchen gallery modal -->
+    <UModal v-model="isOpenKitchenGallery" class="w-60" :ui="{container: 'items-start'}">
+        <div class="flex flex-col p-4">
+            <div class="flex justify-end w-full">
+                <UButton label="Zamknij okno" icon="i-heroicons-x-mark" color="red" variant="ghost" @click="isOpenKitchenGallery = false" class="right-0 top-0 m-2"/>
             </div>
+            <div v-for="(image,imageIndex) in kitchenImages" class="p-4">
+                <div class="border-sky-400 border-y-2 flex flex-col">
+                    <div class="w-full justify-end flex">
+                        <UButton label="Usuń" icon="i-heroicons-x-mark" color="red" variant="ghost" @click="deleteKitchenImage(imageIndex)"></UButton>
+                    </div>
+                    <img :src="image" class="mt-2">
+                </div>
+            </div>
+            <div class="loader" v-if="roomImageLoading">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+            <p v-if="kitchenImages.length === 0 && !roomImageLoading">Brak zdjęć w bazie</p>
         </div>
     </UModal>
-    <!-- universal gallery modal-->
 </template>
 <script setup>
 import axios from 'axios';
@@ -370,11 +425,14 @@ const openedKitchen = ref({})
 const imageLibrary = ref({})
 const roomImages = ref([])
 const roomImageLoading = ref(false)
+
+const kitchenImages = ref([])
 // Modals vars
 const isOpenPhotoGallery = ref(false)
 const isOpenRoomModal = ref(false)
 const isOpenCorridorModal = ref(false)
 const isOpenKitchenModal = ref(false)
+const isOpenKitchenGallery = ref(false)
 // FIlters
 const greenFilter = ref(false)
 const redFilter = ref(false)
@@ -791,9 +849,8 @@ const openKitchenModal = (kitchen_name) => {
             return
         }
     })
-    openedKitchen.value.name = kitchen.name
-    openedKitchen.value.comment = kitchen.comment
-    openedKitchen.value.id = kitchen.id
+    console.log(kitchen)
+    openedKitchen.value = kitchen
     isOpenKitchenModal.value = true
 }
 const setCinemaColor = () => {
@@ -1100,6 +1157,12 @@ const submitCorridorEdit = () => {
         getFloorInfo()
         isOpenCorridorModal.value = false
     })
+}
+const submitKitchenEdit = () => {
+    axios.post('/api/kitchen/modify',{'floor_number': floor_number.value, "name" : openedKitchen.value.name, "comment" : openedKitchen.value.comment}).then((response) => {
+        getFloorInfo()
+        isOpenKitchenModal.value = false
+    }) 
 }
 const createNewRoom = () => {
     axios.put('/api/rooms/create', { "floor_number": floor_number.value }).then((response) => {
@@ -1541,11 +1604,40 @@ const openPhotoGallery = () => {
     isOpenPhotoGallery.value = true
     isOpenRoomModal.value = false
 }
+const openKitchenGallery = () => {
+    kitchenImages.value = []
+    roomImageLoading.value = true
+    axios.post('/api/image/getkitchen', {"floor_number" : floor_number.value, "kitchen_name": openedKitchen.value.name }).then((response) => {
+        response.data.forEach((image) => {
+            kitchenImages.value.push(`data:image/webp;base64,${image}`)
+        })
+    })
+    roomImageLoading.value = false
+    isOpenKitchenGallery.value = true
+    isOpenKitchenModal.value = false
+}
 const deleteImage = (imageIndex) => {
-    axios.post('/api/image/delete', { "imageIndex": imageIndex, 'room_number': openedRoom.value.room_number }).then((response) => {
+    axios.post('/api/image/delete', { "imageIndex": imageIndex, 'room_number': openedRoom.value.room_number },
+    {
+        headers: {
+            'type' : 'room'
+        }
+    }).then((response) => {
         getFloorInfo()
         isOpenPhotoGallery.value = false
         isOpenRoomModal.value = true
+    })
+}
+const deleteKitchenImage = (imageIndex) => {
+    axios.post('/api/image/delete', { "imageIndex": imageIndex, 'floor_number': floor_number.value, 'kitchen_name': openedKitchen.value.name },
+    {
+        headers: {
+            'type' : 'kitchen'
+        }
+    }).then((response) => {
+        getFloorInfo()
+        isOpenKitchenGallery.value = false
+        isOpenKitchenModal.value = true
     })
 }
 </script>

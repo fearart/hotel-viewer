@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
+import path from 'path';
 import TokenDecoder from '~/utilities/tokendecoder';
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
@@ -8,11 +9,6 @@ const unauthorizedReturn = (event: any) => {
 export default defineEventHandler(async (event) => {
     const cookie = getCookie(event,'token');
     const storage = useStorage('images');
-    const type = event.headers.get('type') || "";
-    if (type === "") {
-        setResponseStatus(event,400,"Bad Request");
-        return;
-    }
     const decoder = new TokenDecoder(cookie || "");
     const user = await decoder.decode();
     if (!user) {
@@ -20,14 +16,16 @@ export default defineEventHandler(async (event) => {
         return;
     }
     const body = await readBody(event);
+    if (body.floor_number === undefined || body.kitchen_name === undefined) { setResponseStatus(event,400,"Bad Request"); return }
     let keys = await storage.getKeys();
-    if (type === "room") {
-        keys = keys.filter((key) => key.startsWith(body.room_number))
+    keys = keys.filter((key) => key.startsWith(`${body.floor_number}_${body.kitchen_name}`))
+    console.log(keys)
+    let simages : Array<string> = [];
+    for (let i = 0; i < keys.length; i++) {
+        let buffer: Buffer | null = await storage.getItemRaw(keys[i]);
+        if (buffer) {
+            simages.push(buffer.toString('base64'));
+        }
     }
-    if (type === "kitchen") {
-        keys = keys.filter((key) => key.startsWith(`${body.floor_number}_${body.kitchen_name}`))
-    }
-    let key = keys[body.imageIndex];
-    storage.removeItem(key);
-    return `deleted ${key}`
+    return simages;
 })
