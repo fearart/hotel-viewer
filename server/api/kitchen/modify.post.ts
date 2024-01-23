@@ -13,27 +13,27 @@ export default defineEventHandler(async (event) => {
         setResponseStatus(event,401,"Unauthorized")
         return
     }
-    if (user.role.root !== true) {
-        setResponseStatus(event,401,"Unauthorized")
-        return
-    }
     const body = await readBody(event)
-    if (body.floor_number === undefined || body.kitchen_name === undefined || body.comment === undefined) {
+    if (body.floor_number === undefined || body.name === undefined || body.comment === undefined) {
         setResponseStatus(event,400,"Bad Request")
         return
     }
-    let floor_object = await mongoose.connection.db.collection('hotel-floors').findOne({floor_number: body.floor_number})
-    if (!floor_object) {
+    const floor_number = Number.parseInt(body.floor_number)
+    const floor_object = await mongoose.connection.db.collection('hotel-floors').findOne({floor_number: floor_number})
+    if (floor_object === null) {
         setResponseStatus(event,404,"Not Found")
         return
     }
-    let kitchens = floor_object.kitchens || []
-    let kitchen_object = kitchens.find((kitchen:any) => kitchen.kitchen_name === body.kitchen_name)
-    if (!kitchen_object) {
+    let kitchens: Array<any> = floor_object.kitchens || []
+    let kitchen_object = kitchens.find((kitchen:any) => kitchen.name === body.name)
+    if (kitchen_object == null) {
         setResponseStatus(event,404,"Not Found")
         return
     }
     kitchen_object.comment = body.comment
-    kitchen_object.kitchen_name = body.kitchen_name
-    await mongoose.connection.db.collection('hotel-floors').updateOne({floor_number: body.floor_number}, {$set: {kitchens: kitchens}})
+    kitchen_object.name = body.name
+    kitchens = kitchens.filter((kitchen:any) => kitchen.name !== body.name)
+    kitchens.push(kitchen_object)
+    console.log(kitchens)
+    await mongoose.connection.db.collection('hotel-floors').updateOne({floor_number: floor_number}, {$set: {kitchens: kitchens}})
 })
