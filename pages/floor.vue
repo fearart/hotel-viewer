@@ -72,6 +72,21 @@
         <UDivider v-if="hasConferenceRooms && !hide_naxuy_conference_rooms" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENconference_rooms">Sale konferencyjne</UDivider>
         <UDivider v-if="hasRestaurants && !hide_naxuy_restaurants" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENrestaurants">Restauracje</UDivider>
         <UDivider v-if="hasPlayrooms" class="prevent-select my-4 cursor-pointer">Bawialni</UDivider>
+        <UDivider v-if="hasKitchens && !hide_naxuy_kitchens" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENkitchens">Kuchnie</UDivider>
+        <div v-if="displayKitchens">
+            <div v-for="(kitchen, kitchenIndex) in kitchens" :key="kitchenIndex" 
+                class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
+                @click="openKitchenModal(kitchen.name)"
+                >
+                {{ kitchen.name}}
+            </div>
+            <div class="xl:w-24 xl:h-24 w-12 h-12  mb-3 room-card bg-gray-500 text-white flex items-center justify-center rounded-lg cursor-pointer"
+                @click="createNewKitchen()"
+                v-if="isAdmin"
+                >
+                <span class="text-center text-6xl">+</span>
+            </div>
+        </div>
         <div>
             <UButton v-if="!enhancedMode && isRoot" @click="enhanceToggle">Enable Enhanced Mode</UButton>
             <UButton v-if="enhancedMode && isRoot" @click="enhanceToggle" color="red">Disable Enhanced Mode</UButton>
@@ -209,7 +224,7 @@
                                         name="file-input"
                                         id="file-input"
                                         class="file-input__input"
-                                        v-on:change="handleFileUpload"
+                                        v-on:change="roomFileUpload"
                                     />
                                     <label class="file-input__label" for="file-input">
                                         <svg
@@ -285,6 +300,23 @@
             <p v-if="roomImages.length === 0 && !roomImageLoading">Brak zdjęć w bazie</p>
         </div>
     </UModal>
+    <!-- kitchen modal -->
+    <UModal v-model="isOpenKitchenModal" class="w-60" :ui="{ container: 'items-start'}">
+        <button></button>
+        <div class="flex justify-center flex-col items-center p-6">
+            <UInput v-model="openedKitchen.name" v-maska data-maska="#####" class="text-xl w-24 mb-2"
+                placeholder="Kitchen name" />
+            <div>
+                <!-- params -->
+            </div>
+            <UInput v-model="openedKitchen.comment" placeholder="Comment"  />
+            <div class="w-full justify-between flex mt-4">
+                <UButton label="Submit" @click="submitCorridorEdit"></UButton>
+                <UButton label="Cancel" color="red" @click="isOpenCorridorModal = false"></UButton>
+            </div>
+        </div>
+    </UModal>
+    <!-- universal gallery modal-->
 </template>
 <script setup>
 import axios from 'axios';
@@ -296,6 +328,7 @@ const rooms = ref([])
 const savedRooms = ref([])
 const corridors = ref([])
 const savedCorridors = ref([])
+const kitchens = ref([])
 const userPermissions = ref({})
 const user = ref({})
 const isAdmin = ref(false)
@@ -319,15 +352,21 @@ const displayRestaurants = ref(false)
 
 const hasPlayrooms = ref(false)
 const displayPlayrooms = ref(false)
+
+const hasKitchens = ref(false)
+const displayKitchens = ref(false)
+
 // useless shit
 const hide_naxuy_cinema = ref(false)
 const hide_naxuy_corridor = ref(false)
 const hide_naxuy_rooms = ref(false)
 const hide_naxuy_conference_rooms = ref(false)
 const hide_naxuy_restaurants = ref(false)
+const hide_naxuy_kitchens = ref(false)
 // Objects
 const openedRoom = ref({})
 const openedCorridor = ref({})
+const openedKitchen = ref({})
 const imageLibrary = ref({})
 const roomImages = ref([])
 const roomImageLoading = ref(false)
@@ -335,7 +374,7 @@ const roomImageLoading = ref(false)
 const isOpenPhotoGallery = ref(false)
 const isOpenRoomModal = ref(false)
 const isOpenCorridorModal = ref(false)
-
+const isOpenKitchenModal = ref(false)
 // FIlters
 const greenFilter = ref(false)
 const redFilter = ref(false)
@@ -399,6 +438,11 @@ const getFloorInfo = () => {
                     return a.AccessPointNumber - b.AccessPointNumber
                 })
                 savedCorridors.value = corridors.value
+            }
+            if (typeof (floor.value.kitchens) !== undefined) {
+                hasKitchens.value = true
+                kitchens.value = floor.value.kitchens
+                console.log(kitchens.value[0])
             }
         })
         .catch((error) => {
@@ -737,6 +781,12 @@ const OpenCorridorModal = (corridor_number) => {
     openedCorridor.value.AccessPointNumber = corridor_number
     isOpenCorridorModal.value = true
 }
+const openKitchenModal = (kitchen_name) => {
+    console.log(kitchen_name)
+    console.log(kitchens.value[0])
+    openedKitchen.value = kitchens.value.find((kitchen) => kitchen.name === kitchen_name)
+    isOpenKitchenModal.value = true
+}
 const setCinemaColor = () => {
     return 'bg-gray-500'
     // TODO: implement
@@ -1052,6 +1102,12 @@ const createNewCorridorAcessPoint = () => {
         getFloorInfo()
     })
 }
+const createNewKitchen = () => {
+    axios.put('/api/kitchens/create', { "floor_number": floor_number.value }).then((response) => {
+        getFloorInfo()
+    })
+
+}
 // #region Open/Close
 const MEGAOPENrooms = () => {
     if (displayRooms.value === true) {
@@ -1059,6 +1115,7 @@ const MEGAOPENrooms = () => {
         hide_naxuy_cinema.value = false
         hide_naxuy_corridor.value = false
         hide_naxuy_conference_rooms.value = false
+        hide_naxuy_kitchens.value = false
         hide_naxuy_restaurants.value = false
     }
     else {
@@ -1067,6 +1124,7 @@ const MEGAOPENrooms = () => {
         hide_naxuy_corridor.value = true
         hide_naxuy_conference_rooms.value = true
         hide_naxuy_restaurants.value = true
+        hide_naxuy_kitchens.value = true
         displayCinemas.value = false
     }
 }
@@ -1076,6 +1134,7 @@ const MEGAOPENcorrdior = () => {
         hide_naxuy_cinema.value = false
         hide_naxuy_rooms.value = false
         hide_naxuy_conference_rooms.value = false
+        hide_naxuy_kitchens.value = false
         hide_naxuy_restaurants.value = false
     }
     else {
@@ -1084,6 +1143,7 @@ const MEGAOPENcorrdior = () => {
         hide_naxuy_rooms.value = true
         hide_naxuy_conference_rooms.value = true
         hide_naxuy_restaurants.value = true
+        hide_naxuy_kitchens.value = true
         displayCinemas.value = false
     }
 }
@@ -1093,6 +1153,7 @@ const MEGAOPENcinema = () => {
         hide_naxuy_corridor.value = false
         hide_naxuy_rooms.value = false
         hide_naxuy_conference_rooms.value = false
+        hide_naxuy_kitchens.value = false
         hide_naxuy_restaurants.value = false
     }
     else {
@@ -1101,6 +1162,7 @@ const MEGAOPENcinema = () => {
         hide_naxuy_rooms.value = true
         hide_naxuy_conference_rooms.value = true
         hide_naxuy_restaurants.value = true
+        hide_naxuy_kitchens.value = true
         displayCorridor.value = false
         displayRooms.value = false
     }
@@ -1112,6 +1174,7 @@ const MEGAOPENconference_rooms = () => {
         hide_naxuy_rooms.value = false
         hide_naxuy_corridor.value = false
         hide_naxuy_restaurants.value = false
+        hide_naxuy_kitchens.value = false
     }
     else {
         displayConferenceRooms.value = true
@@ -1119,6 +1182,7 @@ const MEGAOPENconference_rooms = () => {
         hide_naxuy_rooms.value = true
         hide_naxuy_corridor.value = true
         hide_naxuy_restaurants.value = true
+        hide_naxuy_kitchens.value = true
         displayCinemas.value = false
     }
 }
@@ -1129,6 +1193,7 @@ const MEGAOPENrestaurants = () => {
         hide_naxuy_rooms.value = false
         hide_naxuy_conference_rooms.value = false
         hide_naxuy_corridor.value = false
+        hide_naxuy_kitchens.value = false
     }
     else {
         displayRestaurants.value = true
@@ -1136,6 +1201,27 @@ const MEGAOPENrestaurants = () => {
         hide_naxuy_rooms.value = true
         hide_naxuy_conference_rooms.value = true
         hide_naxuy_corridor.value = true
+        hide_naxuy_kitchens.value = true
+        displayCinemas.value = false
+    }
+}
+const MEGAOPENkitchens = () => {
+    if (displayKitchens.value === true) {
+        displayKitchens.value = false
+        hide_naxuy_cinema.value = false
+        hide_naxuy_rooms.value = false
+        hide_naxuy_conference_rooms.value = false
+        hide_naxuy_corridor.value = false
+        hide_naxuy_restaurants.value = false
+        hide_naxuy_kitchens.value = false
+    }
+    else {
+        displayKitchens.value = true
+        hide_naxuy_cinema.value = true
+        hide_naxuy_rooms.value = true
+        hide_naxuy_conference_rooms.value = true
+        hide_naxuy_corridor.value = true
+        hide_naxuy_restaurants.value = true
         displayCinemas.value = false
     }
 }
@@ -1386,7 +1472,7 @@ const enhanceToggle = () => {
         clearTimeout(timeout.value)
     }
 }
-const handleFileUpload = (event) => {
+const roomFileUpload = (event) => {
     const file = event.target.files[0]
     const formData = new FormData()
     formData.append('file', file)
@@ -1394,19 +1480,45 @@ const handleFileUpload = (event) => {
     formData.append('token', useCookie('token').value)
     axios.post('/api/image', formData, {
         headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data',
+            'type' : "room"
         }
 
     }).then((response) => {
         getFloorInfo()
             toast.add({
             color: "green",
-            description: "Image added",
+            description: "Zdjęnie dodane",
             id: "imgadded",
             timeout: 3000,
             title: "Success",
         })
     })
+}
+const kitchenFileUpload = (event) => {
+    const file = event.target.files[0]
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('kitchen_name', openedKitchen.value.name)
+    formData.append('token', useCookie('token').value)
+    formData.append('floor_number', floor_number.value)
+    axios.post('/api/image', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'type' : "kitchen"
+        }
+
+    }).then((response) => {
+        getFloorInfo()
+            toast.add({
+            color: "green",
+            description: "Zdjęnie dodane",
+            id: "imgadded",
+            timeout: 3000,
+            title: "Success",
+        })
+    })
+
 }
 const openPhotoGallery = () => {
     roomImages.value = []
