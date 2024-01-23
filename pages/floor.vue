@@ -783,8 +783,17 @@ const OpenCorridorModal = (corridor_number) => {
 }
 const openKitchenModal = (kitchen_name) => {
     console.log(kitchen_name)
-    console.log(kitchens.value[0])
-    openedKitchen.value = kitchens.value.find((kitchen) => kitchen.name === kitchen_name)
+    console.log(kitchens.value[0].name)
+    let kitchen = {}
+    kitchens.value.forEach((k) => {
+        if (k.name === kitchen_name) {
+            kitchen = k
+            return
+        }
+    })
+    openedKitchen.value.name = kitchen.name
+    openedKitchen.value.comment = kitchen.comment
+    openedKitchen.value.id = kitchen.id
     isOpenKitchenModal.value = true
 }
 const setCinemaColor = () => {
