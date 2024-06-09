@@ -12,6 +12,7 @@
                 <div id="gray-filter" class="w-4 h-4 bg-gray-500 rounded-sm cursor-pointer" @click="applyGrey">
                     
                 </div>
+                <UIcon name="i-material-symbols:find-in-page" class="w-4 h-4 cursor-pointer" @click="openSearchForm"/>
             </div>
         </div>
         <UDivider v-if="!hide_naxuy_rooms" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENrooms">Pokoje [{{ rooms.length }}]</UDivider>
@@ -372,6 +373,22 @@
             <p v-if="kitchenImages.length === 0 && !roomImageLoading">Brak zdjęć w bazie</p>
         </div>
     </UModal>
+    <!-- Mac Search -->
+    <UModal v-model="isOpenSearchForm" class="w-60" :ui="{container: 'items-start'}">
+        <div class="p-4">
+            <button></button>
+            <div class="flex flex-col space-y-4">
+            <div class="flex justify-center w-full">Znajdź urządzenie za MAC</div>
+                <UInput v-model="searchMac" v-maska data-maska="**:**:**:**:**:**" placeholder="MAC:Address" class="pb-2"/>
+                <UButton label="Szukaj" @click="searchMacAddress"></UButton>
+            </div>
+            <div v-if="currentFoundMac.type !== null" class="mt-4 text-center w-full">
+                <p v-if="currentFoundMac.type == 'room'"> P {{ currentFoundMac.data.room_number }}</p>
+                <p v-else-if="currentFoundMac.type == 'corridor'">K {{ currentFoundMac.data.accessPointNumber }}</p>
+                <p v-else>Brak wyników</p>
+            </div>
+        </div>
+    </UModal>
 </template>
 <script setup>
 import axios from 'axios';
@@ -425,6 +442,8 @@ const openedKitchen = ref({})
 const imageLibrary = ref({})
 const roomImages = ref([])
 const roomImageLoading = ref(false)
+const currentFoundMac = ref({})
+const searchMac = ref("")
 
 const kitchenImages = ref([])
 // Modals vars
@@ -433,6 +452,7 @@ const isOpenRoomModal = ref(false)
 const isOpenCorridorModal = ref(false)
 const isOpenKitchenModal = ref(false)
 const isOpenKitchenGallery = ref(false)
+const isOpenSearchForm = ref(false)
 // FIlters
 const greenFilter = ref(false)
 const redFilter = ref(false)
@@ -804,6 +824,9 @@ const openRoomModal = (room_number) => {
         openedRoom.value.defaultIndex = 3
     }
     isOpenRoomModal.value = true
+}
+const openSearchForm = () => {
+    isOpenSearchForm.value = !isOpenSearchForm.value
 }
 const setCorridorAPColor = (corridorIndex) => {
     let corridorAP = corridors.value[corridorIndex]
@@ -1423,6 +1446,33 @@ const setFilterOutline = () => {
         document.getElementById('gray-filter').classList.remove('outline')
         document.getElementById('gray-filter').classList.remove('outline-sky-500')
     }
+}
+const searchMacAddress = () => {
+    axios.post('/api/search/mac',{'macAddress' : searchMac.value}).then((response) => {
+        console.log(response)
+        if (Object.keys(response.data).length === 0){
+            currentFoundMac.value = {
+                'data' : null,
+                'type' : null
+            }
+            console.log("found nothing")
+            return
+        }
+        if (response.data.type === "room") {
+            currentFoundMac.value = {
+                'data' : response.data,
+                'type' : 'room'
+            }
+            console.log("found room")
+        }
+        else if (response.data.type === "corridor") {
+            currentFoundMac.value = {
+                'data' : response.data,
+                'type' : 'corridor'
+            }
+            console.log("found corridor")
+        }
+    })
 }
 const toggleAlarm = () => {
     openedRoom.value.alarm = !openedRoom.value.alarm

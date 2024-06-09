@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
         "hasPhone" : body.hasPhone,
         'hasBathPhone' : body.hasBathPhone,
         "comment" : body.comment,
-        "macAddress" : body.macAddress,
+        "macAddress" : body.macAddress.toUpperCase(),
         "alarm" : body.alarm,
         'hasLock' : body.hasLock,
         'hasBroom' : body.hasBroom,

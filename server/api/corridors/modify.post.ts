@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
     }
     let corridor_record = {
         'accessPointNumber' : corridor_number,
-        "macAddress" : body.macAddress,
+        "macAddress" : body.macAddress.toUpperCase(),
         "comment" : body.comment,
         "APStatus" : body.APStatus
     }
