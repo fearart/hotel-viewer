@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     mongodb_uri: process.env.MONGODB_URI,
     jwt_secret: process.env.JWT_SECRET,
-    telegram_token: "6581985549:AAE_lBJZfO9mnvjEy7zxZ__xpnxtWC9Es8o",
+    telegram_token: "6581985549:AAHbklHF7wJ-MupXpZHtRw0c4wIwN8EXUAw",
     version: "0.3",
     telegram_chat_id: -4021165189,
     telegram_chat_id_test: -1002137267212/3
