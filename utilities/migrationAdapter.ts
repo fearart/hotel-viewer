@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const localDB = "mongodb+srv://read:read@cluster0.sz9vy3k.mongodb.net/test"; // Update with your local database connection
+const localDB = "mongodb+srv://a:a@cluster0.sz9vy3k.mongodb.net/test"; // Update with your local database connection
 const remoteDB = "mongodb://localhost:27017/test"; // Update with your remote database connection
 
 // Collections to copy
