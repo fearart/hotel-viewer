@@ -80,7 +80,7 @@
       <UDivider v-if="hasPlayrooms" class="prevent-select my-4 cursor-pointer">Bawialni</UDivider>
       <UDivider v-if="hasKitchens && !hide_naxuy_kitchens" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENkitchens">Kuchnie</UDivider>
       <div v-if="displayKitchens">
-          <div v-for="(kitchen, kitchenIndex) in kitchens" :key="kitchenIndex" 
+          <div v-for="(kitchen, kitchegnIndex) in kitchens" :key="kitchenIndex" 
               class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
               @click="openKitchenModal(kitchen.name)"
               >
