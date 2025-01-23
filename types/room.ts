@@ -65,7 +65,7 @@ export interface Room {
     administracja: {
         isApproved: "Yes" | "No" | "unknown";
         isApprovedBy: string;
-        isApprovedDate: Date;
+        isApprovedDate: Date | null;
         Acomment: string;
         _id: string;
     }
