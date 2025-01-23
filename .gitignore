@@ -20,3 +20,7 @@ logs
 .env
 .env.*
 !.env.example
+
+nuxt.config.ts
+bun.lockb
+server/api/test.post.ts
