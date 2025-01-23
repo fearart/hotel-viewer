@@ -16,11 +16,11 @@
               <div  class="w-4 h-4 bg-sky-500 rounded-sm cursor-pointer p-0 m-0 text-center" @click=""><p class="text-xs">I</p></div>
           </div>
       </div>
-      <UDivider v-if="!hide_naxuy_rooms" class="prevent-select my-4 cursor-pointer " @click="MEGAOPENrooms"><div class="flex flex-col align-center"><p>Pokoje [{{ rooms.length }}]</p> <p>{{ calculateRoomsPercentage() }}% </p></div></UDivider>
-      <div v-if="displayRooms && !hide_naxuy_rooms"
+      <UDivider class="prevent-select my-4 cursor-pointer " @click="toggleRooms"><div class="flex flex-col align-center"><p>Pokoje [{{ rooms.length }}]</p> <p>{{ calculateRoomsPercentage() }}% </p></div></UDivider>
+      <div v-if="displayRooms"
           class="grid 2xl:grid-cols-12 xl:grid-cols-10 grid-cols-6 w-full place-items-center justify-center h-full"
           >
-          <div v-if="displayRooms && !hide_naxuy_rooms" v-for="(room, roomIndex) in rooms" :key="roomIndex"
+          <div v-if="displayRooms" v-for="(room, roomIndex) in rooms" :key="roomIndex"
               class="mb-3 room-card text-white flex-col flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
               :class="[setRoomColor(roomIndex), room.alarm ? 'alarm' : '']" @click="openRoomModal(roomIndex)">
               {{ room.roomNumber }}
@@ -37,10 +37,10 @@
               <span class="text-center text-6xl">+</span>
           </div>
       </div>
-      <UDivider v-if="!hide_naxuy_corridor" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENcorrdior">Korytarz [{{ corridors.length }}]</UDivider>
-      <div v-if="displayCorridor && !hide_naxuy_corridor"
+      <UDivider class="prevent-select my-4 cursor-pointer" @click="toggleCorridor">Korytarz [{{ corridors.length }}]</UDivider>
+      <div v-if="displayCorridor"
           class="grid 2xl:grid-cols-12 xl:grid-cols-10 grid-cols-6 w-full place-items-center justify-center h-full">
-          <div v-if="displayCorridor && !hide_naxuy_corridor"
+          <div v-if="displayCorridor"
               v-for="(corridor, corridorIndex) in corridors" 
               :key="corridorIndex"
               class="mb-3 room-card text-white flex-col flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
@@ -57,7 +57,7 @@
               <span class="text-center text-6xl">+</span>
           </div>
       </div>
-      <UDivider v-if="hasCinemas && !hide_naxuy_cinema" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENcinema">Kina</UDivider>
+      <UDivider class="prevent-select my-4 cursor-pointer" @click="toggleCinemas">Kina</UDivider>
       <div v-if="displayCinemas"
           class="grid 2xl:grid-cols-12 xl:grid-cols-10 grid-cols-6 w-full place-items-center justify-center h-full">
           <!--<div v-if="displayCinemas"
@@ -75,10 +75,10 @@
               <span class="text-center text-6xl">+</span>
           </div>
       </div>
-      <UDivider v-if="hasConferenceRooms && !hide_naxuy_conference_rooms" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENconference_rooms">Sale konferencyjne</UDivider>
-      <UDivider v-if="hasRestaurants && !hide_naxuy_restaurants" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENrestaurants">Restauracje</UDivider>
-      <UDivider v-if="hasPlayrooms" class="prevent-select my-4 cursor-pointer">Bawialni</UDivider>
-      <UDivider v-if="hasKitchens && !hide_naxuy_kitchens" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENkitchens">Kuchnie</UDivider>
+      <UDivider class="prevent-select my-4 cursor-pointer" @click="toggleConferenceRooms">Sale konferencyjne</UDivider>
+      <UDivider class="prevent-select my-4 cursor-pointer" @click="toggleRestaurants">Restauracje</UDivider>
+      <UDivider class="prevent-select my-4 cursor-pointer">Bawialni</UDivider>
+      <UDivider class="prevent-select my-4 cursor-pointer" @click="toggleKitchens">Kuchnie</UDivider>
       <div v-if="displayKitchens">
           <div v-for="(kitchen, kitchegnIndex) in kitchens" :key="kitchenIndex" 
               class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
@@ -491,122 +491,28 @@ const createNewKitchen = () => {
 
 }
 // #region Open/Close
-const MEGAOPENrooms = () => {
-  if (displayRooms.value === true) {
-      displayRooms.value = false
-      hide_naxuy_cinema.value = false
-      hide_naxuy_corridor.value = false
-      hide_naxuy_conference_rooms.value = false
-      hide_naxuy_kitchens.value = false
-      hide_naxuy_restaurants.value = false
-  }
-  else {
-      displayRooms.value = true
-      hide_naxuy_cinema.value = true
-      hide_naxuy_corridor.value = true
-      hide_naxuy_conference_rooms.value = true
-      hide_naxuy_restaurants.value = true
-      hide_naxuy_kitchens.value = true
-      displayCinemas.value = false
-  }
+const toggleRooms = () => {
+  displayRooms.value = !displayRooms.value
 }
-const MEGAOPENcorrdior = () => {
-  if (displayCorridor.value === true) {
-      displayCorridor.value = false
-      hide_naxuy_cinema.value = false
-      hide_naxuy_rooms.value = false
-      hide_naxuy_conference_rooms.value = false
-      hide_naxuy_kitchens.value = false
-      hide_naxuy_restaurants.value = false
-  }
-  else {
-      displayCorridor.value = true
-      hide_naxuy_cinema.value = true
-      hide_naxuy_rooms.value = true
-      hide_naxuy_conference_rooms.value = true
-      hide_naxuy_restaurants.value = true
-      hide_naxuy_kitchens.value = true
-      displayCinemas.value = false
-  }
+const toggleCorridor = () => {
+  displayCorridor.value = !displayCorridor.value
 }
-const MEGAOPENcinema = () => {
-  if (displayCinemas.value === true) {
-      displayCinemas.value = false
-      hide_naxuy_corridor.value = false
-      hide_naxuy_rooms.value = false
-      hide_naxuy_conference_rooms.value = false
-      hide_naxuy_kitchens.value = false
-      hide_naxuy_restaurants.value = false
-  }
-  else {
-      displayCinemas.value = true
-      hide_naxuy_corridor.value = true
-      hide_naxuy_rooms.value = true
-      hide_naxuy_conference_rooms.value = true
-      hide_naxuy_restaurants.value = true
-      hide_naxuy_kitchens.value = true
-      displayCorridor.value = false
-      displayRooms.value = false
-  }
+const toggleCinemas = () => {
+  displayCinemas.value = !displayCinemas.value
 }
-const MEGAOPENconference_rooms = () => {
-  if (displayConferenceRooms.value === true) {
-      displayConferenceRooms.value = false
-      hide_naxuy_cinema.value = false
-      hide_naxuy_rooms.value = false
-      hide_naxuy_corridor.value = false
-      hide_naxuy_restaurants.value = false
-      hide_naxuy_kitchens.value = false
-  }
-  else {
-      displayConferenceRooms.value = true
-      hide_naxuy_cinema.value = true
-      hide_naxuy_rooms.value = true
-      hide_naxuy_corridor.value = true
-      hide_naxuy_restaurants.value = true
-      hide_naxuy_kitchens.value = true
-      displayCinemas.value = false
-  }
+const toggleConferenceRooms = () => {
+  displayConferenceRooms.value = !displayConferenceRooms.value
 }
-const MEGAOPENrestaurants = () => {
-  if (displayRestaurants.value === true) {
-      displayRestaurants.value = false
-      hide_naxuy_cinema.value = false
-      hide_naxuy_rooms.value = false
-      hide_naxuy_conference_rooms.value = false
-      hide_naxuy_corridor.value = false
-      hide_naxuy_kitchens.value = false
-  }
-  else {
-      displayRestaurants.value = true
-      hide_naxuy_cinema.value = true
-      hide_naxuy_rooms.value = true
-      hide_naxuy_conference_rooms.value = true
-      hide_naxuy_corridor.value = true
-      hide_naxuy_kitchens.value = true
-      displayCinemas.value = false
-  }
+const toggleRestaurants = () => {
+  displayRestaurants.value = !displayRestaurants.value
 }
-const MEGAOPENkitchens = () => {
-  if (displayKitchens.value === true) {
-      displayKitchens.value = false
-      hide_naxuy_cinema.value = false
-      hide_naxuy_rooms.value = false
-      hide_naxuy_conference_rooms.value = false
-      hide_naxuy_corridor.value = false
-      hide_naxuy_restaurants.value = false
-      hide_naxuy_kitchens.value = false
-  }
-  else {
-      displayKitchens.value = true
-      hide_naxuy_cinema.value = true
-      hide_naxuy_rooms.value = true
-      hide_naxuy_conference_rooms.value = true
-      hide_naxuy_corridor.value = true
-      hide_naxuy_restaurants.value = true
-      displayCinemas.value = false
-  }
+const togglePlayrooms = () => {
+  displayPlayrooms.value = !displayPlayrooms.value
 }
+const toggleKitchens = () => {
+  displayKitchens.value = !displayKitchens.value
+}
+
 // #endregion
 
 const applyGreen = () => {
