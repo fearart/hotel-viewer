@@ -120,7 +120,7 @@ export default defineEventHandler(async (event) => {
         { key: "hasToilet", label: "Toaleta" },
         { key: "hasRadiator", label: "Grzejnik" },
         { key: "hasBidet", label: "Bidet" },
-        { key: "hasSink", label: "Zmywarka" },
+        { key: "hasSink", label: "Umywalka" },
         { key: "hasDoor", label: "Drzwi" },
         { key: "hasDrain", label: "Kratka Balkon" },
         { key: "hasWallpaper", label: "Tapety" },
