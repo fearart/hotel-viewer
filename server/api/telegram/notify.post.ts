@@ -19,16 +19,33 @@ function prettifyText (text: string) : string {
     return text
 }
 
+const getPosition = (user: User) => {
+    if (user.group.it) {
+        return "Informatyk"
+    }
+    if (user.group.elektrycy) {
+        return "Elektryk"
+    }
+    if (user.group.konserwatorzy) {
+        return "Konserwator"
+    }
+    if (user.group.pokojowki) {
+        return "Pokojówka"
+    }
+
+}
+
+
 const getChatID = (request: "E" | "K" | "I" | "P" | "A") => {
     switch (request) {
         case "E":
-            return "-4743981768"
+            return "-1002137267212"
         case "K":
-            return "-4743981768"
+            return "-1002137267212"
         case "I":
-            return "-4743981768"
+            return "-1002137267212"
         case "P":
-            return "-4743981768"
+            return "-1002137267212"
         default:
             return "-4743981768"
     }
@@ -90,6 +107,7 @@ export default defineEventHandler(async (event) => {
         }
     });
     if (tgMessage !== `--------${body.roomNumber}--------\n`) {
+        tgMessage += `${getPosition(user)} | (${user.surname} ${user.name})\n`
         tgMessage += "------------------------\n";
         bot.telegram.sendMessage(getChatID("E"), tgMessage);
     }
@@ -132,6 +150,7 @@ export default defineEventHandler(async (event) => {
         }
     });
     if (tgMessage !== `--------${body.roomNumber}--------\n`) {
+        tgMessage += `${getPosition(user)} | (${user.surname} ${user.name})\n`
         tgMessage += "------------------------\n";
         bot.telegram.sendMessage(getChatID("K"), tgMessage);
     }
@@ -161,6 +180,7 @@ export default defineEventHandler(async (event) => {
         }
     });
     if (tgMessage !== `--------${body.roomNumber}--------\n`) {
+        tgMessage += `${getPosition(user)} | (${user.surname} ${user.name})\n`
         tgMessage += "------------------------\n";
         bot.telegram.sendMessage(getChatID("I"), tgMessage);
     }
@@ -190,6 +210,7 @@ export default defineEventHandler(async (event) => {
         }
     });
     if (tgMessage !== `--------${body.roomNumber}--------\n`) {
+        tgMessage += `${getPosition(user)} | (${user.surname} ${user.name})\n`
         tgMessage += "------------------------\n";
         bot.telegram.sendMessage(getChatID("P"), tgMessage);
     }
