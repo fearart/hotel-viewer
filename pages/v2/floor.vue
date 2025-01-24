@@ -20,6 +20,9 @@
       <div v-if="displayRooms"
           class="grid 2xl:grid-cols-12 xl:grid-cols-10 grid-cols-6 w-full place-items-center justify-center h-full"
           >
+          <div class="xl:w-24 xl:h-24 w-12 h-12  mb-3 room-card bg-sky-500 text-white flex items-center justify-center rounded-lg cursor-pointer" v-if="isAdmin" @click="isOpenRoomStatsModal = true">
+              <UIcon name="i-heroicons:information-circle-16-solid" class="w-1/2 h-1/2" />
+          </div>
           <div v-if="displayRooms" v-for="(room, roomIndex) in rooms" :key="roomIndex"
               class="mb-3 room-card text-white flex-col flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
               :class="[setRoomColor(roomIndex), room.alarm ? 'alarm' : '']" @click="openRoomModal(roomIndex)">
@@ -83,6 +86,7 @@
   </div>
   <!-- rooms modal-->
   <RoomModal v-model:isOpen="isOpenRoomModal" @close="handleRoomClose" @update:isOpenRoom="handleRoomClose" :user="user" :activeRoom="openedRoom"/>
+  <ModalRoomInfoModal v-model:isOpen="isOpenRoomStatsModal" @close="handleRoomStatsClose" @update:isOpen="handleRoomStatsClose" :Rooms="rooms"/>
   <!-- corridors modal -->
   <CorridorModal v-model:isOpen="isOpenCorridorModal" @close="handleCorridorClose" @update:isOpen="handleCorridorClose" :user="user" :activeCorridor="openedCorridor"/>
   <!-- photo gallery modal -->
@@ -165,9 +169,6 @@ const userPermissions = ref({})
 const user = ref<User>({})
 const isAdmin = ref(false)
 const isRoot = ref(false)
-const enhancedMode = ref(false)
-const timeout = ref(null)
-const toast = useToast()
 // Floor part
 const displayRooms = ref(false)
 
@@ -188,13 +189,6 @@ const displayPlayrooms = ref(false)
 const hasKitchens = ref(false)
 const displayKitchens = ref(false)
 
-// useless shit
-const hide_naxuy_cinema = ref(false)
-const hide_naxuy_corridor = ref(false)
-const hide_naxuy_rooms = ref(false)
-const hide_naxuy_conference_rooms = ref(false)
-const hide_naxuy_restaurants = ref(false)
-const hide_naxuy_kitchens = ref(false)
 // Objects
 // @ts-ignore
 const openedRoom = ref<Room>({})
@@ -211,6 +205,7 @@ const kitchenImages = ref([])
 // Modals vars
 const isOpenPhotoGallery = ref(false)
 const isOpenRoomModal = ref(false)
+const isOpenRoomStatsModal = ref(false)
 const isOpenCorridorModal = ref(false)
 const isOpenKitchenModal = ref(false)
 const isOpenKitchenGallery = ref(false)
@@ -357,7 +352,13 @@ const openRoomModal = (roomIndex: number) => {
 const handleRoomClose = () => {
   isOpenRoomModal.value = false
   getFloorInfo()
-}   
+}
+
+const handleRoomStatsClose = () => {
+  isOpenRoomStatsModal.value = false
+  getFloorInfo()
+}
+
 const openSearchForm = () => {
   isOpenSearchForm.value = !isOpenSearchForm.value
 }
@@ -405,13 +406,6 @@ const setCinemaColor = () => {
 }
 const openCinemaModal = () => {
   // TODO: implement
-}
-
-const submitKitchenEdit = () => {
-  axios.post('/api/kitchen/modify',{'floor_number': floor_number.value, "name" : openedKitchen.value.name, "comment" : openedKitchen.value.comment}).then((response) => {
-      getFloorInfo()
-      isOpenKitchenModal.value = false
-  }) 
 }
 const createNewRoom = () => {
   axios.put('/api/rooms/create', { "floorNumber": floor_number.value }).then((response) => {
