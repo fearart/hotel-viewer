@@ -1,6 +1,4 @@
 import jwt from 'jsonwebtoken';
-import fs from 'fs';
-import path from 'path';
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
@@ -16,9 +14,9 @@ export default defineEventHandler(async (event) => {
         return;
     }
     const body = await readBody(event);
-    if (body.room_number === undefined) { setResponseStatus(event,400,"Bad Request"); return }
+    if (body.corridorNumber === undefined) { setResponseStatus(event,400,"Bad Request"); return }
     let keys = await storage.getKeys();
-    keys = keys.filter((key) => key.startsWith(body.room_number))
+    keys = keys.filter((key) => key.startsWith(body.corridorNumber))
     let simages : Array<string> = [];
     for (let i = 0; i < keys.length; i++) {
         let buffer: Buffer | null = await storage.getItemRaw(keys[i]);

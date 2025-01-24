@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 const config = useRuntimeConfig();
-
+import { Corridor } from "~/types/corridor";
+import Floor from "~/model/floor";
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
@@ -25,31 +26,33 @@ export default defineEventHandler(async (event) => {
         return
     }
     const floor_number = Number.parseInt(body.floor_number)
-    const floor = await mongoose.connection.db.collection('hotel-floors').findOne({floor_number: floor_number})
-    if (floor === null) {
+    const floor = await Floor.findOne({floor_number: floor_number})
+    if (!floor) {
         setResponseStatus(event,404,"Not Found")
         return
     }
-    let AcessPoints = floor.corridor
-    if (AcessPoints === undefined) {
-        AcessPoints = []
+    let corridorNumber;
+    if (!floor.corridor || floor.corridor.length === 0) {
+        corridorNumber = Number.parseInt(`${floor_number}001`);
+    } else {
+        //@ts-ignore
+        corridorNumber = floor.corridor[floor.corridor.length - 1].corridorNumber + 1;
     }
-
-    let AccessPointNumber = 1
-    if (AcessPoints.length == 0) {
-        AccessPointNumber = Number.parseInt(`${floor_number}001`)
-    }
-    else {
-        let biggest_AccessPointNumber = AcessPoints.reduce((prev:any, current:any) => (prev.AccessPointNumber > current.AccessPointNumber) ? prev : current)
-        AccessPointNumber = biggest_AccessPointNumber.accessPointNumber + 1
-    }
-    let AcessPointRecord = {
-        "accessPointNumber" : AccessPointNumber,
-        "macAddress" : "",
-        "comment" : "",
-        'APStatus' : "unknown",
-    }
-    AcessPoints.push(AcessPointRecord)
-    Object.assign(floor, {corridor: AcessPoints})
-    mongoose.connection.db.collection('hotel-floors').replaceOne({floor_number: floor_number},floor,{upsert: true})
+    const newCorridorRecord = {
+        corridorNumber: corridorNumber,
+        floorNumber: floor_number,
+        alarm: false,
+        informatycy: {
+            hasAccessPoint: "unknown",
+            macAddress: "",
+            Icomment: "",
+        },
+        elektrycy: {
+            hasBulb: "unknown",
+            hasSocket: "unknown",
+            Ecomment: "",
+        },
+    } as Corridor;
+    floor.corridor.push(newCorridorRecord)
+    await Floor.updateOne({floor_number: floor_number}, {$set: {corridor: floor.corridor}})
 })

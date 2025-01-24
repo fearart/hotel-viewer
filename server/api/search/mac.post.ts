@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 import Logger from "~/utilities/logger";
-
+import { Room } from "~/types/room";
+import { Corridor } from "~/types/corridor";
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
@@ -29,8 +30,8 @@ export default defineEventHandler(async (event) => {
     }
     const mac: string = body.macAddress 
     const floors : Array<any> = await mongoose.connection.db.collection('hotel-floors').find().toArray()
-    let rooms: Array<any> = []
-    let corridor: Array<any> = []
+    let rooms: Array<Room> = []
+    let corridor: Array<Corridor> = []
     floors.forEach((floor) => {
         try {
             rooms = rooms.concat(floor.rooms)
@@ -41,13 +42,14 @@ export default defineEventHandler(async (event) => {
             corridor = []
         }
     })
-    let record = rooms.find((room: any) => room.macAddress == mac)
+    console.log(rooms)
+    let record = rooms.find((room: Room) => room.informatycy.macAddress == mac)
     if (record !== undefined) {
         record.type = "room"
         return record
     }
     else {
-        record = corridor.find((corridor: any) => corridor.macAddress == mac)
+        record = corridor.find((corridor: Corridor) => corridor.macAddress == mac)
         if (record !== undefined) {
             record.type = "corridor"
             return record

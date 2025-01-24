@@ -1,13 +1,15 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 import Logger from "~/utilities/logger";
+import Floor from "~/model/floor";
+import type { Room } from "~/types/room";
+const config = useRuntimeConfig();
+
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig();
-    await mongoose.connect(config.mongodb_uri);
     let token = getCookie(event,'token')
     if (!token) {
         unauthorizedReturn(event)
@@ -21,78 +23,42 @@ export default defineEventHandler(async (event) => {
         return
     }
     const body = await readBody(event)
-    if (body.floor_number === undefined || body.room_number === undefined || body.hasPhone === undefined || body.hasTV === undefined || 
-        body.hasAccessPoint === undefined || body.hasBathPhone === undefined || body.comment === undefined || body.macAddress === undefined || 
-        body.alarm === undefined || body.hasLock === undefined || body.hasBroom === undefined || body.hasSink === undefined || body.hasToilet === undefined ||
-        body.hasRadiator === undefined || body.hasShower === undefined || body.hasBidet === undefined || body.hasSocket === undefined || 
-        body.hasBulb === undefined || body.hasBed === undefined || body.hasGuard === undefined || body.hasAdmin === undefined || body.hasDoor === undefined ||
-        body.hasDoctor === undefined) {
+    if (body.roomNumber === undefined || body.floorNumber === undefined) {
         setResponseStatus(event,400,"Bad Request")
         return
     }
-    const floor_number = Number.parseInt(body.floor_number)
-    const floor = await mongoose.connection.db.collection('hotel-floors').findOne({floor_number: floor_number})
-    if (floor === null) {
+    let roomNumber = Number.parseInt(body.roomNumber)
+    let floorNumber = Number.parseInt(body.floorNumber)
+    const floor = await Floor.findOne({floor_number: floorNumber})
+    if (!floor) {
         setResponseStatus(event,404,"Not Found")
         return
     }
-    let rooms = []
-    try {
-        rooms = floor.rooms
-    }
-    catch {
-        rooms = []
-    }
-    let room_number = 1
-    if (rooms.length == 0) {
-        room_number = Number.parseInt(`${floor_number}001`)
-    }
-    else {
-        room_number = Number.parseInt(body.room_number)
-    }
-    let room = {
-        'room_number' : room_number,
-        'hasAccessPoint' : body.hasAccessPoint,
-        'hasTV' : body.hasTV,
-        "hasPhone" : body.hasPhone,
-        'hasBathPhone' : body.hasBathPhone,
-        "comment" : body.comment,
-        "macAddress" : body.macAddress.toUpperCase(),
-        "alarm" : body.alarm,
-        'hasLock' : body.hasLock,
-        'hasBroom' : body.hasBroom,
-        'hasSink' : body.hasSink,
-        'hasToilet' : body.hasToilet,
-        'hasRadiator' : body.hasRadiator,
-        'hasShower' : body.hasShower,
-        'hasBidet' : body.hasBidet,
-        'hasSocket' : body.hasSocket,
-        'hasBulb' : body.hasBulb,
-        'hasBed' : body.hasBed,
-        'hasGuard' : body.hasGuard,
-        'hasAdmin' : body.hasAdmin,
-        'hasDoor' : body.hasDoor,
-        'hasDoctor' : body.hasDoctor,
-        'Ecomment' : body.Ecomment,
-        'Kcomment' : body.Kcomment,
-        'Icomment' : body.Icomment,
-        'Pcomment' : body.Pcomment,
-        'Acomment' : body.Acomment,
-    }
-
-    // delete old room  
-    rooms = rooms.filter((room:any) => room.room_number != room_number)
-    rooms.push(room)
-    let floor_obj = Object.assign(floor, {rooms: rooms})
-    mongoose.connection.db.collection('hotel-floors').replaceOne({floor_number: floor_number},floor_obj,{upsert: true})
+    // @ts-ignore
+    const roomRecord = floor.rooms.find(
+        (item) => item.roomNumber === roomNumber
+    ) as Room;
+    if (body.administracja.isApproved && body.administracja.isApproved === undefined) {
+        body.administracja.isApproved = 'No'
+        body.administracja.isApprovedBy = ''
+        body.administracja.isApprovedDate = '' 
+    }   
+    const newRoomRecord = {
+        ...roomRecord,
+        ...body
+    } as Room;
+    // remove old room record
+    floor.rooms.remove(roomRecord)
+    // add new room record
+    floor.rooms.push(newRoomRecord)
+    await Floor.updateOne({floor_number: floorNumber}, {$set: {rooms: floor.rooms}})
     mongoose.connection.db.collection('hotel-logs').insertOne({
-        "event" : `Room #${room_number} modified.`,
+        "ID" : await Logger.getID(),
         "type" : "modify",
+        "event" : `Room #${roomNumber} was modified`,
+        "user" : await Logger.search(token),
         "timestamp" : Date.now(),
-        "user" : await new Logger(token).search(),
-        "details" : `${JSON.stringify(room)}`,
-        'ID' : await Logger.getID()
-        
+        "details" : body
     })
     return {
         statusCode: 200,

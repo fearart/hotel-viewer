@@ -110,7 +110,6 @@ import { onMounted, ref } from 'vue';
 import axios from 'axios';
 
 const islogged = ref(false)
-const isOpen = ref(false)
 const isOpenRoomModal = ref(false)
 const colorMode = useColorMode()
 
@@ -122,7 +121,6 @@ const isDark = computed({
     colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
   }
 })
-
 
 const floors = ref([])
 const pending = ref(true)
@@ -213,9 +211,9 @@ const addFloor = () => {
     })
 }
 const toggleFloorMenu = (index) => {
-    navigateTo(`/floor?floor_number=${index+1}`)
+    navigateTo(`/v2/floor?floor_number=${index+1}`)
     reloadNuxtApp({
-        path: `/floor?floor_number=${index+1}`,
+        path: `/v2/floor?floor_number=${index+1}`,
         ttl: 1000, // default 10000
     });
     return
@@ -339,8 +337,6 @@ const isAcessPointRed = () => {
     }
     return false
 }
-
-
 
 </script>
 
