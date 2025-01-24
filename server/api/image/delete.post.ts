@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     let keys = await storage.getKeys();
     if (type === "room") {
-        keys = keys.filter((key) => key.startsWith(body.room_number))
+        keys = keys.filter((key) => key.startsWith(body.roomNumber))
     }
     if (type === "kitchen") {
         keys = keys.filter((key) => key.startsWith(`${body.floor_number}_${body.kitchen_name}`))

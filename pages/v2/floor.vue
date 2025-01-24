@@ -168,7 +168,6 @@ const isRoot = ref(false)
 const enhancedMode = ref(false)
 const timeout = ref(null)
 const toast = useToast()
-defineEmits(['closeCorridorModal'])
 // Floor part
 const displayRooms = ref(false)
 
@@ -667,7 +666,7 @@ const eShouldDisplay = (index: number) => {
 }
 const kShouldDisplay = (index: number) => {
   let room = rooms.value[index] as Room;
-  const { Kcomment, _id, ...params } = room.konserwatorzy;
+  const { Kcomment, _id, hasJoints, ...params } = room.konserwatorzy;
   for (const key in params) {
     if (params[key as keyof typeof params] !== "Yes") {
       return true;
@@ -745,7 +744,7 @@ const calculateRoomsPercentage = () => {
       .every(([, value]) => value === "Yes");
       
     const isKonserwatorzyOk = Object.entries(konserwatorzy)
-      .filter(([key]) => !['_id', 'Kcomment'].includes(key))
+      .filter(([key]) => !['_id', 'hasJoints', 'Kcomment'].includes(key))
       .every(([, value]) => value === "Yes");
       
     const isInformatycyOk = Object.entries(informatycy)

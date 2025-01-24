@@ -12,9 +12,10 @@
                           placeholder="Room number" size="xl"/>
                           <UButton v-if="props.activeRoom.alarm" icon="i-heroicons-bell" color="red" @click="toggleAlarm" class="mr-2"/>
                           <UButton v-else icon="i-heroicons-bell" color="gray" @click="toggleAlarm" class="mr-2"/>
-                          <UButton label="" @click="requestEdit">
+                          <UButton label="" @click="requestEdit" class="mr-2">
                               <img src="~/assets/svg/tg-white.png" class="w-6 h-6">
                           </UButton>
+                          <UButton label="✔" color="green" @click="setEverythingGreen"></UButton>
                       </div>
                   </template>
                   <div v-if="item.key === 'I'" class="flex justify-center flex-col items-center p-6">
@@ -225,22 +226,29 @@
                       </div>
                   </template>
               </UCard>
+              <div v-if="isGalleryOpen" class="flex flex-col items-center p-2">
+                <div v-for="(image,imageIndex) in galleryImages">
+                    <div class="border-sky-400 border-y-2 flex flex-col">
+                    <div class="w-full justify-end flex">
+                        <UButton label="Usuń" icon="i-heroicons-x-mark" color="red" variant="ghost" @click="deleteImage(imageIndex)"></UButton>
+                    </div>
+                    <img :src="image" class="mt-2">
+                </div>
+                </div>
+              </div>
           </template>
           <template #default="{item,index,selected}">
               <div class="flex items-center gap-2 relative truncate">
                   <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
                   <span class="truncate">{{ item.key }}</span>
-
                   <span v-if="selected" class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
               </div>
           </template>
       </UTabs>
   </UModal>
-  <RoomGallery :is-loading="isRoomLoading" :is-open="isGalleryOpen" :roomImages="roomGallery"></RoomGallery>
 </template>
 <script setup lang="ts">
 import type { Room } from '@/types/room';
-import RoomGallery from '~/components/modal/RoomGallery.vue';
 import type { User } from '~/types/user';
 
 onMounted(() => {
@@ -255,16 +263,15 @@ const props = defineProps({
     },
     activeRoom : {
         type: Object as PropType<Room>,
-            required: true
-        }, 
-        user: {
-            type: Object as PropType<User>,
-                required: true
-            }
-        })
+        required: true
+    }, 
+    user: {
+        type: Object as PropType<User>,
+        required: true
+    }
+})
 const activeRoom = ref(props.activeRoom)
-const roomGallery = ref([])
-const isRoomLoading = ref(false)
+const galleryImages = ref([])
 const isGalleryOpen = ref(false)
 const modalItems = [
     {
@@ -341,7 +348,7 @@ const roomFileUpload = async (event: Event) => {
     const file = (event.target as HTMLInputElement).files?.[0]
     const formData = new FormData()
     formData.append('file', file as Blob)
-    formData.append('roomNumber', String(activeRoom.value.roomNumber))
+    formData.append('roomNumber', String(props.activeRoom.roomNumber))
     const token = useCookie('token').value || ''
     formData.append('token', token)
     
@@ -363,8 +370,38 @@ const roomFileUpload = async (event: Event) => {
     } catch (error) {
         console.error(error)
     }
+    isGalleryOpen.value = false
 }
-const openPhotoGallery = async () => {}
+const openPhotoGallery = async () => {
+    galleryImages.value = []
+    const response = await $fetch('/api/image/get', {
+        method: 'POST',
+        body: {
+            roomNumber: props.activeRoom.roomNumber
+        }
+    })
+    console.log(response)
+    response.forEach((image: string) => {
+        galleryImages.value.push(`data:image/webp;base64,${image}`)
+    })
+    console.log(activeRoom.value.roomNumber)
+    isGalleryOpen.value = !isGalleryOpen.value
+    
+}
+const deleteImage = (imageIndex: number) => {
+    const image = galleryImages.value[imageIndex]
+    const imageBase64 = image.split(',')[1]
+    const response = $fetch('/api/image/delete', {
+        method: 'POST',
+        headers: {
+            'type': 'room'
+        },
+        body: {
+            roomNumber: props.activeRoom.roomNumber,
+        }
+    })
+    galleryImages.value.splice(imageIndex, 1)
+}
 const SwitchStates = (type: string, state: string,category: string) => {
   if (state === "Yes") { state = "No"; }
   else if (state === "No") { state = "unknown"; }
@@ -449,6 +486,29 @@ const acceptRoom = async () => {
         })  
     }
 
+}
+const setEverythingGreen = () => {
+    let { _id, Icomment, macAddress, ...iValues} = props.activeRoom.informatycy
+    Object.keys(iValues).forEach((key) => {
+        // @ts-ignore
+        props.activeRoom.informatycy[key] = 'Yes'
+    })
+    let { _id : eID, Ecomment, ...eValues} = props.activeRoom.elektrycy
+    Object.keys(eValues).forEach((key) => {
+        // @ts-ignore
+        props.activeRoom.elektrycy[key] = 'Yes'
+    })
+    let { _id: kID, Kcomment, hasJoints, ...kValues} = props.activeRoom.konserwatorzy
+    Object.keys(kValues).forEach((key) => {
+        // @ts-ignore
+        props.activeRoom.konserwatorzy[key] = 'Yes'
+    })
+    let { _id: pID, Pcomment, ...pValues} = props.activeRoom.pokojowe
+    Object.keys(pValues).forEach((key) => {
+        // @ts-ignore
+        props.activeRoom.pokojowe[key] = 'Yes'
+    })
+    
 }
 </script>
 <style scoped lang="scss">

@@ -109,7 +109,7 @@ export default defineEventHandler(async (event) => {
     if (tgMessage !== `--------${body.roomNumber}--------\n`) {
         tgMessage += `${getPosition(user)} | (${user.surname} ${user.name})\n`
         tgMessage += "------------------------\n";
-        bot.telegram.sendMessage(getChatID("E"), tgMessage);
+        bot.telegram.sendMessage("-1002137267212", tgMessage, {reply_to_message_id: 9});
     }
     tgMessage = `--------${body.roomNumber}--------\n`
 
@@ -152,7 +152,7 @@ export default defineEventHandler(async (event) => {
     if (tgMessage !== `--------${body.roomNumber}--------\n`) {
         tgMessage += `${getPosition(user)} | (${user.surname} ${user.name})\n`
         tgMessage += "------------------------\n";
-        bot.telegram.sendMessage(getChatID("K"), tgMessage);
+        bot.telegram.sendMessage("-1002137267212", tgMessage, {reply_to_message_id: 7});
     }
     tgMessage = `--------${body.roomNumber}--------\n`
 
@@ -182,7 +182,7 @@ export default defineEventHandler(async (event) => {
     if (tgMessage !== `--------${body.roomNumber}--------\n`) {
         tgMessage += `${getPosition(user)} | (${user.surname} ${user.name})\n`
         tgMessage += "------------------------\n";
-        bot.telegram.sendMessage(getChatID("I"), tgMessage);
+        bot.telegram.sendMessage("-1002137267212", tgMessage, {reply_to_message_id: 3});
     }
     tgMessage = `--------${body.roomNumber}--------\n`
 
@@ -212,7 +212,7 @@ export default defineEventHandler(async (event) => {
     if (tgMessage !== `--------${body.roomNumber}--------\n`) {
         tgMessage += `${getPosition(user)} | (${user.surname} ${user.name})\n`
         tgMessage += "------------------------\n";
-        bot.telegram.sendMessage(getChatID("P"), tgMessage);
+        bot.telegram.sendMessage("-1002137267212", tgMessage, {reply_to_message_id: 5});
     }
     tgMessage = `--------${body.roomNumber}--------\n`
 
