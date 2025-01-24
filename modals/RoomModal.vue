@@ -134,7 +134,9 @@
                             <div class="pr-2 h-20 w-20">
                                 <img :src="loadImages('Drain', props.activeRoom.konserwatorzy.hasDrain)" @click="SwitchStates('Drain', props.activeRoom.konserwatorzy.hasDrain,'konserwatorzy')" class="cursor-pointer"/>
                             </div>
-                            
+                            <div class="pr-2 h-20 w-20">
+                                <img :src="loadImages('Key', props.activeRoom.konserwatorzy.hasKey)" @click="SwitchStates('Key', props.activeRoom.konserwatorzy.hasKey,'konserwatorzy')" class="cursor-pointer"/>
+                            </div>
                           </div>
                       </div>
                       <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
@@ -234,9 +236,11 @@
           </template>
       </UTabs>
   </UModal>
+  <RoomGallery :is-loading="isRoomLoading" :is-open="isGalleryOpen" :roomImages="roomGallery"></RoomGallery>
 </template>
 <script setup lang="ts">
 import type { Room } from '@/types/room';
+import RoomGallery from '~/components/modal/RoomGallery.vue';
 import type { User } from '~/types/user';
 
 onMounted(() => {
@@ -259,6 +263,9 @@ const props = defineProps({
             }
         })
 const activeRoom = ref(props.activeRoom)
+const roomGallery = ref([])
+const isRoomLoading = ref(false)
+const isGalleryOpen = ref(false)
 const modalItems = [
     {
         label: "Elektrycy",
@@ -295,8 +302,33 @@ const calculateDefaultIndex = () => {
     if (props.user.group.it) return 2;
     if (props.user.group.pokojowki) return 3;
 }
-const requestEdit = () => {}
+const requestEdit = () => {
+    if (props.activeRoom.administracja.isApproved === 'Yes') {
+        useToast().add({
+            title: "Pomieszczenie zatwierdzone",
+            description: "Nie można edytować zatwierdzonego pomieszczenia",
+            color: "red",
+            icon: "i-heroicons-exclamation-triangle",
+            timeout: 5000
+        })
+    }
+    else {
+        useToast().add({
+            title: "Zgłoszenie edycji",
+            description: "Zgłoszenie edycji pomieszczenia zostało wysłane",
+            color: "green",
+            icon: "i-heroicons-check-circle",
+            timeout: 5000
+        })
+        const response = $fetch('/api/telegram/notify', {
+            method: 'POST',
+            body: props.activeRoom
+        })
+        emitClose();
+    }
+}
 const submitEdit = async () => {
+    if (props.activeRoom.konserwatorzy.Kcomment === undefined) props.activeRoom.konserwatorzy.Kcomment = ''
     const request = await $fetch('/api/rooms/modify', {
         method: 'POST',
         body: props.activeRoom
@@ -305,8 +337,34 @@ const submitEdit = async () => {
         emitClose()
     }
 }
-const roomFileUpload = () => {}
-const openPhotoGallery = () => {}
+const roomFileUpload = async (event: Event) => {
+    const file = (event.target as HTMLInputElement).files?.[0]
+    const formData = new FormData()
+    formData.append('file', file as Blob)
+    formData.append('roomNumber', String(activeRoom.value.roomNumber))
+    const token = useCookie('token').value || ''
+    formData.append('token', token)
+    
+    try {
+        await $fetch('/api/image', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'type': 'room'
+            }
+        })
+            useToast().add({
+            color: "green",
+            description: "Zdjęnie dodane",
+            id: "imgadded",
+            timeout: 3000,
+            title: "Success",
+        })
+    } catch (error) {
+        console.error(error)
+    }
+}
+const openPhotoGallery = async () => {}
 const SwitchStates = (type: string, state: string,category: string) => {
   if (state === "Yes") { state = "No"; }
   else if (state === "No") { state = "unknown"; }
@@ -344,10 +402,8 @@ const emitClose = () => {
 const calculatePercentage = (type: string) => {
     if (type === 'informatycy') {
         const totalValues = Object.values(props.activeRoom.informatycy).length -3
-        console.log(`TOTAL: ${totalValues}`)
         let { _id, Icomment, macAddress, ...values} = props.activeRoom.informatycy
         const yesValues = Object.values(values).filter((value) => value === 'Yes').length
-        console.log(`YES: ${yesValues}`)
         return (yesValues / totalValues) * 100
     }
     else if (type === 'elektrycy') {

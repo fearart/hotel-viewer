@@ -46,6 +46,7 @@ export interface Room {
         hasToiletDoor: "Yes" | "No" | "unknown"; // drzwi do toalety
         hasWindow: "Yes" | "No" | "unknown"; // Szyby
         hasCeilingPainting: "Yes" | "No" | "unknown"; // Malowanie sufitu
+        hasKey: "Yes" | "No" | "unknown"; // Klucz
         Kcomment: string;
         _id: string;
     },

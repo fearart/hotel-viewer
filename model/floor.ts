@@ -39,6 +39,7 @@ const KonserwatorzySchema = new mongoose.Schema({
     hasToiletDoor: { type: 'string', required: false },
     hasWindow: { type: 'string', required: false },
     hasCeilingPainting: { type: 'string', required: false },
+    hasKey: { type: 'string', required: false },
     Kcomment: { type: 'string', required: false },
 })
 
@@ -78,7 +79,7 @@ const RoomSchema = new mongoose.Schema({
 })
 
 const FloorSchema = new mongoose.Schema({
-    floorNumber: { type: Number, required: true },
+    floor_number: { type: Number, required: true },
     rooms: { type: [RoomSchema], required: true },
     corridor: { type: [CorridorSchema], required: true },
     cinemas: { type: [mongoose.Schema.Types.Mixed], required: true },

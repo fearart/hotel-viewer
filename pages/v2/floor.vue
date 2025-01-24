@@ -37,7 +37,7 @@
               <span class="text-center text-6xl">+</span>
           </div>
       </div>
-      <UDivider class="prevent-select my-4 cursor-pointer" @click="toggleCorridor">Korytarz [{{ corridors.length }}]</UDivider>
+      <UDivider class="prevent-select my-4 cursor-pointer" @click="toggleCorridor"><div class="flex flex-col align-center"><p>Korytarze [{{ corridors.length }}]</p> <p>{{ calculateCorridorsPercentage() }}% </p></div></UDivider>
       <div v-if="displayCorridor"
           class="grid 2xl:grid-cols-12 xl:grid-cols-10 grid-cols-6 w-full place-items-center justify-center h-full">
           <div v-if="displayCorridor"
@@ -79,20 +79,7 @@
       <UDivider class="prevent-select my-4 cursor-pointer" @click="toggleRestaurants">Restauracje</UDivider>
       <UDivider class="prevent-select my-4 cursor-pointer">Bawialni</UDivider>
       <UDivider class="prevent-select my-4 cursor-pointer" @click="toggleKitchens">Kuchnie</UDivider>
-      <div v-if="displayKitchens">
-          <div v-for="(kitchen, kitchegnIndex) in kitchens" :key="kitchenIndex" 
-              class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
-              @click="openKitchenModal(kitchen.name)"
-              >
-              {{ kitchen.name}}
-          </div>
-          <div class="xl:w-24 xl:h-24 w-12 h-12  mb-3 room-card bg-gray-500 text-white flex items-center justify-center rounded-lg cursor-pointer"
-              @click="createNewKitchen()"
-              v-if="isAdmin"
-              >
-              <span class="text-center text-6xl">+</span>
-          </div>
-      </div>
+      
   </div>
   <!-- rooms modal-->
   <RoomModal v-model:isOpen="isOpenRoomModal" @close="handleRoomClose" @update:isOpenRoom="handleRoomClose" :user="user" :activeRoom="openedRoom"/>
@@ -119,56 +106,6 @@
           </div>
           <p v-if="roomImages.length === 0 && !roomImageLoading">Brak zdjęć w bazie</p>
       </div>
-  </UModal>
-  <!-- kitchen modal -->
-  <UModal v-model="isOpenKitchenModal" class="w-60" :ui="{ container: 'items-start'}">
-  <div class="p-4">
-      <button></button>
-      <div class="flex justify-center flex-col items-center">
-          <div class="w-full justify-around flex mt-4">
-              <UButton label="Submit" @click="submitKitchenEdit"></UButton>
-              <UButton label="Cancel" color="red" @click="isOpenKitchenModal = false"></UButton>
-          </div>
-          <UInput v-model="openedKitchen.name" class="text-xl w-24 mb-2"
-              placeholder="Kitchen name" />
-          <div>
-              <!-- params -->
-          </div>
-          <UInput v-model="openedKitchen.comment" placeholder="Comment"  />
-      </div>
-      <div class="flex flex-row justify-evenly mt-4">
-          <form>
-              <div class="file-input">
-                  <input
-                      type="file"
-                      name="file-input"
-                      id="file-input"
-                      class="file-input__input"
-                      v-on:change="kitchenFileUpload"
-                  />
-                  <label class="file-input__label" for="file-input">
-                      <svg
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fas"
-                      data-icon="upload"
-                      class="svg-inline--fa fa-upload fa-w-16"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                      >
-                      <path
-                          fill="currentColor"
-                          d="M296 384h-80c-13.3 0-24-10.7-24-24V192h-87.7c-17.8 0-26.7-21.5-14.1-34.1L242.3 5.7c7.5-7.5 19.8-7.5 27.3 0l152.2 152.2c12.6 12.6 3.7 34.1-14.1 34.1H320v168c0 13.3-10.7 24-24 24zm216-8v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h136v8c0 30.9 25.1 56 56 56h80c30.9 0 56-25.1 56-56v-8h136c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z"
-                      ></path>
-                      </svg>
-                      <span>Dodaj zdjęcie</span>
-                  </label>
-              </div>
-          </form>
-          <UButton label="Zdjęcia" icon="i-heroicons-photo-16-solid" @click="openKitchenGallery"/>
-      </div>
-  </div>
   </UModal>
   <!-- kitchen gallery modal -->
   <UModal v-model="isOpenKitchenGallery" class="w-60" :ui="{container: 'items-start'}">
@@ -348,7 +285,6 @@ const getFloorInfo = async () => {
     if (typeof (floor.value.kitchens) !== undefined) {
       hasKitchens.value = true
       kitchens.value = floor.value.kitchens
-      console.log(kitchens.value[0])
     }
   } catch (error) {
     console.log(error)
@@ -412,6 +348,10 @@ const openRoomModal = (roomIndex: number) => {
     const res = response.data
     openedRoom.value = res
     openedRoom.value.floorNumber = floor_number.value
+    if (openedRoom.value.konserwatorzy.hasKey === undefined) {
+      openedRoom.value.konserwatorzy.hasKey = 'unknown';
+    }
+    // DEBUG ^
     isOpenRoomModal.value = true
   })
 }
@@ -654,13 +594,11 @@ const setFilterOutline = () => {
 }
 const searchMacAddress = () => {
   axios.post('/api/search/mac',{'macAddress' : searchMac.value.toUpperCase()}).then((response) => {
-      console.log(response)
       if (Object.keys(response.data).length === 0){
           currentFoundMac.value = {
               'data' : null,
               'type' : null
           }
-          console.log("found nothing")
           return
       }
       if (response.data.type === "room") {
@@ -732,7 +670,6 @@ const kShouldDisplay = (index: number) => {
   const { Kcomment, _id, ...params } = room.konserwatorzy;
   for (const key in params) {
     if (params[key as keyof typeof params] !== "Yes") {
-        console.log(params[key as keyof typeof params])
       return true;
     }
   }
@@ -741,7 +678,6 @@ const kShouldDisplay = (index: number) => {
 const iShouldDisplay = (index: number) => {
   let room = rooms.value[index] as Room;
   const { Icomment, macAddress, _id, ...params } = room.informatycy;
-  console.log(params)
   for (const key in params) {
     if (params[key as keyof typeof params] !== "Yes") {
       return true;
@@ -770,78 +706,7 @@ const aShouldDisplay = (index: number) => {
   return false;
 }
 
-const roomFileUpload = (event) => {
-  const file = event.target.files[0]
-  const formData = new FormData()
-  formData.append('file', file)
-  formData.append('room_number', openedRoom.value.room_number)
-  formData.append('token', useCookie('token').value)
-  axios.post('/api/image', formData, {
-      headers: {
-          'Content-Type': 'multipart/form-data',
-          'type' : "room"
-      }
 
-  }).then((response) => {
-      getFloorInfo()
-          toast.add({
-          color: "green",
-          description: "Zdjęnie dodane",
-          id: "imgadded",
-          timeout: 3000,
-          title: "Success",
-      })
-  })
-}
-const kitchenFileUpload = (event) => {
-  const file = event.target.files[0]
-  const formData = new FormData()
-  formData.append('file', file)
-  formData.append('kitchen_name', openedKitchen.value.name)
-  formData.append('token', useCookie('token').value)
-  formData.append('floor_number', floor_number.value)
-  axios.post('/api/image', formData, {
-      headers: {
-          'Content-Type': 'multipart/form-data',
-          'type' : "kitchen"
-      }
-
-  }).then((response) => {
-      getFloorInfo()
-          toast.add({
-          color: "green",
-          description: "Zdjęnie dodane",
-          id: "imgadded",
-          timeout: 3000,
-          title: "Success",
-      })
-  })
-
-}
-const openPhotoGallery = () => {
-  roomImages.value = []
-  roomImageLoading.value = true
-  axios.post('/api/image/get', { "room_number": openedRoom.value.room_number }).then((response) => {
-      response.data.forEach((image) => {
-          roomImages.value.push(`data:image/webp;base64,${image}`)
-      })
-  })
-  roomImageLoading.value = false
-  isOpenPhotoGallery.value = true
-  isOpenRoomModal.value = false
-}
-const openKitchenGallery = () => {
-  kitchenImages.value = []
-  roomImageLoading.value = true
-  axios.post('/api/image/getkitchen', {"floor_number" : floor_number.value, "kitchen_name": openedKitchen.value.name }).then((response) => {
-      response.data.forEach((image) => {
-          kitchenImages.value.push(`data:image/webp;base64,${image}`)
-      })
-  })
-  roomImageLoading.value = false
-  isOpenKitchenGallery.value = true
-  isOpenKitchenModal.value = false
-}
 const deleteImage = (imageIndex: number) => {
   axios.post('/api/image/delete', { "imageIndex": imageIndex, 'room_number': openedRoom.value.room_number },
   {
@@ -905,8 +770,10 @@ const calculateCorridorsPercentage = () => {
     const isInformatycyOk = Object.entries(corridor.informatycy)
       .filter(([key]) => !['_id', 'macAddress', 'Icomment'].includes(key))
       .every(([, value]) => value === "Yes");
-
-    if (isInformatycyOk) {
+    const isElectrycyOK = Object.entries(corridor.elektrycy)
+    .filter(([key])=> !['_id','Ecomment'].includes(key))
+    .every(([,value])=> value === "Yes")
+    if (isInformatycyOk && isElectrycyOK) {
       okay_corridors++;
     }
   }

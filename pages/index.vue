@@ -211,9 +211,9 @@ const addFloor = () => {
     })
 }
 const toggleFloorMenu = (index) => {
-    navigateTo(`/floor?floor_number=${index+1}`)
+    navigateTo(`/v2/floor?floor_number=${index+1}`)
     reloadNuxtApp({
-        path: `/floor?floor_number=${index+1}`,
+        path: `/v2/floor?floor_number=${index+1}`,
         ttl: 1000, // default 10000
     });
     return
