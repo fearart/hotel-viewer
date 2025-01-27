@@ -4,8 +4,9 @@
       <h1 class="text-2xl">Statystyki</h1>
       <ProgressBar :value="calculatePercentage('elektrycy') ?? 0" :max="100" text="Elektrycy" class="w-full"/>
       <ProgressBar :value="calculatePercentage('informatycy') ?? 0" :max="100" text="Informatycy" class="w-full"/>
-      <UButton v-if="!isOpenPrintSection" @click="isOpenPrintSection = !isOpenPrintSection" class="mt-4">Drukuj</UButton>
-      <UButton v-else @click="isOpenPrintSection = !isOpenPrintSection" class="mt-4">Zamknij</UButton>
+      <UButton class="mt-4" @click="openCorridorFullInfo">Szczegóły</UButton>
+      <UButton disabled v-if="!isOpenPrintSection" @click="isOpenPrintSection = !isOpenPrintSection" class="mt-4">Drukuj</UButton>
+      <UButton disabled v-else @click="isOpenPrintSection = !isOpenPrintSection" class="mt-4">Zamknij</UButton>
     </div>
     <div v-if="isOpenPrintSection" class="w-full">
       <PrintSection></PrintSection>
@@ -52,6 +53,15 @@ const calculatePercentage = (type: string) => {
 
 const emitClose = () => {
   emit('update:isOpenRoom', false)
+}
+const openCorridorFullInfo = () => {
+  const corridorNumber = String(props.corridor[0].corridorNumber)
+  if (corridorNumber.length === 4) {
+    navigateTo(`/v2/corridorstats/?floorNumber=${corridorNumber.slice(0, 1)}`)
+  }
+  else {
+    navigateTo(`/v2/corridorstats/?floorNumber=${corridorNumber.slice(0, 2)}`)
+  }
 }
 </script>
 

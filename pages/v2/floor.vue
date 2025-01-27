@@ -91,8 +91,8 @@
   <RoomStatsModal v-model:isOpen="isOpenRoomInfoModal" :rooms="rooms" @update:isOpenRoom="handleRoomStatsClose"/>
   <!-- corridors modal -->
   <CorridorModal v-model:isOpen="isOpenCorridorModal" @close="handleCorridorClose" @update:isOpen="handleCorridorClose" :user="user" :activeCorridor="openedCorridor"/>
-  <!--<CorridorStatsModal v-model:isOpen="isOpenCorridorInfoModal" @close="handleCorridorStatsClose" :corridor="corridors" @update:isOpen="handleCorridorStatsClose"/>
-  --><!-- photo gallery modal -->
+  <CorridorStatsModal v-model:isOpen="isOpenCorridorInfoModal" @close="handleCorridorStatsClose" :corridor="corridors" @update:isOpen="handleCorridorStatsClose"/>
+  <!-- photo gallery modal -->
   <UModal v-model="isOpenPhotoGallery" class="w-60" :ui="{ container: 'items-start' }">
       <div class="flex flex-col p-4">
           <div class="flex justify-end w-full">

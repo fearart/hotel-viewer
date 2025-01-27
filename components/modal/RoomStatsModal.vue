@@ -7,8 +7,8 @@
       <ProgressBar :value="calculatePercentage('informatycy') ?? 0" :max="100" text="Informatycy" class="w-full"/>
       <ProgressBar :value="calculatePercentage('pokojowe') ?? 0" :max="100" text="Pokojówki" class="w-full"/> 
       <UButton class="mt-4" @click="openRoomFullInfo">Szczegóły</UButton>
-      <UButton v-if="!isOpenPrintSection" @click="isOpenPrintSection = !isOpenPrintSection" class="mt-4">Drukuj</UButton>
-      <UButton v-else @click="isOpenPrintSection = !isOpenPrintSection" class="mt-4">Zamknij</UButton>
+      <UButton v-if="!isOpenPrintSection" @click="isOpenPrintSection = !isOpenPrintSection" disabled class="mt-4">Drukuj</UButton>
+      <UButton v-else @click="isOpenPrintSection = !isOpenPrintSection" class="mt-4" disabled>Zamknij</UButton>
     </div>
     <div v-if="isOpenPrintSection" class="w-full">
       <PrintSection></PrintSection>
