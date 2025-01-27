@@ -20,6 +20,9 @@
       <div v-if="displayRooms"
           class="grid 2xl:grid-cols-12 xl:grid-cols-10 grid-cols-6 w-full place-items-center justify-center h-full"
           >
+          <div class="mb-3 room-card text-white flex-col flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-sky-600" @click="openRoomInfoModal">
+            <UIcon name="i-heroicons:information-circle" class="w-2/5 h-2/5 cursor-pointer"/>
+          </div>
           <div v-if="displayRooms" v-for="(room, roomIndex) in rooms" :key="roomIndex"
               class="mb-3 room-card text-white flex-col flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
               :class="[setRoomColor(roomIndex), room.alarm ? 'alarm' : '']" @click="openRoomModal(roomIndex)">
@@ -38,9 +41,11 @@
           </div>
       </div>
       <UDivider class="prevent-select my-4 cursor-pointer" @click="toggleCorridor"><div class="flex flex-col align-center"><p>Korytarze [{{ corridors.length }}]</p> <p>{{ calculateCorridorsPercentage() }}% </p></div></UDivider>
-      <div v-if="displayCorridor"
-          class="grid 2xl:grid-cols-12 xl:grid-cols-10 grid-cols-6 w-full place-items-center justify-center h-full">
-          <div v-if="displayCorridor"
+      <div v-if="displayCorridor"class="grid 2xl:grid-cols-12 xl:grid-cols-10 grid-cols-6 w-full place-items-center justify-center h-full">
+        <div class="mb-3 room-card text-white flex-col flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-sky-600">
+            <UIcon name="i-heroicons:information-circle" class="w-2/5 h-2/5 cursor-pointer" @click="openCorridorInfoModal"/>
+        </div>  
+        <div v-if="displayCorridor"
               v-for="(corridor, corridorIndex) in corridors" 
               :key="corridorIndex"
               class="mb-3 room-card text-white flex-col flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
@@ -83,9 +88,11 @@
   </div>
   <!-- rooms modal-->
   <RoomModal v-model:isOpen="isOpenRoomModal" @close="handleRoomClose" @update:isOpenRoom="handleRoomClose" :user="user" :activeRoom="openedRoom"/>
+  <RoomStatsModal v-model:isOpen="isOpenRoomInfoModal" :rooms="rooms" @update:isOpenRoom="handleRoomStatsClose"/>
   <!-- corridors modal -->
   <CorridorModal v-model:isOpen="isOpenCorridorModal" @close="handleCorridorClose" @update:isOpen="handleCorridorClose" :user="user" :activeCorridor="openedCorridor"/>
-  <!-- photo gallery modal -->
+  <!--<CorridorStatsModal v-model:isOpen="isOpenCorridorInfoModal" @close="handleCorridorStatsClose" :corridor="corridors" @update:isOpen="handleCorridorStatsClose"/>
+  --><!-- photo gallery modal -->
   <UModal v-model="isOpenPhotoGallery" class="w-60" :ui="{ container: 'items-start' }">
       <div class="flex flex-col p-4">
           <div class="flex justify-end w-full">
@@ -154,6 +161,8 @@ import { eShouldDisplayCorridor, iShouldDisplayCorridor } from '@/utilities/corr
 import type { User } from '~/types/user';
 import type { Room } from '~/types/room';
 import type { Corridor } from '~/types/corridor';
+import RoomStatsModal from '~/components/modal/RoomStatsModal.vue';
+import CorridorStatsModal from '~/components/modal/CorridorStatsModal.vue';
 // Base data
 const floor_number = ref(0)
 const floor = ref(null)
@@ -188,13 +197,6 @@ const displayPlayrooms = ref(false)
 const hasKitchens = ref(false)
 const displayKitchens = ref(false)
 
-// useless shit
-const hide_naxuy_cinema = ref(false)
-const hide_naxuy_corridor = ref(false)
-const hide_naxuy_rooms = ref(false)
-const hide_naxuy_conference_rooms = ref(false)
-const hide_naxuy_restaurants = ref(false)
-const hide_naxuy_kitchens = ref(false)
 // Objects
 // @ts-ignore
 const openedRoom = ref<Room>({})
@@ -211,7 +213,9 @@ const kitchenImages = ref([])
 // Modals vars
 const isOpenPhotoGallery = ref(false)
 const isOpenRoomModal = ref(false)
+const isOpenRoomInfoModal = ref(false)
 const isOpenCorridorModal = ref(false)
+const isOpenCorridorInfoModal = ref(false)
 const isOpenKitchenModal = ref(false)
 const isOpenKitchenGallery = ref(false)
 const isOpenSearchForm = ref(false)
@@ -358,6 +362,10 @@ const handleRoomClose = () => {
   isOpenRoomModal.value = false
   getFloorInfo()
 }   
+const handleRoomStatsClose = () => {
+  isOpenRoomInfoModal.value = false
+  getFloorInfo()
+}
 const openSearchForm = () => {
   isOpenSearchForm.value = !isOpenSearchForm.value
 }
@@ -781,6 +789,16 @@ const calculateCorridorsPercentage = () => {
 const roomAccepted = (index: number) => {
   let room = rooms.value[index] as Room;
   return room.administracja.isApproved === 'Yes';
+}
+
+const openRoomInfoModal = () => {
+    isOpenRoomInfoModal.value = true;
+} 
+const openCorridorInfoModal = () => {
+  isOpenCorridorInfoModal.value = true;
+}
+const handleCorridorStatsClose = () => {
+  isOpenCorridorInfoModal.value = false;
 }
 </script>
 <style scoped>

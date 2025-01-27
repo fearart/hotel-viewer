@@ -26,8 +26,7 @@
                             </div>
                         </div>
                         <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
-                            <p> {{ props.activeCorridor.informatycy.Icomment }} a</p>
-                                <UTextarea v-model="props.activeCorridor.informatycy.Icomment" placeholder="Comment" class="pb-2" size="xl"/>
+                            <UTextarea v-model="props.activeCorridor.informatycy.Icomment" placeholder="Comment" class="pb-2" size="xl"/>
                         </div>
                     </div><!--
                     <div v-if="item.key === 'K'">
@@ -183,7 +182,6 @@ const calculateDefaultIndex = () => {
 }
 const requestEdit = () => {}
 const submitEdit = async () => {
-    console.log(props.activeCorridor.informatycy)
     const request = await $fetch('/api/corridors/modify', {
         method: 'POST',
         body: props.activeCorridor
@@ -229,10 +227,8 @@ const calculatePercentage = (type: string) => {
     }
     else if (type === 'elektrycy') {
         const totalValues = Object.values(props.activeCorridor.elektrycy).length -2
-        console.log(Object.values(props.activeCorridor.elektrycy))
         let { _id, Ecomment, ...values} = props.activeCorridor.elektrycy
         const yesValues = Object.values(values).filter((value) => value === 'Yes').length
-        console.log(yesValues, totalValues)
         return (yesValues / totalValues) * 100
     }
 }

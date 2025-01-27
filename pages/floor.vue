@@ -519,7 +519,6 @@ const getFloorInfo = () => {
             if (typeof (floor.value.kitchens) !== undefined) {
                 hasKitchens.value = true
                 kitchens.value = floor.value.kitchens
-                console.log(kitchens.value[0])
             }
         })
         .catch((error) => {

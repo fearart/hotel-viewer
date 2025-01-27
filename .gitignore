@@ -21,6 +21,9 @@ logs
 .env.*
 !.env.example
 
+
+public\images
+
 nuxt.config.ts
 bun.lockb
 server/api/test.post.ts

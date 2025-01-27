@@ -380,11 +380,9 @@ const openPhotoGallery = async () => {
             roomNumber: props.activeRoom.roomNumber
         }
     })
-    console.log(response)
     response.forEach((image: string) => {
         galleryImages.value.push(`data:image/webp;base64,${image}`)
     })
-    console.log(activeRoom.value.roomNumber)
     isGalleryOpen.value = !isGalleryOpen.value
     
 }
@@ -450,8 +448,8 @@ const calculatePercentage = (type: string) => {
         return (yesValues / totalValues) * 100
     }
     else if (type === 'konserwatorzy') {
-        const totalValues = Object.values(props.activeRoom.konserwatorzy).length -2
-        let { _id, Kcomment, ...values} = props.activeRoom.konserwatorzy
+        const totalValues = Object.values(props.activeRoom.konserwatorzy).length -3
+        let { _id, Kcomment, hasJoints, ...values} = props.activeRoom.konserwatorzy
         const yesValues = Object.values(values).filter((value) => value === 'Yes').length
         return (yesValues / totalValues) * 100
     }
