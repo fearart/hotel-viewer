@@ -36,7 +36,7 @@ const cols = [
   },
   {
     key: 'informatycy.hasBathPhone',
-    label: "Telefon Laz."
+    label: "Telefon Łaz."
   },
   {
     key: 'informatycy.hasPhone',
