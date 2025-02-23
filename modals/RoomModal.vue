@@ -5,17 +5,21 @@
           <template #item="{ item }">
               <UCard @submit.prevent class="mb-2">
                   <template #header>
-                      <div class="flex flex-row h-10 w-full justify-center">
-                          <UButton v-if="props.user.permissions.admin" label="Submit" @click="submitEdit"></UButton>
-                          <UButton label="Cancel" color="red" class="ml-2" @click="emitClose"></UButton>
-                          <UInput v-model="props.activeRoom.roomNumber" v-maska data-maska="#####" class="text-xl w-24 mb-2 mx-2"
-                          placeholder="Room number" size="xl"/>
+                      <div class="flex flex-col justify-center space-y-2">
+                        <div class="flex flex-row h-10 w-full justify-center">
+                          <UButton v-if="props.user.permissions.admin" label="Submit" @click="submitEdit" class="mr-2"></UButton>
+                          <UButton label="Cancel" color="red" class="mr-2" @click="emitClose"></UButton>
                           <UButton v-if="props.activeRoom.alarm" icon="i-heroicons-bell" color="red" @click="toggleAlarm" class="mr-2"/>
                           <UButton v-else icon="i-heroicons-bell" color="gray" @click="toggleAlarm" class="mr-2"/>
                           <UButton label="" @click="requestEdit" class="mr-2">
                               <img src="~/assets/svg/tg-white.png" class="w-6 h-6">
                           </UButton>
                           <UButton label="✔" color="green" @click="setEverythingGreen"></UButton>
+                        </div>
+                        <div class="flex flex-row h-10 w-full justify-center">
+                            <UInput v-model="props.activeRoom.roomNumber" v-maska data-maska="#####" class="text-xl w-24 mb-2 mx-2"
+                            placeholder="Room number" size="xl"/>
+                        </div>
                       </div>
                   </template>
                   <div v-if="item.key === 'I'" class="flex justify-center flex-col items-center p-6">
@@ -135,10 +139,10 @@
                             <div class="pr-2 h-20 w-20">
                                 <img :src="loadImages('Drain', props.activeRoom.konserwatorzy.hasDrain)" @click="SwitchStates('Drain', props.activeRoom.konserwatorzy.hasDrain,'konserwatorzy')" class="cursor-pointer"/>
                             </div>
-                            <div class="pr-2 h-20 w-20">
-                                <img :src="loadImages('Key', props.activeRoom.konserwatorzy.hasKey)" @click="SwitchStates('Key', props.activeRoom.konserwatorzy.hasKey,'konserwatorzy')" class="cursor-pointer"/>
-                            </div>
-                          </div>
+                        </div>
+                        <div class="pr-2 h-20 w-20">
+                            <img :src="loadImages('Key', props.activeRoom.konserwatorzy.hasKey)" @click="SwitchStates('Key', props.activeRoom.konserwatorzy.hasKey,'konserwatorzy')" class="cursor-pointer"/>
+                        </div>
                       </div>
                       <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
                               <UTextarea v-model="props.activeRoom.konserwatorzy.Kcomment" placeholder="Comment" class="pb-2" size="xl"/>
@@ -387,9 +391,7 @@ const openPhotoGallery = async () => {
     
 }
 const deleteImage = (imageIndex: number) => {
-    const image = galleryImages.value[imageIndex]
-    const imageBase64 = image.split(',')[1]
-    const response = $fetch('/api/image/delete', {
+    $fetch('/api/image/delete', {
         method: 'POST',
         headers: {
             'type': 'room'

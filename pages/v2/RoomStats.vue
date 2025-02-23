@@ -5,6 +5,8 @@
       <UPagination v-model="page" :page-count="pageCount" :total="rooms.length" />
       <UButton @click="sendJSON" icon="i-heroicons:document-arrow-up-16-solid">CSV</UButton>
       <UButton @click="reloadPage" icon="i-heroicons:document-arrow-down-20-solid">Odswiez</UButton>
+      <UButton @click="unselectAll" icon="i-heroicons:x-circle">Wyłącz wszystko</UButton>
+      <UButton @click="selectAll" icon="i-heroicons:check">Włącz wszystko</UButton>
     </div>
     <UTable :rows="rows" :columns="selectedColumns" caption="Pokoje">
 
@@ -243,10 +245,9 @@ function jsonToCSV(flattenedJSON) {
     const values = headers.map(header => JSON.stringify(obj[header], replacer));
     csvRows.push(values.join(','));
   }
-
+  csvRows.join('\n')
   return csvRows.join('\n');
 }
-
 function replacer(key, value) {
   if (value === null) {
     return '';
@@ -258,6 +259,12 @@ const reloadPage = () => {
 }
 function uniteComments(Ecomment: String, Kcomment: String,Icomment: String,Pcomment: String) {
   const totalString = `${Ecomment} | ${Kcomment} | ${Icomment} | ${Pcomment}`.replaceAll('\n','')
+}
+function selectAll() {
+  selectedColumns.value = [...cols]
+}
+function unselectAll() {
+  selectedColumns.value = []
 }
 </script>
 

@@ -13,3 +13,16 @@ export interface Floor {
     kitchens: any[];
     coffeeBrakes: any[];
 }
+
+export interface IFloor {
+    /** @deprecated */
+    floor_number: number;
+    floorNumber: number;
+    rooms: Room[];
+    corridor: Corridor[];
+    cinemas: any[];
+    conferenceRooms: any[];
+    restaurants: any[];
+    kitchens: any[];
+    coffeeBrakes: any[];
+}
