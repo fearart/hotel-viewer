@@ -42,7 +42,6 @@ export default defineEventHandler(async (event) => {
         ...corridorRecord,
         ...body
     } as Corridor;
-    console.log(newCorridorRecord)
     floor.corridor.remove(corridorRecord)
     floor.corridor.push(newCorridorRecord)
     await Floor.updateOne({floor_number: floorNumber}, {$set: {corridor: floor.corridor}})

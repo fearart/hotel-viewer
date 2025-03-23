@@ -861,8 +861,6 @@ const OpenCorridorModal = (corridor_number) => {
     isOpenCorridorModal.value = true
 }
 const openKitchenModal = (kitchen_name) => {
-    console.log(kitchen_name)
-    console.log(kitchens.value[0].name)
     let kitchen = {}
     kitchens.value.forEach((k) => {
         if (k.name === kitchen_name) {
@@ -870,7 +868,6 @@ const openKitchenModal = (kitchen_name) => {
             return
         }
     })
-    console.log(kitchen)
     openedKitchen.value = kitchen
     isOpenKitchenModal.value = true
 }
@@ -1447,13 +1444,11 @@ const setFilterOutline = () => {
 }
 const searchMacAddress = () => {
     axios.post('/api/search/mac',{'macAddress' : searchMac.value.toUpperCase()}).then((response) => {
-        console.log(response)
         if (Object.keys(response.data).length === 0){
             currentFoundMac.value = {
                 'data' : null,
                 'type' : null
             }
-            console.log("found nothing")
             return
         }
         if (response.data.type === "room") {
@@ -1461,14 +1456,12 @@ const searchMacAddress = () => {
                 'data' : response.data,
                 'type' : 'room'
             }
-            console.log("found room")
         }
         else if (response.data.type === "corridor") {
             currentFoundMac.value = {
                 'data' : response.data,
                 'type' : 'corridor'
             }
-            console.log("found corridor")
         }
     })
 }
@@ -1696,7 +1689,6 @@ const calculateFloorPercentage = () => {
             okay_rooms += 1;
         }
     }
-    console.log(`${okay_rooms} / ${total_rooms} = ${okay_rooms / total_rooms}`)
     return Number.parseFloat((okay_rooms / total_rooms) * 100).toFixed(2)
 }
 </script>

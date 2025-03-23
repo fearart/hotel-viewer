@@ -31,13 +31,11 @@ export default defineEventHandler(async (event) => {
     let roomNumber = Number.parseInt(body.roomNumber)
     const floor = await Floor.findOne({floor_number: floorNumber})
     if (!floor) {
-      console.log("floor not found")
         setResponseStatus(event,404,"Not Found")
         return
     }
     const roomIndex = floor.rooms.findIndex((a) => a.roomNumber === roomNumber);
     if (roomIndex === -1) {
-      console.log("room not found")
       setResponseStatus(event, 404, "Not Found");
       return;
     }

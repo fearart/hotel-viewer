@@ -42,14 +42,13 @@ export default defineEventHandler(async (event) => {
             corridor = []
         }
     })
-    console.log(rooms)
-    let record = rooms.find((room: Room) => room.informatycy.macAddress == mac)
+    let record : Room | Corridor | undefined = rooms.find((room: Room) => compareMacEnds(room.informatycy.macAddress,mac.toUpperCase()))
     if (record !== undefined) {
         record.type = "room"
         return record
     }
     else {
-        record = corridor.find((corridor: Corridor) => corridor.macAddress == mac)
+        record = corridor.find((corridor: Corridor) => compareMacEnds(corridor.informatycy.macAddress,mac.toUpperCase()))
         if (record !== undefined) {
             record.type = "corridor"
             return record
@@ -63,3 +62,12 @@ catch (e) {
     console.log(e)
 }
 })
+function compareMacEnds(mac1: string, mac2: string): boolean {
+    if (mac1 === null || mac2 === null) { return false }
+    const getLastTwoPairs = (mac: string) => {
+        const parts = mac.split(":");
+        return parts.slice(-2).join(":");
+    };
+
+    return getLastTwoPairs(mac1).toLowerCase() === getLastTwoPairs(mac2).toLowerCase();
+}

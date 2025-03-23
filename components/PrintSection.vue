@@ -32,7 +32,6 @@ const isPlayroomsSelected = ref(false)
 const isKitchensSelected = ref(false)
 const pdfSection = ref<HTMLElement | null>(null)
 const exportToExcel = () => {
-  console.log('exported')
 }
 </script>
 

@@ -14,8 +14,6 @@ export default defineEventHandler(async (event) => {
         return;
     }
     const body = await readBody(event);
-    console.log(`body: ${JSON.stringify(body)}`);
-    console.log(body.roomNumber)
     let keys = await storage.getKeys();
     keys = keys.filter((key) => key.startsWith(body.roomNumber))
     let simages : Array<string> = [];

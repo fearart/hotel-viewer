@@ -34,6 +34,5 @@ export default defineEventHandler(async (event) => {
     kitchen_object.name = body.name
     kitchens = kitchens.filter((kitchen:any) => kitchen.name !== body.name)
     kitchens.push(kitchen_object)
-    console.log(kitchens)
     await mongoose.connection.db.collection('hotel-floors').updateOne({floor_number: floor_number}, {$set: {kitchens: kitchens}})
 })

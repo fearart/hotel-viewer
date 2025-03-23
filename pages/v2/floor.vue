@@ -146,7 +146,7 @@
           </div>
           <div v-if="currentFoundMac.type !== null" class="mt-4 text-center w-full">
               <p v-if="currentFoundMac.type == 'room'">-P-{{ currentFoundMac.data.roomNumber }}</p>
-              <p v-else-if="currentFoundMac.type == 'corridor'">-K-{{ currentFoundMac.data.accessPointNumber }}</p>
+              <p v-else-if="currentFoundMac.type == 'corridor'">-K-{{ currentFoundMac.data.corridorNumber }}</p>
               <p v-else>Brak wyników</p>
           </div>
       </div>

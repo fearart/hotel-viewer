@@ -179,11 +179,9 @@ const passwordForm = reactive({ currentPassword: '', newPassword: '' })
 const tableLoading = ref(false)
 
 function onSubmitAccount () {
-  console.log('Submitted form:', accountForm)
 }
 
 function onSubmitPassword () {
-  console.log('Submitted form:', passwordForm)
 }
 onMounted(async () => {
     if (cookie.value === null || cookie.value === undefined) {
@@ -277,7 +275,6 @@ const resetPassword = () => {
         return
     }
     axios.post('/api/users/reset',{"login": openedUser.value.login,"password" : password}).then((res) => {
-        console.log(res)
     })
 }
 const options = [

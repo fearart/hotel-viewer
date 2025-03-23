@@ -23,7 +23,6 @@ export default defineEventHandler(async (event) => {
         return
     }
     const body = await readBody(event)
-    console.log(body)
     if (body.floorNumber === undefined || body.corridorNumber === undefined) {
         setResponseStatus(event,400,"Bad Request")
         return
