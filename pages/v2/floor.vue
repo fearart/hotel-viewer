@@ -13,7 +13,6 @@
                   
               </div>
               <UIcon name="i-material-symbols:find-in-page" class="w-4 h-4 cursor-pointer" @click="openSearchForm"/>
-              <div  class="w-4 h-4 bg-sky-500 rounded-sm cursor-pointer p-0 m-0 text-center" @click=""><p class="text-xs">I</p></div>
           </div>
       </div>
       <UDivider class="prevent-select my-4 cursor-pointer " @click="toggleRooms"><div class="flex flex-col align-center"><p>Pokoje [{{ rooms.length }}]</p> <p>{{ calculateRoomsPercentage() }}% </p></div></UDivider>
@@ -146,7 +145,7 @@
               <UButton label="Szukaj" @click="searchMacAddress"></UButton>
           </div>
           <div v-if="currentFoundMac.type !== null" class="mt-4 text-center w-full">
-              <p v-if="currentFoundMac.type == 'room'">-P-{{ currentFoundMac.data.room_number }}</p>
+              <p v-if="currentFoundMac.type == 'room'">-P-{{ currentFoundMac.data.roomNumber }}</p>
               <p v-else-if="currentFoundMac.type == 'corridor'">-K-{{ currentFoundMac.data.accessPointNumber }}</p>
               <p v-else>Brak wyników</p>
           </div>

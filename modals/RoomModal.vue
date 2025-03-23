@@ -14,7 +14,8 @@
                           <UButton label="" @click="requestEdit" class="mr-2">
                               <img src="~/assets/svg/tg-white.png" class="w-6 h-6">
                           </UButton>
-                          <UButton label="✔" color="green" @click="setEverythingGreen"></UButton>
+                          <UButton label="✔" color="green" class="mr-2" @click="setEverythingGreen"></UButton>
+                          <UButton v-if="props.user.permissions.root" label="🗑️" color="red" @click="deleteRoom"></UButton>
                         </div>
                         <div class="flex flex-row h-10 w-full justify-center">
                             <UInput v-model="props.activeRoom.roomNumber" v-maska data-maska="#####" class="text-xl w-24 mb-2 mx-2"
@@ -509,6 +510,17 @@ const setEverythingGreen = () => {
         props.activeRoom.pokojowe[key] = 'Yes'
     })
     
+}
+
+const deleteRoom = () => {
+    $fetch('/api/rooms', {
+        method: 'DELETE',
+        body: {
+            floorNumber: props.activeRoom.floorNumber,
+            roomNumber: props.activeRoom.roomNumber,
+        }
+    })
+    emitClose()
 }
 </script>
 <style scoped lang="scss">

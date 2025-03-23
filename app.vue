@@ -49,6 +49,7 @@ const isDark = computed({
     colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
   }
 })
+
 const deleteCookie = () => {
     let cookie = useCookie('token')
     cookie.value = null
