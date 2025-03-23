@@ -22,12 +22,14 @@ export default defineEventHandler(async (event) => {
         unauthorizedReturn(event)
         return
     }
-    const body = await readBody(event)
+    const body = await readBody(event) as Room
     if (body.roomNumber === undefined || body.floorNumber === undefined) {
         setResponseStatus(event,400,"Bad Request")
         return
     }
+    // @ts-ignore
     let roomNumber = Number.parseInt(body.roomNumber)
+    // @ts-ignore
     let floorNumber = Number.parseInt(body.floorNumber)
     const floor = await Floor.findOne({floor_number: floorNumber})
     if (!floor) {
@@ -42,7 +44,10 @@ export default defineEventHandler(async (event) => {
         body.administracja.isApproved = 'No'
         body.administracja.isApprovedBy = ''
         body.administracja.isApprovedDate = '' 
-    }   
+    }
+    if (body.informatycy.macAddress !== roomRecord.informatycy.macAddress) {
+        body.informatycy.macAddress = body.informatycy.macAddress.toUpperCase()
+    }
     const newRoomRecord = {
         ...roomRecord,
         ...body

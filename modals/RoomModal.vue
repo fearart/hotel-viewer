@@ -24,7 +24,7 @@
                       </div>
                   </template>
                   <div v-if="item.key === 'I'" class="flex justify-center flex-col items-center p-6">
-                      <UInput v-model="props.activeRoom.informatycy.macAddress" placeholder="MAC:Address" /> 
+                      <UInput v-model="props.activeRoom.informatycy.macAddress" v-maska data-maska="**:**:**:**:**:**" placeholder="MAC:Address" /> 
                       <div class="m-2 flex flex-col items-center">
                           <div class="flex flex-row">
                               <div class="pr-2 h-20 w-20">

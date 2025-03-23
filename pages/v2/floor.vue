@@ -145,9 +145,10 @@
               <UButton label="Szukaj" @click="searchMacAddress"></UButton>
           </div>
           <div v-if="currentFoundMac.type !== null" class="mt-4 text-center w-full">
-              <p v-if="currentFoundMac.type == 'room'">-P-{{ currentFoundMac.data.roomNumber }}</p>
-              <p v-else-if="currentFoundMac.type == 'corridor'">-K-{{ currentFoundMac.data.corridorNumber }}</p>
-              <p v-else>Brak wyników</p>
+            <div v-for="searchRecord in currentFoundMac">
+              <p v-if="searchRecord.type === 'R'">-P-{{ searchRecord.roomNumber }} | {{ searchRecord.informatycy.macAddress }}</p>
+              <p v-if="searchRecord.type === 'K'">-K-{{ searchRecord.corridorNumber}} | {{ searchRecord.informatycy.macAddress }}</p>
+            </div>
           </div>
       </div>
   </UModal>
@@ -160,6 +161,7 @@ import { eShouldDisplayCorridor, iShouldDisplayCorridor } from '@/utilities/corr
 import type { User } from '~/types/user';
 import type { Room } from '~/types/room';
 import type { Corridor } from '~/types/corridor';
+import type { IMacSearchResponse } from '~/types/macsearchresponse';
 import RoomStatsModal from '~/components/modal/RoomStatsModal.vue';
 import CorridorStatsModal from '~/components/modal/CorridorStatsModal.vue';
 // Base data
@@ -205,11 +207,11 @@ const openedCorridor = ref<Corridor>({})
 const openedKitchen = ref({})
 const roomImages = ref([])
 const roomImageLoading = ref(false) 
-const currentFoundMac = ref({})
+const currentFoundMac = ref<Array<Room | Corridor>>([])
 const searchMac = ref("")
 
 const kitchenImages = ref([])
-// Modals vars
+// Modals vars 
 const isOpenPhotoGallery = ref(false)
 const isOpenRoomModal = ref(false)
 const isOpenRoomInfoModal = ref(false)
@@ -600,24 +602,11 @@ const setFilterOutline = () => {
 }
 const searchMacAddress = () => {
   axios.post('/api/search/mac',{'macAddress' : searchMac.value.toUpperCase()}).then((response) => {
-      if (Object.keys(response.data).length === 0){
-          currentFoundMac.value = {
-              'data' : null,
-              'type' : null
-          }
-          return
+      if (!response) {
+        currentFoundMac.value = []
       }
-      if (response.data.type === "room") {
-          currentFoundMac.value = {
-              'data' : response.data,
-              'type' : 'room'
-          }
-      }
-      else if (response.data.type === "corridor") {
-          currentFoundMac.value = {
-              'data' : response.data,
-              'type' : 'corridor'
-          }
+      else {
+        currentFoundMac.value = response.data
       }
   })
 }
