@@ -49,6 +49,8 @@
                       <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
                               <UTextarea v-model="props.activeRoom.informatycy.Icomment" placeholder="Comment" class="pb-2" size="xl"/>
                       </div>
+                      <UCheckbox label="55' TV" v-model="props.activeRoom.informatycy.smallTvStatus"></UCheckbox>
+                      <UCheckbox label="65' TV" v-model="props.activeRoom.informatycy.largeTvStatus"></UCheckbox>
                   </div>
                   <div v-if="item.key === 'P'">
                       <div class="m-2 flex flex-col items-center">

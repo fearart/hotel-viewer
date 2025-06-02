@@ -9,6 +9,8 @@ const InformatycySchema = new mongoose.Schema({
     hasLock: { type: 'string', required: false },
     macAddress: { type: 'string', required: false },
     Icomment: { type: 'string', required: false },
+    smallTvStatus: { type: 'boolean', required: false, default: false },
+    largeTvStatus: { type: 'boolean', required: false, default: false },
 })
 
 const ElektrycySchema = new mongoose.Schema({
@@ -87,6 +89,7 @@ const FloorSchema = new mongoose.Schema({
     restaurants: { type: [mongoose.Schema.Types.Mixed], required: true },
     kitchens: { type: [mongoose.Schema.Types.Mixed], required: true },
     coffeeBrakes: { type: [mongoose.Schema.Types.Mixed], required: true },
+    alarm: { type: Boolean, required: false, default: false },
 })
 export default mongoose.model('hotel-floors', FloorSchema);
 

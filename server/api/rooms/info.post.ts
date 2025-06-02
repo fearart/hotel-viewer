@@ -49,6 +49,15 @@ export default defineEventHandler(async (event) => {
     roomObject.konserwatorzy = room.konserwatorzy
     roomObject.pokojowe = room.pokojowe
     roomObject.administracja = room.administracja
+    if (roomObject.informatycy.smallTvStatus === undefined) {
+        if (roomObject.informatycy.hasTV === "Yes") {
+            roomObject.informatycy.smallTvStatus = true
+        }
+        else roomObject.informatycy.smallTvStatus = false
+    }
+    if (roomObject.informatycy.largeTvStatus === undefined) {
+        roomObject.informatycy.largeTvStatus = false
+    }
     if (room === undefined) {
         setResponseStatus(event,404,"Not Found")
         return

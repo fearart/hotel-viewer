@@ -15,6 +15,8 @@ export interface Room {
         macAddress: string;
         Icomment: string;
         _id: string;
+        smallTvStatus: boolean;
+        largeTvStatus: boolean;
     },
 
     elektrycy: {
