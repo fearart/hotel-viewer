@@ -298,7 +298,7 @@ const setRoomColor = (roomIndex: number) => {
   let room = rooms.value[roomIndex] as Room;
   let userGroup = user.value.group
   if (userGroup.it) {   
-    let { _id, Icomment, macAddress, ...values} = room.informatycy
+    let { _id, Icomment, macAddress, smallTvStatus, largeTvStatus ...values} = room.informatycy
     if (Object.values(values).every(value => value === "Yes")) {
       return 'bg-green-500'
     }
