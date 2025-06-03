@@ -53,11 +53,9 @@ export default defineEventHandler(async (event) => {
         ...body,
     } as Room;
     // remove old room record
-    console.log(newRoomRecord)
     floor.rooms.remove(roomRecord)
     // add new room record
     floor.rooms.push(newRoomRecord)
-    console.log(floor.rooms[floor.rooms.length - 1])
     await Floor.updateOne({floor_number: floorNumber}, {$set: {rooms: floor.rooms}})
     mongoose.connection.db.collection('hotel-logs').insertOne({
         "ID" : await Logger.getID(),
