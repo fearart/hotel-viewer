@@ -672,7 +672,7 @@ const kShouldDisplay = (index: number) => {
 }
 const iShouldDisplay = (index: number) => {
   let room = rooms.value[index] as Room;
-  const { Icomment, macAddress, _id, ...params } = room.informatycy;
+  const { Icomment, macAddress, _id, smallTvStatus, largeTvStatus, ...params } = room.informatycy;
   for (const key in params) {
     if (params[key as keyof typeof params] !== "Yes") {
       return true;

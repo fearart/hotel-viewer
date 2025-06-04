@@ -172,7 +172,7 @@ const selectedColumns = ref([...cols])
 const StatusDecoder = (status: string) => {
   if (status === 'Yes') return 'OK'
   if (status === 'No') return 'Błąd'
-  if (status === 'unknown') return "Niema"
+  if (status === 'unknown') return "Brak"
   return status
 }
 const getRooms = async () => {
@@ -236,7 +236,7 @@ function jsonToCSV(flattenedJSON) {
   const csvRows = [];
 
   // Add headers and rows
-  const colsArr = ['Numer pokoju','Access Point','Telefon Laz.','Telefon','Telewizor','Zamek',"Uwagi Inf.",
+  const colsArr = ['Numer pokoju','Access Point','Telefon Laz.','Telefon','Telewizor','Zamek',"Uwagi Inf.", "TV 55'", "TV 65'",
                   'Gniazdka','Oświetlenie','Lodówka','Suszarka','Lusterko','Klimatyzacja','Uwagi elek.',
                   'Prysznic','Miska WC','Grzejnik','Bidet','Umywalka','Drzwi Wejśćiowe','Kratka Balkon','Tapety','Płytki + Fugi','Sylikony','Sufit','Kratki went.','Drzwickzki rew.','Drzwi Toaleta','Okna','Malowanie Sufitu','Kluszę','Uwagi Kons.',
                   'Wykładziny','Meble','Firany i Zasłony','Obrazy','Sejf','Czajnik','Uwagi Pok.']
@@ -252,6 +252,8 @@ function replacer(key, value) {
   if (value === null) {
     return '';
   }
+  if (value === true) return "✓";
+  if (value === false) return '';
   return value;
 }
 const reloadPage = () => {

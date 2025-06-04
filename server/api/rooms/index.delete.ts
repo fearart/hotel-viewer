@@ -44,14 +44,13 @@ export default defineEventHandler(async (event) => {
     await mongoose.connection.db.collection('hotel-logs').insertOne({
         "ID" : await Logger.getID(),
         "type" : "modify",
-        "event" : "Rooms Modified",
-        "user" : await new Logger(token).search(),
+        "event" : "Rooms Deleted",
+        "user" : await Logger.search(token),
         "timestamp" : new Date().getTime(),
-        "details" : rooms
+        "details" : roomNumber
     })
     return {
         statusCode: 200,
         body: "OK"
     }
-    
 })

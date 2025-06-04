@@ -37,13 +37,17 @@ export default defineEventHandler(async (event) => {
         return
     }
     // @ts-ignore
-    const roomRecord = floor.rooms.find(
+    let roomRecord = floor.rooms.find(
         (item) => item.roomNumber === roomNumber
     ) as Room;
     if (body.administracja.isApproved && body.administracja.isApproved === undefined) {
         body.administracja.isApproved = 'No'
         body.administracja.isApprovedBy = ''
         body.administracja.isApprovedDate = '' 
+    }
+    console.log(roomRecord)
+    if (roomRecord === undefined) {
+        roomRecord = body
     }
     if (body.informatycy.macAddress !== roomRecord.informatycy.macAddress) {
         body.informatycy.macAddress = body.informatycy.macAddress.toUpperCase()
