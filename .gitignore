@@ -27,3 +27,5 @@ public\images
 nuxt.config.ts
 bun.lockb
 server/api/test.post.ts
+
+images/
