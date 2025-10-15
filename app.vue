@@ -26,6 +26,14 @@
   <div class="flex items-center justify-center align-middle h-full">
     <RouterView></RouterView>
   </div>
+  <div class="items-center align-middle block fixed bottom-0 w-full bg-gray-800 opacity-30 rounded-t-xl p-x-2">
+    <div class="flex items-center align-middle h-full flex-row justify-center ">
+      <p class="dark:text-white text-black">© Mykola Pukovskyi</p>
+      <UButton label="" target="_blank" to="https://fearart.dev" class="text-blue-500" size="xs" variant="link" icon="i-heroicons-arrow-top-right-on-square-20-solid"></UButton>
+      <UButton label="" target="_blank" to="https://github.com/fearart" class="text-blue-500" size="xs" variant="link" icon="i-heroicons-solid:code"></UButton>
+
+    </div>
+  </div>
   </div>
   <UNotifications />
 </template>
@@ -41,6 +49,7 @@ const isDark = computed({
     colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
   }
 })
+
 const deleteCookie = () => {
     let cookie = useCookie('token')
     cookie.value = null

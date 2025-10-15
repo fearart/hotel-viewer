@@ -15,16 +15,17 @@ logs
 
 # Misc
 .DS_Store
-.fleet
-.idea
 
 # Local env files
 .env
 .env.*
 !.env.example
 
-# Local Netlify folder
-.netlify
-public/images/
+
+public\images
+
 nuxt.config.ts
+bun.lockb
+server/api/test.post.ts
+
 images/

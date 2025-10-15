@@ -1,14 +1,15 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
-const config = useRuntimeConfig();
 import Logger from "~/utilities/logger";
+import Floor from "~/model/floor";
+import type { Room } from "~/types/room";
+const config = useRuntimeConfig();
+
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
 
 export default defineEventHandler(async (event) => {
-    const config = useRuntimeConfig();
-    await mongoose.connect(config.mongodb_uri);
     let token = getCookie(event,'token')
     if (!token) {
         unauthorizedReturn(event)
@@ -22,75 +23,93 @@ export default defineEventHandler(async (event) => {
         return
     }
     const body = await readBody(event)
-    if (body.floor_number === undefined) {
+    if (body.floorNumber === undefined) {
         setResponseStatus(event,400,"Bad Request")
         return
     }
-    const floor_number = Number.parseInt(body.floor_number)
-    const floor = await mongoose.connection.db.collection('hotel-floors').findOne({floor_number: floor_number})
-    if (floor === null) {
+    let floorNumber = Number.parseInt(body.floorNumber)
+    const floor = await Floor.findOne({floor_number: floorNumber})
+    if (!floor) {
         setResponseStatus(event,404,"Not Found")
         return
     }
-    let rooms = []
-    try {
-        rooms = floor.rooms
+    let roomNumber;
+    if (floor.rooms.length === 0) {
+        roomNumber = Number(floorNumber + "001");
+    } else {
+        roomNumber = floor.rooms[floor.rooms.length - 1].roomNumber + 1;
     }
-    catch {
-        rooms = []
-    }
-    let room_number = 1
-    if (rooms.length == 0) {
-        room_number = Number.parseInt(`${floor_number}001`)
-    }
-    else {
-        let biggest_room_number = rooms.reduce((prev:any, current:any) => (prev.room_number > current.room_number) ? prev : current)
-        room_number = biggest_room_number.room_number + 1
-    }
-    let room = {
-        'room_number' : room_number,
-        'hasAccessPoint' : "unknown",
-        'hasTV' : "unknown",
-        "hasPhone" : "unknown",
-        'hasBathPhone' : "unknown",
-        "comment" : "",
-        "macAddress" : "",
-        "alarm" : false,
-        'hasLock' : 'unknown',
-        'hasBroom' : 'unknown',
-        'hasSink' : 'unknown',
-        'hasToilet' : 'unknown',
-        'hasRadiator' : 'unknown',
-        'hasShower' : 'unknown',
-        'hasBidet' : 'unknown',
-        'hasSocket' : 'unknown',
-        'hasBulb' : 'unknown',
-        'hasBed' : 'unknown',
-        'hasGuard' : 'unknown',
-        'hasAdmin' : 'unknown',
-        'hasDoor' : 'unknown',
-        'hasDoctor' : 'unknown',
-        'Ecomment' : "",
-        'Kcomment' : "",
-        'Icomment' : "",
-        'Pcomment' : "",
-        'Acomment' : "",
-    }
-    rooms.push(room)
-    Object.assign(floor, {rooms: rooms})
-    await mongoose.connection.db.collection('hotel-floors').updateOne({floor_number: floor_number},{$set: floor})
-    await mongoose.connection.db.collection('hotel-logs').insertOne({
-        "event" : `Room added`,
-        "type" : "info",
-        "timestamp" : Date.now(),
-        "user" : await new Logger(token).search(),
-        "details" : {
-            "floor_number" : floor_number,
-            "room_number" : room_number,
+    const newRoomRecord = {
+        floorNumber: floorNumber,
+        roomNumber: roomNumber,
+        alarm: false,
+        informatycy: {
+            hasAccessPoint: "unknown",
+            hasBathPhone: "unknown",
+            hasPhone: "unknown",
+            hasTV: "unknown",
+            hasLock: "unknown",
+            macAddress: "",
+            Icomment: "",
         },
-        'ID' : await Logger.getID()
+        elektrycy: {
+            hasSocket: "unknown",
+            hasBulb: "unknown",
+            hasFreezer: "unknown",
+            hasDryer: "unknown",
+            hasMirror: "unknown",
+            hasAC: "unknown",
+            Ecomment: "",
+        },
+        administracja: {
+            isApproved: "No",
+            isApprovedBy: "",
+            isApprovedDate: "",
+            Acomment: "",
+        },
+        konserwatorzy: {
+            hasShower: "unknown",
+            hasToilet: "unknown",
+            hasRadiator: "unknown",
+            hasBidet: "unknown",
+            hasSink: "unknown",
+            hasDoor: "unknown",
+            hasDrain: "unknown",
+            hasWallpaper: "unknown",
+            hasTiles: "unknown",
+            hasJoints: "unknown",
+            hasSilicone: "unknown",
+            hasCeiling: "unknown",
+            hasVent: "unknown",
+            hasRevisionDoor: "unknown",
+            hasToiletDoor: "unknown",
+            hasWindow: "unknown",
+            hasCeilingPainting: "unknown",
+            Kcomment: "",
+        },
+        pokojowe: {
+            hasCarpet: "unknown",
+            hasBed: "unknown",
+            hasCurtains: "unknown",
+            hasPainting: "unknown",
+            hasSafe: "unknown",
+            hasBroom: "unknown",
+            hasKettle: "unknown",
+            Pcomment: "",
+        }
+    } as unknown as Room
+    floor.rooms.push(newRoomRecord)
+    await Floor.updateOne({floor_number: floorNumber}, {$set: {rooms: floor.rooms}})
+    mongoose.connection.db.collection('hotel-logs').insertOne({
+        "ID" : await Logger.getID(),
+        "type" : "create",
+        "event" : `Room #${String(floor.rooms.length)} was created`,
+        "user" : await Logger.search(token),
+        "timestamp" : Date.now(),
+        "details" : body
     })
     return {
-        body: room
+        statusCode: 200,
+        body: "OK"
     }
 })

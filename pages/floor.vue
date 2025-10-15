@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col p-4 items-center w-full montserrat">
         <div class="flex flex-col">
-            <h1 class="text-3xl justify-center w-full">Piętro {{ floor_number }}</h1>
+            <h1 class="text-3xl justify-center w-full">Piętro {{ floor_number }} <UIcon name="i-heroicons-wrench-screwdriver" color="red" size="xl" class="w-4 h-4 cursor-pointer" @click="navigateTo('/v2/floor?floor_number=' + floor_number)"/></h1>
             <div class="flex flex-row justify-between">
                 <div id="green-filter" class="w-4 h-4 bg-green-500 rounded-sm cursor-pointer" @click="applyGreen">
                     
@@ -15,7 +15,7 @@
                 <UIcon name="i-material-symbols:find-in-page" class="w-4 h-4 cursor-pointer" @click="openSearchForm"/>
             </div>
         </div>
-        <UDivider v-if="!hide_naxuy_rooms" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENrooms">Pokoje [{{ rooms.length }}]</UDivider>
+        <UDivider v-if="!hide_naxuy_rooms" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENrooms">Pokoje [{{ rooms.length }}] {{ calculateFloorPercentage() }}%/100% &nbsp; <UButton icon="i-heroicons-information-circle" @click="sortRooms"></UButton></UDivider>
         <div v-if="displayRooms && !hide_naxuy_rooms"
             class="grid 2xl:grid-cols-12 xl:grid-cols-10 grid-cols-6 w-full place-items-center justify-center h-full"
             >
@@ -28,7 +28,6 @@
                     <p class="w-1/5" v-if="kShouldDisplay(roomIndex)">K</p>
                     <p class="w-1/5" v-if="iShouldDisplay(roomIndex)">I</p>
                     <p class="w-1/5" v-if="pShouldDisplay(roomIndex)">P</p>
-                    <p class="w-1/5" v-if="aShouldDisplay(roomIndex)">A</p>
                 </div>
             </div>
             <div class="xl:w-24 xl:h-24 w-12 h-12  mb-3 room-card bg-gray-500 text-white flex items-center justify-center rounded-lg cursor-pointer"
@@ -98,7 +97,7 @@
         <button></button>
         <UTabs :items="roomModalItems" :default-index="openedRoom.defaultIndex" class="px-2 mt-2">
             <template #item="{ item }">
-                <UCard @submit.prevent="() => onSubmit(item.key === 'account' ? accountForm : passwordForm)" class="mb-2">
+                <UCard @submit.prevent class="mb-2">
                     <template #header>
                         <div class="flex flex-row h-10 w-full justify-center">
                             <UButton v-if="isAdmin" label="Submit" @click="submitEdit"></UButton>
@@ -383,8 +382,8 @@
                 <UButton label="Szukaj" @click="searchMacAddress"></UButton>
             </div>
             <div v-if="currentFoundMac.type !== null" class="mt-4 text-center w-full">
-                <p v-if="currentFoundMac.type == 'room'"> P {{ currentFoundMac.data.room_number }}</p>
-                <p v-else-if="currentFoundMac.type == 'corridor'">K {{ currentFoundMac.data.accessPointNumber }}</p>
+                <p v-if="currentFoundMac.type == 'room'">-P-{{ currentFoundMac.data.room_number }}</p>
+                <p v-else-if="currentFoundMac.type == 'corridor'">-K-{{ currentFoundMac.data.accessPointNumber }}</p>
                 <p v-else>Brak wyników</p>
             </div>
         </div>
@@ -520,7 +519,6 @@ const getFloorInfo = () => {
             if (typeof (floor.value.kitchens) !== undefined) {
                 hasKitchens.value = true
                 kitchens.value = floor.value.kitchens
-                console.log(kitchens.value[0])
             }
         })
         .catch((error) => {
@@ -814,7 +812,7 @@ const openRoomModal = (room_number) => {
     if (user.value.group.it) {
         openedRoom.value.defaultIndex = 2
     }
-    else if (user.value.group.electrycy) {
+    else if (user.value.group.elektrycy) {
         openedRoom.value.defaultIndex = 0
     }
     else if (user.value.group.hydraulicy) {
@@ -863,8 +861,6 @@ const OpenCorridorModal = (corridor_number) => {
     isOpenCorridorModal.value = true
 }
 const openKitchenModal = (kitchen_name) => {
-    console.log(kitchen_name)
-    console.log(kitchens.value[0].name)
     let kitchen = {}
     kitchens.value.forEach((k) => {
         if (k.name === kitchen_name) {
@@ -872,7 +868,6 @@ const openKitchenModal = (kitchen_name) => {
             return
         }
     })
-    console.log(kitchen)
     openedKitchen.value = kitchen
     isOpenKitchenModal.value = true
 }
@@ -1448,14 +1443,12 @@ const setFilterOutline = () => {
     }
 }
 const searchMacAddress = () => {
-    axios.post('/api/search/mac',{'macAddress' : searchMac.value}).then((response) => {
-        console.log(response)
+    axios.post('/api/search/mac',{'macAddress' : searchMac.value.toUpperCase()}).then((response) => {
         if (Object.keys(response.data).length === 0){
             currentFoundMac.value = {
                 'data' : null,
                 'type' : null
             }
-            console.log("found nothing")
             return
         }
         if (response.data.type === "room") {
@@ -1463,14 +1456,12 @@ const searchMacAddress = () => {
                 'data' : response.data,
                 'type' : 'room'
             }
-            console.log("found room")
         }
         else if (response.data.type === "corridor") {
             currentFoundMac.value = {
                 'data' : response.data,
                 'type' : 'corridor'
             }
-            console.log("found corridor")
         }
     })
 }
@@ -1567,15 +1558,6 @@ const iShouldDisplay = (index) => {
 const pShouldDisplay = (index) => {
     let room = rooms.value[index]
     if (room.hasBroom === "No") {
-        return true
-    }
-    else {
-        return false
-    }
-}
-const aShouldDisplay = (index) => {
-    let room = rooms.value[index]
-    if (room.hasAdmin === "No" || room.hasGuard === "No") {
         return true
     }
     else {
@@ -1689,6 +1671,25 @@ const deleteKitchenImage = (imageIndex) => {
         isOpenKitchenGallery.value = false
         isOpenKitchenModal.value = true
     })
+}
+
+const calculateFloorPercentage = () => {
+    let total_rooms = rooms.value.length
+    let okay_rooms = 0
+    for (let room_index = 0; room_index < rooms.value.length; room_index++) {
+        let keys = Object.keys(rooms.value[room_index]).filter(key => key.startsWith('has'))
+        let room_okay = true;
+        for (let key_index = 0; key_index < keys.length; key_index++) {
+            if (rooms.value[room_index][keys[key_index]] !== 'Yes') {
+                room_okay = false;
+                break;
+            }
+        }
+        if (room_okay) {
+            okay_rooms += 1;
+        }
+    }
+    return Number.parseFloat((okay_rooms / total_rooms) * 100).toFixed(2)
 }
 </script>
 <style scoped>

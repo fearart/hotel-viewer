@@ -1,16 +1,10 @@
 import mongoose from "mongoose";
 
 class Logger {
-    private _token: string;
-
-    constructor(token: string) {
-        this._token = token;
-    }
-
-    public async search() : Promise<Array<Object>> {
-        const user = await mongoose.connection.db.collection('hotel-users').findOne({"token" : this._token})
+    public static async search(token: string) : Promise<string> {
+        const user = await mongoose.connection.db.collection('hotel-users').findOne({"token" : token})
         if (user === null) {
-            return [];
+            return "";
         }
         return user.login;
     }

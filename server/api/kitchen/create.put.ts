@@ -36,9 +36,7 @@ export default defineEventHandler(async (event) => {
         id: floor_object.kitchens.length + 1,
         comment: "",
     }
-    console.log(kitchen_object)
     floor_object.kitchens.push(kitchen_object)
-    console.log(floor_object)
     await mongoose.connection.db.collection('hotel-floors').updateOne({floor_number: body.floor_number}, {$set: {kitchens: floor_object.kitchens}})
     setResponseStatus(event,200,"OK")
     return

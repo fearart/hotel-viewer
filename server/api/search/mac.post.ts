@@ -1,7 +1,9 @@
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 import Logger from "~/utilities/logger";
-
+import { Room } from "~/types/room";
+import { Corridor } from "~/types/corridor";
+import type { IMacSearchResponse } from "~/types/macsearchresponse";
 const unauthorizedReturn = (event: any) => {
     setResponseStatus(event,401,"Unauthorized")
 }
@@ -29,8 +31,8 @@ export default defineEventHandler(async (event) => {
     }
     const mac: string = body.macAddress 
     const floors : Array<any> = await mongoose.connection.db.collection('hotel-floors').find().toArray()
-    let rooms: Array<any> = []
-    let corridor: Array<any> = []
+    let rooms: Array<Room> = []
+    let corridor: Array<Corridor> = []
     floors.forEach((floor) => {
         try {
             rooms = rooms.concat(floor.rooms)
@@ -41,16 +43,27 @@ export default defineEventHandler(async (event) => {
             corridor = []
         }
     })
-    let record = rooms.find((room: any) => room.macAddress == mac)
+    const matchedRecords: (Room | Corridor)[] = [];
+    let record : Room | Corridor | undefined = rooms.find((room: Room) => compareMacEnds(room.informatycy.macAddress,mac.toUpperCase()))
     if (record !== undefined) {
-        record.type = "room"
-        return record
+        rooms.forEach(room => {
+            if (compareMacEnds(room.informatycy.macAddress, mac.toUpperCase())) {
+                room.type = "R"
+                matchedRecords.push(room);
+            }
+        });
+        return matchedRecords;
     }
     else {
-        record = corridor.find((corridor: any) => corridor.macAddress == mac)
+        record = corridor.find((corridor: Corridor) => compareMacEnds(corridor.informatycy.macAddress,mac.toUpperCase()))
         if (record !== undefined) {
-            record.type = "corridor"
-            return record
+            corridor.forEach(corridor => {
+                if (compareMacEnds(corridor.informatycy.macAddress, mac.toUpperCase())) {
+                    corridor.type = 'K'
+                    matchedRecords.push(corridor);
+                }
+            });
+            return matchedRecords;
         }
         else {
             return {}
@@ -61,3 +74,12 @@ catch (e) {
     console.log(e)
 }
 })
+function compareMacEnds(mac1: string, mac2: string): boolean {
+    if (mac1 === null || mac2 === null) { return false }
+    const getLastTwoPairs = (mac: string) => {
+        const parts = mac.split(":");
+        return parts.slice(-2).join(":");
+    };
+
+    return getLastTwoPairs(mac1).toLowerCase() === getLastTwoPairs(mac2).toLowerCase();
+}
