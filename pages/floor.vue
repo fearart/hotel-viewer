@@ -3,13 +3,13 @@
         <div class="flex flex-col">
             <h1 class="text-3xl justify-center w-full">Piętro {{ floor_number }} <UIcon name="i-heroicons-wrench-screwdriver" color="red" size="xl" class="w-4 h-4 cursor-pointer" @click="navigateTo('/v2/floor?floor_number=' + floor_number)"/></h1>
             <div class="flex flex-row justify-between">
-                <div id="green-filter" class="w-4 h-4 bg-green-500 rounded-sm cursor-pointer" @click="applyGreen">
+                <div id="green-filter" class="w-4 h-4 bg-green-500 rounded-xs cursor-pointer" @click="applyGreen">
                     
                 </div>
-                <div id="red-filter" class="w-4 h-4 bg-red-500 rounded-sm cursor-pointer" @click="applyRed">
+                <div id="red-filter" class="w-4 h-4 bg-red-500 rounded-xs cursor-pointer" @click="applyRed">
 
                 </div>
-                <div id="gray-filter" class="w-4 h-4 bg-gray-500 rounded-sm cursor-pointer" @click="applyGrey">
+                <div id="gray-filter" class="w-4 h-4 bg-gray-500 rounded-xs cursor-pointer" @click="applyGrey">
                     
                 </div>
                 <UIcon name="i-material-symbols:find-in-page" class="w-4 h-4 cursor-pointer" @click="openSearchForm"/>
@@ -20,7 +20,7 @@
             class="grid 2xl:grid-cols-12 xl:grid-cols-10 grid-cols-6 w-full place-items-center justify-center h-full"
             >
             <div v-if="displayRooms && !hide_naxuy_rooms" v-for="(room, roomIndex) in rooms" :key="roomIndex"
-                class="mb-3 room-card text-white flex-col flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
+                class="mb-3 room-card text-white flex-col flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl grow bg-gray-500"
                 :class="[setRoomColor(roomIndex), room.alarm ? 'alarm' : '']" @click="openRoomModal(roomIndex)">
                 {{ room.room_number }}
                 <div class="flex flex-row 2xl:w-2/3 w-5/6 justify-center text-center text-sm 2xl:pt-4">
@@ -41,7 +41,7 @@
             <div v-if="displayCorridor"
                 v-for="(corridor, corridorIndex) in corridors" 
                 :key="corridorIndex"
-                class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
+                class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl grow bg-gray-500"
                 :class="setCorridorAPColor(corridorIndex)"
                 @click="OpenCorridorModal(corridorIndex)">
                 {{ corridor.accessPointNumber }}
@@ -57,7 +57,7 @@
             <!--<div v-if="displayCinemas"
                 v-for="(cinema, cinemaIndex) in cinemas" 
                 :key="cinemaIndex"
-                class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
+                class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl grow bg-gray-500"
                 :class="setCinemaColor(cinemaIndex)"
                 @click="openCinemaModal(cinemaIndex)">
                 {{ cinema.number}}
@@ -75,7 +75,7 @@
         <UDivider v-if="hasKitchens && !hide_naxuy_kitchens" class="prevent-select my-4 cursor-pointer" @click="MEGAOPENkitchens">Kuchnie</UDivider>
         <div v-if="displayKitchens">
             <div v-for="(kitchen, kitchenIndex) in kitchens" :key="kitchenIndex" 
-                class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
+                class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl grow bg-gray-500"
                 @click="openKitchenModal(kitchen.name)"
                 >
                 {{ kitchen.name}}
@@ -253,7 +253,7 @@
             </template>
             <template #default="{item,index,selected}">
                 <div class="flex items-center gap-2 relative truncate">
-                    <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
+                    <UIcon :name="item.icon" class="w-4 h-4 shrink-0" />
                     <span class="truncate">{{ item.key }}</span>
 
                     <span v-if="selected" class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
@@ -1418,27 +1418,27 @@ const refreshFilter = () => {
 }
 const setFilterOutline = () => {
     if (greenFilter.value) {
-        document.getElementById('green-filter').classList.add('outline')
+        document.getElementById('green-filter').classList.add('outline-solid')
         document.getElementById('green-filter').classList.add('outline-sky-500')
     }
     else {
-        document.getElementById('green-filter').classList.remove('outline')
+        document.getElementById('green-filter').classList.remove('outline-solid')
         document.getElementById('green-filter').classList.remove('outline-sky-500')
     }
     if (redFilter.value) {
-        document.getElementById('red-filter').classList.add('outline')
+        document.getElementById('red-filter').classList.add('outline-solid')
         document.getElementById('red-filter').classList.add('outline-sky-500')
     }
     else {
-        document.getElementById('red-filter').classList.remove('outline')
+        document.getElementById('red-filter').classList.remove('outline-solid')
         document.getElementById('red-filter').classList.remove('outline-sky-500')
     }
     if (grayFilter.value) {
-        document.getElementById('gray-filter').classList.add('outline')
+        document.getElementById('gray-filter').classList.add('outline-solid')
         document.getElementById('gray-filter').classList.add('outline-sky-500')
     }
     else {
-        document.getElementById('gray-filter').classList.remove('outline')
+        document.getElementById('gray-filter').classList.remove('outline-solid')
         document.getElementById('gray-filter').classList.remove('outline-sky-500')
     }
 }

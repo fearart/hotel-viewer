@@ -1,74 +1,7 @@
 <template>
-    <div class="flex m-2 flex-col font-gost">
-    <div class="flex flex-col">
-        <UModal v-model="isOpenRoomModal" class="w-60" :ui="{ container: 'items-start' }">
-            <div class="flex justify-center flex-col items-center p-6">
-                <UInput v-model="openedRoomNumber" v-maska data-maska="#####" class="text-xl w-24 mb-2" placeholder="Room number"/>
-                <UInput v-model="openedRoomAcessPointMAC" v-maska data-maska="**:**:**:**:**:**" placeholder="MAC:Address"/>
-                <div class="m-2 flex flex-col">
-                    <div class="flex flex-row">
-                        <div class="pr-2">
-                            <img v-if="isAcessPointGreen()" src="~/assets/pngs/wifi-green.png" @click="AcessPointstate" class="cursor-pointer"/>
-                            <img v-if="isAcessPointGray()" src="~/assets/pngs/wifi-gray.png" @click="AcessPointstate" class="cursor-pointer"/>
-                            <img v-if="isAcessPointRed()" src="~/assets/pngs/wifi-red.png" @click="AcessPointstate" class="cursor-pointer"/>
-                        </div>
-                        <div class="pr-2">
-                            <img v-if="isTvGreen()" src="~/assets/pngs/tv-green.png" @click="TVstate" class="cursor-pointer"/>
-                            <img v-if="isTvGray()" src="~/assets/pngs/tv-gray.png" @click="TVstate" class="cursor-pointer"/>
-                            <img v-if="isTvRed()" src="~/assets/pngs/tv-red.png" @click="TVstate" class="cursor-pointer"/>
-                        </div>
-                    </div>
-                    <div class="flex flex-row">
-                        <div class="pr-2">
-                            <img v-if="isBathPhoneGreen()" src="~/assets/pngs/bath-green.png" @click="BathPhonestate" class="cursor-pointer"/>
-                            <img v-if="isBathPhoneGray()" src="~/assets/pngs/bath-gray.png" @click="BathPhonestate" class="cursor-pointer"/>
-                            <img v-if="isBathPhoneRed()" src="~/assets/pngs/bath-red.png" @click="BathPhonestate" class="cursor-pointer"/>
-                        </div>
-                        <div>
-                            <img v-if="isPhoneGreen()" src="~/assets/pngs/phone-green.png" @click="Phonestate" class="cursor-pointer"/>
-                            <img v-if="isPhoneGray()" src="~/assets/pngs/phone-gray.png" @click="Phonestate" class="cursor-pointer"/>
-                            <img v-if="isPhoneRed()" src="~/assets/pngs/phone-red.png" @click="Phonestate" class="cursor-pointer"/>
-                        </div>
-                    </div>
-                </div>
-                <div class="w-full justify-between flex mt-4">
-                    <UButton label="Submit" @click="submitEdit"></UButton>
-                    <div class="flex flex-col mx-4 2xl:mx-0">
-                        <UInput v-model="openedRoomComment" placeholder="Comment" class="pb-2"/>
-                    </div>
-                    
-                    <UButton label="Cancel" color="red" @click="isOpenRoomModal = false"></UButton>
-                </div>
-            </div>
-        </UModal>
-        <!-- Outdated login
-            <div class="flex items-end justify-end" v-if="!islogged">
-                <UButton label="Login" @click="isOpen = true" class="self-end items-end justify-end"></UButton>
-            </div>
-        -->
-        <!--
-        <div class="flex items-end justify-end" v-if="islogged">
-            <ClientOnly>
-                <UButton
-                :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
-                color="gray"
-                variant="ghost"
-                aria-label="Theme"
-                @click="isDark = !isDark"
-                class="mr-2"
-                />
-
-                <template #fallback>
-                <div class="w-8 h-8" />
-                </template>
-            </ClientOnly>
-            <UButton label="Log out" @click="deleteCookie" class="self-end items-end justify-end"></UButton>
-        </div>
-        -->
-    </div>
-    <div class="flex flex-col items-center">
+    <div class="flex m-2 flex-col font-gost w-full">
         <div v-if="pending && islogged">Loading...</div>
-        <div v-else class="w-full flex flex-col-reverse justify-center">
+        <div v-else class="w-full flex flex-col-reverse justify-center items-center">
             <div v-if="islogged" class="text-2xl rounded-3xl flex text-center justify-center h-16 items-center cursor-pointer" @click="addFloor">
                 <span class="self-center text-5xl font-black">+</span>
             </div>
@@ -82,7 +15,7 @@
                     <div
                         v-for="(room, roomIndex) in floor.rooms"
                         :key="roomIndex"
-                        class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl flex-grow bg-gray-500"
+                        class="mb-3 room-card text-white flex items-center justify-center rounded-lg cursor-pointer w-12 h-12  xl:w-24 xl:h-24 text-sm xl:text-sm 2xl:text-2xl grow bg-gray-500"
                         :class="setRoomColor(roomIndex)"
                         @click="openRoomModal(floor_index,roomIndex)"
                     >
@@ -98,7 +31,6 @@
                 </div>
             </div>
         </div>
-    </div>
     </div>
 </template>
 <style scoped>

@@ -1,6 +1,6 @@
-<template>
-  <div class="w-full h-full">
-    <div class="flex items-start p-2">
+@<template>
+  <UApp>
+    <div class="flex items-start p-2 w-full">
     <div class="flex w-1/2">
       <img v-if="useColorMode().value === 'dark'" src="~/assets/pngs/hotel-icon-dark.png" height="35" width="35" @click="navigateTo('/')" class="cursor-pointer">
       <img v-else src="~/assets/pngs/hotel-icon.png" height="35" width="35" @click="navigateTo('/')" class="cursor-pointer">  
@@ -23,19 +23,16 @@
       <UButton label="Log out" @click="deleteCookie" class="self-end items-end justify-end" v-if="islogged"></UButton>
     </div>
     </div>
-  <div class="flex items-center justify-center align-middle h-full">
-    <RouterView></RouterView>
-  </div>
-  <div class="items-center align-middle block fixed bottom-0 w-full bg-gray-800 opacity-30 rounded-t-xl p-x-2">
-    <div class="flex items-center align-middle h-full flex-row justify-center ">
+    <NuxtPage />
+  <div class="fixed bottom-0 w-full bg-gray-800 opacity-30 rounded-t-xl px-2">
+    <div class="flex items-center justify-center h-full flex-row">
       <p class="dark:text-white text-black">© Mykola Pukovskyi</p>
       <UButton label="" target="_blank" to="https://fearart.dev" class="text-blue-500" size="xs" variant="link" icon="i-heroicons-arrow-top-right-on-square-20-solid"></UButton>
       <UButton label="" target="_blank" to="https://github.com/fearart" class="text-blue-500" size="xs" variant="link" icon="i-heroicons-solid:code"></UButton>
 
     </div>
   </div>
-  </div>
-  <UNotifications />
+  </UApp>
 </template>
 <script setup>
 const colorMode = useColorMode()

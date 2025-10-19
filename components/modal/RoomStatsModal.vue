@@ -1,5 +1,6 @@
 <template>
-  <UModal v-model="props.isOpen" @close="emitClose">
+  <UModal v-model="props.open" @close="emitClose">
+    <template #body>
     <div class="m-4 flex flex-col items-center px-2 py-2">
       <h1 class="text-2xl">Statystyki</h1>
       <ProgressBar :value="calculatePercentage('elektrycy') ?? 0" :max="100" text="Elektrycy" class="w-full"/>
@@ -13,6 +14,7 @@
     <div v-if="isOpenPrintSection" class="w-full">
       <PrintSection></PrintSection>
     </div>
+    </template>
   </UModal>
 </template>
 
@@ -23,12 +25,12 @@ const props = defineProps({
     type: Array as PropType<Room[]>,
     required: true
   },
-  isOpen: {
+  open: {
     type: Boolean,
     required: true
   },
 })
-const emit = defineEmits(['update:isOpenRoom'])
+const emit = defineEmits(['update:open'])
 
 const isOpenPrintSection = ref(false)
 
@@ -85,7 +87,7 @@ const calculatePercentage = (type: string) => {
 }
 
 const emitClose = () => {
-  emit('update:isOpenRoom', false)
+  emit('update:open', false)
 }
 
 const openRoomFullInfo = () => {

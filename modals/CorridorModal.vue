@@ -1,139 +1,133 @@
 <template>
-    <UModal v-model="props.isOpen" class="w-60" :ui="{ container: 'items-start' }">
-        <button></button>
-        <UTabs :items="modalItems" :default-index="calculateDefaultIndex()" class="px-2 mt-2">
-            <template #item="{ item }">
-                <UCard @submit.prevent class="mb-2">
-                    <template #header>
-                        <div class="flex flex-row h-10 w-full justify-center">
-                            <UButton v-if="props.user.permissions.admin" label="Submit" @click="submitEdit"></UButton>
-                            <UButton label="Cancel" color="red" class="ml-2" @click="emitClose"></UButton>
-                            <UInput v-model="props.activeCorridor.corridorNumber" v-maska data-maska="#####" class="text-xl w-24 mb-2 mx-2" placeholder="corridor number" size="lg"/>
-                            <UButton v-if="props.activeCorridor.alarm" icon="i-heroicons-bell" color="red" @click="toggleAlarm" class="mr-2"/>
-                            <UButton v-else icon="i-heroicons-bell" color="gray" @click="toggleAlarm" class="mr-2"/>
-                            <UButton label="" @click="requestEdit">
-                                <img src="~/assets/svg/tg-white.png" class="w-6 h-6">
-                            </UButton>
-                        </div>
-                    </template>
-                    <div v-if="item.key === 'I'" class="flex justify-center flex-col items-center p-6">
-                        <UInput v-model="props.activeCorridor.informatycy.macAddress" v-maska data-maska="**:**:**:**:**:**" placeholder="Mac Address" />
-                        <div class="m-2 flex flex-col items-center">
-                            <div class="flex flex-row">
-                                <div class="pr-2 h-20 w-20">
-                                    <img :src="loadImages('AccessPoint', props.activeCorridor.informatycy.hasAccessPoint)" @click="SwitchStates('AccessPoint', props.activeCorridor.informatycy.hasAccessPoint  ,'informatycy')" class="cursor-pointer"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
-                            <UTextarea v-model="props.activeCorridor.informatycy.Icomment" placeholder="Comment" class="pb-2" size="xl"/>
-                        </div>
-                    </div><!--
-                    <div v-if="item.key === 'K'">
-                        <div class="m-2 flex flex-col items-center">
-                            <div class="flex flex-row">
-                                <div class="pr-2 h-20 w-20">
-                                    <img :src="imageLibrary.ShowerImage" @click="Showerstate" class="cursor-pointer"/>
-                                </div>
-                                <div class="pr-2 h-20 w-20">
-                                    <img :src="imageLibrary.BidetImage" @click="Bidetstate" class="cursor-pointer"/>
-                                </div>
-                                <div class="pr-2 h-20 w-20">
-                                    <img :src="imageLibrary.ToiletImage" @click="Toiletstate" class="cursor-pointer"/>
-                                </div>
-                            </div>
-                            <div class="flex flex-row">
-                                <div class="pr-2 h-20 w-20">
-                                    <img :src="imageLibrary.SinkImage" @click="Sinkstate" class="cursor-pointer"/>
-                                </div>
-                                <div class="pr-2 h-20 w-20">
-                                    <img :src="imageLibrary.RadiatorImage" @click="Radiatorstate" class="cursor-pointer"/>
-                                </div>
-                                <div class="pr-2 h-20 w-20">
-                                    <img :src="imageLibrary.DoorImage" @click="Doorstate" class="cursor-pointer"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
-                                <UTextarea v-model="openedRoom.Kcomment" placeholder="Comment" class="pb-2" size="xl"/>
-                        </div>
-                    </div>-->
-                    <div v-if="item.key === 'E'">
-                        <div class="m-2 flex flex-col items-center">
-                            <div class="flex flex-row">
-                                <div class="pr-2 h-20 w-20">
-                                    <img :src="loadImages('Socket', props.activeCorridor.elektrycy.hasSocket)" @click="SwitchStates('Socket', props.activeCorridor.elektrycy.hasSocket,'elektrycy')" class="cursor-pointer"/>
-                                </div>
-                                <div class="pr-2 h-20 w-20">
-                                    <img :src="loadImages('Bulb', props.activeCorridor.elektrycy.hasBulb)" @click="SwitchStates('Bulb', props.activeCorridor.elektrycy.hasBulb,'elektrycy')" class="cursor-pointer"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
-                                <UTextarea v-model="props.activeCorridor.elektrycy.Ecomment" placeholder="Comment" class="pb-2" size="xl"/>
+    <UModal :open="props.open"
+    @update:open="emit('update:open', $event)" 
+    @close="emit('update:open', false)"
+    >
+        <template #header>
+            <div class="flex flex-row h-10 w-full justify-center">
+                <UButton v-if="props.user.permissions.admin" label="Submit" @click="submitEdit"></UButton>
+                <UButton label="Cancel" color="error" class="ml-2" @click="emitClose"></UButton>
+                <UInput v-model="props.activeCorridor.corridorNumber" v-maska data-maska="#####" class="text-xl w-24 mx-2" placeholder="corridor number" size="xl"/>
+                <UButton v-if="props.activeCorridor.alarm" icon="i-heroicons-bell" color="error" @click="toggleAlarm" class="mr-2"/>
+                <UButton v-else icon="i-heroicons-bell" color="neutral" @click="toggleAlarm" class="mr-2"/>
+                <UButton label="" @click="requestEdit">
+                    <img src="~/assets/svg/tg-white.png" class="w-6 h-6">
+                </UButton>
+            </div>
+        </template>
+        <template #body>
+        <UTabs :items="modalItems">
+            <template #content="{ item }">
+            <div v-if="item.key === 'I'" class="flex justify-center flex-col items-center p-6">
+                <UInput v-model="props.activeCorridor.informatycy.macAddress" v-maska data-maska="**:**:**:**:**:**" placeholder="Mac Address" />
+                <div class="m-2 flex flex-col items-center">
+                    <div class="flex flex-row">
+                        <div class="pr-2 h-20 w-20">
+                            <img :src="loadImages('AccessPoint', props.activeCorridor.informatycy.hasAccessPoint)" @click="SwitchStates('AccessPoint', props.activeCorridor.informatycy.hasAccessPoint  ,'informatycy')" class="cursor-pointer"/>
                         </div>
                     </div>
-                    <div v-if="item.key === 'A'">
-                        <div class="m-2 flex flex-col items-center w-full grow">
-                            <h1 class="mb-4">Statystyka</h1>
-                            <ProgressBar :value="calculatePercentage('informatycy') ?? 0" :max="100" text="Informatycy" class="w-full"/>
-                            <ProgressBar :value="calculatePercentage('elektrycy') ?? 0" :max="100" text="Elektrycy" class="w-full"/>
-                        </div>
-                    </div>
-                    <template #footer>
-                        <div class="flex flex-row justify-evenly">
-                            <form>
-                                <div class="file-input">
-                                    <input
-                                        type="file"
-                                        name="file-input"
-                                        id="file-input"
-                                        class="file-input__input"
-                                        v-on:change="corridorFileUpload"
-                                    />
-                                    <label class="file-input__label" for="file-input">
-                                        <svg
-                                        aria-hidden="true"
-                                        focusable="false"
-                                        data-prefix="fas"
-                                        data-icon="upload"
-                                        class="svg-inline--fa fa-upload fa-w-16"
-                                        role="img"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 512 512"
-                                        >
-                                        <path
-                                            fill="currentColor"
-                                            d="M296 384h-80c-13.3 0-24-10.7-24-24V192h-87.7c-17.8 0-26.7-21.5-14.1-34.1L242.3 5.7c7.5-7.5 19.8-7.5 27.3 0l152.2 152.2c12.6 12.6 3.7 34.1-14.1 34.1H320v168c0 13.3-10.7 24-24 24zm216-8v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h136v8c0 30.9 25.1 56 56 56h80c30.9 0 56-25.1 56-56v-8h136c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z"
-                                        ></path>
-                                        </svg>
-                                        <span>Dodaj zdjęcie</span>
-                                    </label>
-                                </div>
-                            </form>
-                            <UButton label="Zdjęcia" icon="i-heroicons-photo-16-solid" @click="openPhotoGallery"/>
-                        </div>
-                    </template>
-                </UCard>
-            </template>
-            <template #default="{item,index,selected}">
-                <div class="flex items-center gap-2 relative truncate">
-                    <UIcon :name="item.icon" class="w-4 h-4 flex-shrink-0" />
-                    <span class="truncate">{{ item.key }}</span>
-
-                    <span v-if="selected" class="absolute -right-4 w-2 h-2 rounded-full bg-primary-500 dark:bg-primary-400" />
                 </div>
+                <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
+                    <UTextarea v-model="props.activeCorridor.informatycy.Icomment" placeholder="Comment" class="pb-2" size="xl"/>
+                </div>
+            </div><!--
+            <div v-if="item.key === 'K'">
+                <div class="m-2 flex flex-col items-center">
+                    <div class="flex flex-row">
+                        <div class="pr-2 h-20 w-20">
+                            <img :src="imageLibrary.ShowerImage" @click="Showerstate" class="cursor-pointer"/>
+                        </div>
+                        <div class="pr-2 h-20 w-20">
+                            <img :src="imageLibrary.BidetImage" @click="Bidetstate" class="cursor-pointer"/>
+                        </div>
+                        <div class="pr-2 h-20 w-20">
+                            <img :src="imageLibrary.ToiletImage" @click="Toiletstate" class="cursor-pointer"/>
+                        </div>
+                    </div>
+                    <div class="flex flex-row">
+                        <div class="pr-2 h-20 w-20">
+                            <img :src="imageLibrary.SinkImage" @click="Sinkstate" class="cursor-pointer"/>
+                        </div>
+                        <div class="pr-2 h-20 w-20">
+                            <img :src="imageLibrary.RadiatorImage" @click="Radiatorstate" class="cursor-pointer"/>
+                        </div>
+                        <div class="pr-2 h-20 w-20">
+                            <img :src="imageLibrary.DoorImage" @click="Doorstate" class="cursor-pointer"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
+                        <UTextarea v-model="openedRoom.Kcomment" placeholder="Comment" class="pb-2" size="xl"/>
+                </div>
+            </div>-->
+            <div v-if="item.key === 'E'">
+                <div class="m-2 flex flex-col items-center">
+                    <div class="flex flex-row">
+                        <div class="pr-2 h-20 w-20">
+                            <img :src="loadImages('Socket', props.activeCorridor.elektrycy.hasSocket)" @click="SwitchStates('Socket', props.activeCorridor.elektrycy.hasSocket,'elektrycy')" class="cursor-pointer"/>
+                        </div>
+                        <div class="pr-2 h-20 w-20">
+                            <img :src="loadImages('Bulb', props.activeCorridor.elektrycy.hasBulb)" @click="SwitchStates('Bulb', props.activeCorridor.elektrycy.hasBulb,'elektrycy')" class="cursor-pointer"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-col mx-4 2xl:mx-0 items-center justify-center">
+                        <UTextarea v-model="props.activeCorridor.elektrycy.Ecomment" placeholder="Comment" class="pb-2" size="xl"/>
+                </div>
+            </div>
+            <div v-if="item.key === 'A'">
+                <div class="m-2 flex flex-col items-center w-full grow">
+                    <h1 class="mb-4">Statystyka</h1>
+                    <ProgressBar :value="calculatePercentage('informatycy') ?? 0" :max="100" text="Informatycy" class="w-full"/>
+                    <ProgressBar :value="calculatePercentage('elektrycy') ?? 0" :max="100" text="Elektrycy" class="w-full"/>
+                </div>
+            </div>
             </template>
         </UTabs>
+        </template>
+        <template #footer>
+            <div class="flex flex-row justify-evenly w-full">
+                <form>
+                    <div class="file-input">
+                        <input
+                            type="file"
+                            name="file-input"
+                            id="file-input"
+                            class="file-input__input"
+                            v-on:change="corridorFileUpload"
+                        />
+                        <label class="file-input__label" for="file-input">
+                            <svg
+                            aria-hidden="true"
+                            focusable="false"
+                            data-prefix="fas"
+                            data-icon="upload"
+                            class="svg-inline--fa fa-upload fa-w-16"
+                            role="img"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 512 512"
+                            >
+                            <path
+                                fill="currentColor"
+                                d="M296 384h-80c-13.3 0-24-10.7-24-24V192h-87.7c-17.8 0-26.7-21.5-14.1-34.1L242.3 5.7c7.5-7.5 19.8-7.5 27.3 0l152.2 152.2c12.6 12.6 3.7 34.1-14.1 34.1H320v168c0 13.3-10.7 24-24 24zm216-8v112c0 13.3-10.7 24-24 24H24c-13.3 0-24-10.7-24-24V376c0-13.3 10.7-24 24-24h136v8c0 30.9 25.1 56 56 56h80c30.9 0 56-25.1 56-56v-8h136c13.3 0 24 10.7 24 24zm-124 88c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20zm64 0c0-11-9-20-20-20s-20 9-20 20 9 20 20 20 20-9 20-20z"
+                            ></path>
+                            </svg>
+                            <span>Dodaj zdjęcie</span>
+                        </label>
+                    </div>
+                </form>
+                <UButton label="Zdjęcia" icon="i-heroicons-photo-16-solid" @click="openPhotoGallery"/>
+            </div>
+        </template>
     </UModal>
 </template>
 <script setup lang="ts">
 import type { Corridor } from '@/types/corridor';
 import type { User } from '~/types/user';
 
-const emit = defineEmits(['update:isOpen'])
+const emit = defineEmits(['update:open'])
 const props = defineProps({
-    isOpen : {
+    open : {
         type: Boolean,
         required: true
     },
@@ -176,12 +170,9 @@ const modalItems = [
 const toggleAlarm = () => {
     props.activeCorridor.alarm = !props.activeCorridor.alarm;
 }
-const calculateDefaultIndex = () => {
-    if (props.user.group.elektrycy) return 0;
-    if (props.user.group.it) return 1;
-}
 const requestEdit = () => {}
 const submitEdit = async () => {
+    props.activeCorridor.informatycy.macAddress = props.activeCorridor.informatycy.macAddress.toUpperCase();
     const request = await $fetch('/api/corridors/modify', {
         method: 'POST',
         body: props.activeCorridor
@@ -216,7 +207,7 @@ const loadImages = (type: string, state: string) => {
     return `/img/pngs/${type.toLowerCase()}-${stateDecoder()}.png`
 }
 const emitClose = () => {
-    emit('update:isOpen', false)
+    emit('update:open', false)
 }
 const calculatePercentage = (type: string) => {
     if (type === 'informatycy') {

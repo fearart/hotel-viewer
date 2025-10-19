@@ -1,6 +1,6 @@
 <template>
   <div>
-    <UModal v-model="props.isOpen" class="w-60" :ui="{ container: 'items-start' }">
+    <UModal v-model="props.isOpen">
         <div class="flex flex-col p-4">
             <div class="flex justify-end w-full">
                 <UButton label="Zamknij okno" icon="i-heroicons-x-mark" color="red" variant="ghost" @click="emitClose()" class="right-0 top-0 m-2"/>
