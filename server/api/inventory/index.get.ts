@@ -6,7 +6,6 @@ import jwt from 'jsonwebtoken';
 const config = useRuntimeConfig();
 export default defineEventHandler(async (event) => {
     let token = getCookie(event,'token' )
-    console.log("Fetching inventory, token:",token)
     if (!token) {
         unauthorizedReturn(event)
         return

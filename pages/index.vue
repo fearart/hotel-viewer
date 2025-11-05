@@ -6,7 +6,7 @@
                 <span class="self-center text-5xl font-black">+</span>
             </div>
             <div v-for="(floor,floor_index) in floors" :key="floor_index">
-                <div class="text-2xl outline-2 rounded-3xl flex justify-center items-center cursor-pointer flex-col dark:bg-gray-800 w-60 mb-4">
+                <div class="text-2xl rounded-3xl flex justify-center items-center cursor-pointer flex-col dark:bg-gray-800 w-60 mb-4">
                     <span class="self-center my-4 prevent_select" @click="toggleFloorMenu(floor_index)">Piętro {{ floor.floor_number }}</span>
                     <div
                         v-if="openFloorIndex === floor_index"

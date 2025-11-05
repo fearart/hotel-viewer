@@ -9,7 +9,7 @@ const unauthorizedReturn = (event: any) => {
 }
 
 export default defineEventHandler(async (event) => {
-    /*let token = getCookie(event,'token')
+    let token = getCookie(event,'token')
     console.log("Creating new item, token:",token)
     if (!token) {
         unauthorizedReturn(event)
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
     catch {
         unauthorizedReturn(event)
         return
-    }*/
+    }
     const body = await readBody(event)
     console.log("Body:",body)
     if (!body) {
@@ -31,16 +31,9 @@ export default defineEventHandler(async (event) => {
             body: "Bad Request"
         }
     }
-    // check if body has all fields for inventory item
-    if (Object.keys(body).length !== 0) {
-        setResponseStatus(event,400,"Bad Request")
-        console.log("Bad Request - empty body")
-        return {
-            statusCode: 400,
-            body: "Bad Request"
-        }
-    }
-    if (!body.label || !body.notifyAt || !body.quantity || !body.serialNumber || !body.location || !body.description) {
+    console.log("Creating new inventory item:",body)
+    console.log(`Type of fields: label=${typeof body.label}, createdAt=${typeof body.createdAt}, notifyAt=${typeof body.notifyAt}, quantity=${typeof body.quantity}, serialNumber=${typeof body.serialNumber}, location=${typeof body.location}, description=${typeof body.description}`)
+    if (!body.label || !body.createdAt || !body.notifyAt || !body.quantity || !body.serialNumber || !body.location || !body.description) {
         setResponseStatus(event,400,"Bad Request")
         console.log("Bad Request - missing fields")
         return {
@@ -48,8 +41,11 @@ export default defineEventHandler(async (event) => {
             body: "Bad Request"
         }
     }
+    if (body.icon === undefined || body.icon === null) {
+        body.icon = "public/img/pngs/fire_ext_green.png"
+    }
     await mongoose.connection.collection('hotel-inventory').insertOne(body)
-    await mongoose.connection.db.collection('hotel-logs').insertOne({
+    await mongoose.connection.collection('hotel-logs').insertOne({
         "ID" : await Logger.getID(),
         "type" : "create",
         "event" : `Item #${String(body._id)} was created`,

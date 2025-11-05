@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
     // add new room record
     floor.rooms.push(newRoomRecord)
     await Floor.updateOne({floor_number: floorNumber}, {$set: {rooms: floor.rooms}})
-    mongoose.connection.db.collection('hotel-logs').insertOne({
+    mongoose.connection.collection('hotel-logs').insertOne({
         "ID" : await Logger.getID(),
         "type" : "modify",
         "event" : `Room #${roomNumber} was modified`,
