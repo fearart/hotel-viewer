@@ -1,9 +1,11 @@
 @<template>
   <UApp>
     <div class="flex items-start p-2 w-full">
-    <div class="flex w-1/2">
+    <div class="flex w-1/2 space-x-2">
       <img v-if="useColorMode().value === 'dark'" src="~/assets/pngs/hotel-icon-dark.png" height="35" width="35" @click="navigateTo('/')" class="cursor-pointer">
       <img v-else src="~/assets/pngs/hotel-icon.png" height="35" width="35" @click="navigateTo('/')" class="cursor-pointer">  
+      <img v-if="useColorMode().value === 'dark'" src="/public/img/pngs/tools_white.png" height="35" width="35" @click="navigateTo('/v2/inventory')" class="cursor-pointer">
+      <img v-else src="/public/img/pngs/tools_black.png" height="35" width="35" @click="navigateTo('/v2/inventory')" class="cursor-pointer">  
     </div>
     <div class="flex items-end justify-end w-1/2">
       <ClientOnly>
